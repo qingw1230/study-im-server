@@ -10,6 +10,7 @@ func Router() *gin.Engine {
 
 	accountRouterGroup := r.Group("/account")
 	{
+		accountRouterGroup.POST("/register", account.Register)
 		accountRouterGroup.POST("/get_check_code", account.GetCheckCode)
 	}
 

@@ -1,0 +1,5 @@
+mysql:
+  dbMysqlAddress: [ 127.0.0.1:13306 ]
+  dbMysqlUserName: root
+  dbMysqlPassword: qin1002.
+  dbMysqlDatabaseName: studyim

@@ -30,7 +30,10 @@ func (d *DataBases) SetCheckCode(id, ans string) error {
 
 func (d *DataBases) GetCheckCode(id string) (string, error) {
 	key := checkCode + id
+	// TODO(qingw1230): 将 GET 和 DEL 放在事务中
 	reply, err := d.Exec("GET", key)
+	// 获取后直接删除，防止多次尝试
+	d.Exec("DEL", key)
 	ans, _ := redis.String(reply, err)
 	return ans, err
 }

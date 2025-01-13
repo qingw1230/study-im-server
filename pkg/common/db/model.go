@@ -11,6 +11,11 @@ type DataBases struct {
 	redisPool *redis.Pool
 }
 
+// key 将 address name 连接形成键
+func key(dbAddress, dbName string) string {
+	return dbAddress + "_" + dbName
+}
+
 func init() {
 	initMySQLDB()
 

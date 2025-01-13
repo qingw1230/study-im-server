@@ -5,6 +5,12 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/db"
 )
 
+var Captcha *MathCaptcha
+
+func init() {
+	Captcha = NewCaptcha()
+}
+
 // MathCaptcha 验证码工具类
 type MathCaptcha struct {
 	captcha *base64Captcha.Captcha
