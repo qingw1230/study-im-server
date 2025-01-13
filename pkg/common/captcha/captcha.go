@@ -1,6 +1,9 @@
 package captcha
 
-import "github.com/mojocn/base64Captcha"
+import (
+	"github.com/mojocn/base64Captcha"
+	"github.com/qingw1230/study-im-server/pkg/common/db"
+)
 
 // MathCaptcha 验证码工具类
 type MathCaptcha struct {
@@ -22,11 +25,16 @@ func NewCaptcha() *MathCaptcha {
 	}
 }
 
-func (m *MathCaptcha) Generate() (string, string, string) {
+func (m *MathCaptcha) Generate() (string, string) {
 	id, b64s, ans, _ := m.captcha.Generate()
-	return id, b64s, ans
+	db.DB.SetCheckCode(id, ans)
+	return id, b64s
 }
 
 func (m *MathCaptcha) Verify(id, ans string) bool {
-	return m.captcha.Verify(id, ans, true)
+	redisAns, err := db.DB.GetCheckCode(id)
+	if err != nil {
+		return false
+	}
+	return redisAns == ans
 }

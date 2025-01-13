@@ -15,7 +15,7 @@ type Data struct {
 
 func GetCheckCode(c *gin.Context) {
 	cap := captcha.NewCaptcha()
-	id, b64s, _ := cap.Generate()
+	id, b64s := cap.Generate()
 
 	resp := base_info.CommonResp{
 		Status: "success",

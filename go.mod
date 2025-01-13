@@ -4,6 +4,7 @@ go 1.22.10
 
 require (
 	github.com/gin-gonic/gin v1.10.0
+	github.com/gomodule/redigo v1.9.2
 	github.com/jinzhu/gorm v1.9.16
 	github.com/mojocn/base64Captcha v1.3.8
 )
