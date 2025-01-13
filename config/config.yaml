@@ -1,3 +1,6 @@
+admin:
+  emails : [ 1366502108@qq.com ]
+
 mysql:
   dbMysqlAddress: [ 127.0.0.1:13306 ]
   dbMysqlUserName: root

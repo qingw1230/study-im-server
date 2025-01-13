@@ -1,9 +1,17 @@
 package db
 
-import "github.com/gomodule/redigo/redis"
+import (
+	"github.com/gomodule/redigo/redis"
+	"github.com/qingw1230/study-im-server/pkg/base_info"
+)
 
 const (
-	checkCode = "STUDYIM:CHECK_CODE:"
+	redisTimeOneMintue = 60
+	redisTimeOneDay    = 60 * 60 * 24
+
+	checkCode       = "STUDYIM:CHECK_CODE:"
+	tokenToUserInfo = "STUDYIM:TOKEN_TO_USER_INFO:"
+	userIDToToken   = "STUDYIM:USER_ID_TO_TOKEN:"
 )
 
 func (d *DataBases) Exec(cmd string, key interface{}, args ...interface{}) (interface{}, error) {
@@ -24,7 +32,7 @@ func (d *DataBases) Exec(cmd string, key interface{}, args ...interface{}) (inte
 
 func (d *DataBases) SetCheckCode(id, ans string) error {
 	key := checkCode + id
-	_, err := d.Exec("SET", key, ans, "EX", 5*60)
+	_, err := d.Exec("SET", key, ans, "EX", 5*redisTimeOneMintue)
 	return err
 }
 
@@ -36,4 +44,15 @@ func (d *DataBases) GetCheckCode(id string) (string, error) {
 	d.Exec("DEL", key)
 	ans, _ := redis.String(reply, err)
 	return ans, err
+}
+
+func (d *DataBases) SetUserToken(token base_info.TokenToRedis) error {
+	key1 := tokenToUserInfo + token.Token
+	_, err1 := d.Exec("SET", key1, token, "EX", redisTimeOneDay)
+	if err1 != nil {
+		return err1
+	}
+	key2 := userIDToToken + token.UserID
+	_, err2 := d.Exec("SET", key2, token.Token, "EX", redisTimeOneDay)
+	return err2
 }

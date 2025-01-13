@@ -18,6 +18,10 @@ var (
 var Config config
 
 type config struct {
+	Admin struct {
+		Emails []string `yaml:"emails"`
+	} `yaml:"admin"`
+
 	Mysql struct {
 		DBAddress      []string `yaml:"dbMysqlAddress"`
 		DBUserName     string   `yaml:"dbMysqlUserName"`
