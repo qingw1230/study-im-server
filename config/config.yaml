@@ -6,3 +6,9 @@ mysql:
   dbMysqlUserName: root
   dbMysqlPassword: qin1002.
   dbMysqlDatabaseName: studyim
+
+log:
+  storageLocation: ./logs/
+  rotationTime: 24
+  remainRotationCount: 5
+  remainLogLevel: 6

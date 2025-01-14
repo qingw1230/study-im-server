@@ -27,7 +27,7 @@ func (UserInfo) TableName() string {
 
 // UserInfoBeauty 靓号表
 type UserInfoBeauty struct {
-	ID     int    `gorm:"column:id;type:int(11);not null;primary_key"`
+	ID     int    `gorm:"column:id;type:int(11) auto_increment;not null;primary_key"`
 	Email  string `gorm:"column:email;type:varchar(50);not null;unique_index:idx_key_email"`
 	UserID string `gorm:"column:user_id;type:varchar(12);not null;unique_index:idx_key_user_id"`
 	Status int    `gorm:"column:status;type:tinyint(1)"`

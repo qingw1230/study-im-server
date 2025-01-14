@@ -28,6 +28,13 @@ type config struct {
 		DBPassword     string   `yaml:"dbMysqlPassword"`
 		DBDatabaseName string   `yaml:"dbMysqlDatabaseName"`
 	} `yaml:"mysql"`
+
+	Log struct {
+		StorageLocation     string `yaml:"storageLocation"`
+		RotationTime        int    `yaml:"rotationTime"`
+		RemainRotationCount uint   `yaml:"remainRotationCount"`
+		RemainLogLevel      uint   `yaml:"remainLogLevel"`
+	} `yaml:"log"`
 }
 
 func init() {
