@@ -8,7 +8,7 @@ import (
 func Router() *gin.Engine {
 	r := gin.Default()
 
-	accountRouterGroup := r.Group("/account")
+	accountRouterGroup := r.Group("/api/account")
 	{
 		accountRouterGroup.POST("/register", account.Register)
 		accountRouterGroup.POST("/login", account.Login)
