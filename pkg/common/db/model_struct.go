@@ -68,7 +68,7 @@ func (UserContact) TableName() string {
 
 // UserContactApply 联系人申请表
 type UserContactApply struct {
-	ApplyID       int    `gorm:"column:apply_id;type:int(11);not null;primary_key;autoIncrement"`
+	ApplyID       int    `gorm:"column:apply_id;type:int(11) auto_increment;not null;primary_key"`
 	ApplyUserID   string `gorm:"column:apply_user_id;type:varchar(12);not null;unique_index:idx_key"`
 	ReceiveUserID string `gorm:"column:receive_user_id;type:varchar(12);not null;unique_index:idx_key"`
 	ContactType   int    `gorm:"column:contact_type;type:tinyint(1);not null"`
