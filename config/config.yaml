@@ -1,14 +1,28 @@
+#--------------- Internal service configuration ---------------#
+serverip: 0.0.0.0
+
+rpcport:
+  accountPort: [ 10100 ]
+
+rpcregistername:
+  accountName: Account
+
 admin:
   emails : [ 1366502108@qq.com ]
-
-mysql:
-  dbMysqlAddress: [ 127.0.0.1:13306 ]
-  dbMysqlUserName: root
-  dbMysqlPassword: qin1002.
-  dbMysqlDatabaseName: studyim
 
 log:
   storageLocation: ./logs/
   rotationTime: 24
   remainRotationCount: 5
   remainLogLevel: 6
+
+#--------------- Infrastructure configuration ---------------#
+zookeeper:
+  zkSchema: studyIM
+  zkAddr: [ 127.0.0.1:12181 ]
+
+mysql:
+  dbMysqlAddress: [ 127.0.0.1:13306 ]
+  dbMysqlUserName: root
+  dbMysqlPassword: qin1002.
+  dbMysqlDatabaseName: studyim

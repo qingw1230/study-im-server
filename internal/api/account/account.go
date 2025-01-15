@@ -1,50 +1,78 @@
 package account
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	"github.com/jinzhu/copier"
 	"github.com/qingw1230/study-im-server/pkg/base_info"
 	"github.com/qingw1230/study-im-server/pkg/common/captcha"
 	"github.com/qingw1230/study-im-server/pkg/common/config"
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/db"
 	"github.com/qingw1230/study-im-server/pkg/common/db/controller"
+	"github.com/qingw1230/study-im-server/pkg/common/log"
+	rpc "github.com/qingw1230/study-im-server/pkg/proto/account"
+	"github.com/qingw1230/study-im-server/pkg/proto/public"
 	"github.com/qingw1230/study-im-server/pkg/utils"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func Register(c *gin.Context) {
 	params := base_info.RegisterReq{}
 	if err := c.BindJSON(&params); err != nil {
+		log.Error("BindJSON failed ", err.Error())
 		c.JSON(http.StatusBadRequest, base_info.CommonResp{
 			Status: constant.Fail,
-			Code:   constant.RequestParamsError,
-			Info:   constant.FailInfo,
+			Code:   constant.RequestBindJSONError,
+			Info:   err.Error(),
 		})
 		return
 	}
+	log.Info("Register BindJSON success")
 
+	// 校验验证码
 	if !captcha.Captcha.Verify(params.CheckCodeID, params.CheckCode) {
+		log.Error("Captcha.Verify failed ", params.Email)
 		c.JSON(http.StatusBadRequest, base_info.CommonResp{
 			Status: constant.Fail,
 			Code:   constant.RequestCheckCodeError,
-			Info:   constant.FailInfo,
+			Info:   constant.CheckCodeInfo,
 		})
 		return
 	}
+	log.Info("Register Captcha.Verify success")
 
-	_, err := controller.GetUserByEmail(params.Email)
-	if err != gorm.ErrRecordNotFound {
-		c.JSON(http.StatusBadRequest, base_info.CommonResp{
-			Status: constant.Fail,
-			Code:   constant.RecordAlreadyExists,
-			Info:   constant.FailInfo,
-		})
+	req := &rpc.RegisterReq{UserRegisterInfo: &public.UserRegisterInfo{}}
+	copier.Copy(req.UserRegisterInfo, &params)
+	log.Info("Register rpc client.Register args", req.String())
+
+	// TODO(qingw1230): 使用服务发现建立连接
+	conn, err := grpc.NewClient("127.0.0.1:10100", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Error("grpc.NewClient failed ", err.Error())
+		c.JSON(http.StatusInternalServerError, constant.CommonFailResp)
 		return
 	}
+	client := rpc.NewAccountClient(conn)
+	reply, err := client.Register(context.Background(), req)
+	if err != nil {
+		log.Error("client.Register internal failed ", err.Error())
+		c.JSON(http.StatusInternalServerError, constant.CommonFailResp)
+		return
+	}
+	if reply.CommonResp.Status == constant.Fail {
+		log.Error("client.Register failed ", reply.CommonResp.Code)
+		resp := base_info.CommonResp{}
+		copier.Copy(&resp, reply.CommonResp)
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+	log.Info("Register rpc client.Register call success")
 
-	controller.CreateUser(params.Email, params.NickName, params.Password)
+	c.JSON(http.StatusOK, constant.CommonSuccessResp)
 }
 
 func Login(c *gin.Context) {
@@ -67,7 +95,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	user, err := controller.GetUserByEmail(params.Email)
+	user, err := controller.FindUserByEmail(params.Email)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, base_info.CommonResp{
 			Status: constant.Fail,
@@ -77,7 +105,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	if !utils.ValidPassword(params.Password, user.Password) {
+	if !utils.ValidPassword(params.Password, user.Salt, user.Password) {
 		c.JSON(http.StatusBadRequest, base_info.CommonResp{
 			Status: constant.Fail,
 			Code:   constant.RecordAccountORPwdError,

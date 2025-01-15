@@ -1,0 +1,15 @@
+syntax = "proto3";
+package server_api_params;
+option go_package = "github.com/qingw1230/study-im-server/pkg/proto/public";
+
+message CommonResp {
+  string status = 1;
+  int32 code = 2;
+  string info = 3;
+}
+
+message UserRegisterInfo {
+  string email = 1;
+  string password = 2;
+  string nickName = 3;
+}

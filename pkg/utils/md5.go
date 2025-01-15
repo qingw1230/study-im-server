@@ -12,11 +12,11 @@ func Md5Encode(data string) string {
 	return hex.EncodeToString(tmpStr)
 }
 
-func MakePassword(pwd string) string {
-	return Md5Encode(pwd)
+func MakePassword(pwd, salt string) string {
+	return Md5Encode(pwd + salt)
 }
 
 // ValidPassword pwd 待加密的原始密码
-func ValidPassword(pwd string, password string) bool {
+func ValidPassword(pwd, salt string, password string) bool {
 	return Md5Encode(pwd) == password
 }

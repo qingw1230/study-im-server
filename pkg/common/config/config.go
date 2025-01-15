@@ -18,16 +18,19 @@ var (
 var Config config
 
 type config struct {
+	ServerIP string `yaml:"serverip"`
+
+	RpcPort struct {
+		AccountPort []int `yaml:"accountPort"`
+	} `yaml:"rpcport"`
+
+	RpcRegisterName struct {
+		AccountName string `yaml:"accountName"`
+	} `yaml:"rpcregistername"`
+
 	Admin struct {
 		Emails []string `yaml:"emails"`
 	} `yaml:"admin"`
-
-	Mysql struct {
-		DBAddress      []string `yaml:"dbMysqlAddress"`
-		DBUserName     string   `yaml:"dbMysqlUserName"`
-		DBPassword     string   `yaml:"dbMysqlPassword"`
-		DBDatabaseName string   `yaml:"dbMysqlDatabaseName"`
-	} `yaml:"mysql"`
 
 	Log struct {
 		StorageLocation     string `yaml:"storageLocation"`
@@ -35,6 +38,18 @@ type config struct {
 		RemainRotationCount uint   `yaml:"remainRotationCount"`
 		RemainLogLevel      uint   `yaml:"remainLogLevel"`
 	} `yaml:"log"`
+
+	Zookeeper struct {
+		ZKSchema string   `yaml:"zkSchema"`
+		ZKAddr   []string `yaml:"zkAddr"`
+	} `yaml:"zookeeper"`
+
+	Mysql struct {
+		DBAddress      []string `yaml:"dbMysqlAddress"`
+		DBUserName     string   `yaml:"dbMysqlUserName"`
+		DBPassword     string   `yaml:"dbMysqlPassword"`
+		DBDatabaseName string   `yaml:"dbMysqlDatabaseName"`
+	} `yaml:"mysql"`
 }
 
 func init() {

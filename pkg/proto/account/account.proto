@@ -1,0 +1,16 @@
+syntax = "proto3";
+import "public/public.proto";
+package pbAccount;
+option go_package = "github.com/qingw1230/study-im-server/pkg/proto/account";
+
+message RegisterReq {
+  server_api_params.UserRegisterInfo UserRegisterInfo = 1;
+}
+
+message RegisterResp {
+  server_api_params.CommonResp CommonResp = 1;
+}
+
+service Account {
+  rpc Register(RegisterReq) returns (RegisterResp);
+}
