@@ -13,3 +13,20 @@ message UserRegisterInfo {
   string password = 2;
   string nickName = 3;
 }
+
+message UserLoginInfo {
+  string email = 1;
+  string password = 2;
+}
+
+message UserLoginSuccessInfo {
+  string token = 1;
+  bool admin = 2;
+  string userID = 3;
+  string nickName = 4;
+  string personalSignature = 5;
+  int32 joinType = 6;
+  int32 sex = 7;
+  string areaName = 8;
+  string areaCode = 9;
+}

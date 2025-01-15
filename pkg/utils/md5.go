@@ -18,5 +18,5 @@ func MakePassword(pwd, salt string) string {
 
 // ValidPassword pwd 待加密的原始密码
 func ValidPassword(pwd, salt string, password string) bool {
-	return Md5Encode(pwd) == password
+	return Md5Encode(pwd+salt) == password
 }

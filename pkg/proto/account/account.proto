@@ -11,6 +11,16 @@ message RegisterResp {
   server_api_params.CommonResp CommonResp = 1;
 }
 
+message LoginReq {
+  server_api_params.UserLoginInfo UserLoginInfo = 1;
+}
+
+message LoginResp {
+  server_api_params.CommonResp CommonResp = 1;
+  server_api_params.UserLoginSuccessInfo UserLoginSuccessInfo = 2;
+}
+
 service Account {
   rpc Register(RegisterReq) returns (RegisterResp);
+  rpc Login(LoginReq) returns (LoginResp);
 }

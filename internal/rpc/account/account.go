@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/jinzhu/copier"
+	"github.com/jinzhu/gorm"
+	"github.com/qingw1230/study-im-server/pkg/base_info"
 	"github.com/qingw1230/study-im-server/pkg/common/config"
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/db"
@@ -18,7 +20,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func (rpc *rpcAccout) Register(_ context.Context, req *pbAccount.RegisterReq) (*pbAccount.RegisterResp, error) {
+func (rpc *rpcAccount) Register(_ context.Context, req *pbAccount.RegisterReq) (*pbAccount.RegisterResp, error) {
 	log.Info("call rpcAccount.Register, args: ", req.String())
 
 	// 确保用户不存在
@@ -28,7 +30,7 @@ func (rpc *rpcAccout) Register(_ context.Context, req *pbAccount.RegisterReq) (*
 			CommonResp: &pbPublic.CommonResp{
 				Status: constant.Fail,
 				Code:   constant.RecordAlreadyExists,
-				Info:   constant.EmailAlreadyRegisterInfo,
+				Info:   constant.RecordEmailAlreadyRegisterErrorInfo,
 			},
 		}
 		return resp, nil
@@ -57,7 +59,68 @@ func (rpc *rpcAccout) Register(_ context.Context, req *pbAccount.RegisterReq) (*
 	return resp, nil
 }
 
-type rpcAccout struct {
+func (rpc *rpcAccount) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAccount.LoginResp, error) {
+	log.Info("call rpcAccount.Login, args: ", req.String())
+
+	// 确保用户存在
+	user, err := controller.FindUserByEmail(req.UserLoginInfo.Email)
+	if err == gorm.ErrRecordNotFound {
+		resp := &pbAccount.LoginResp{
+			CommonResp: &pbPublic.CommonResp{
+				Status: constant.Fail,
+				Code:   constant.RecordNotExists,
+				Info:   constant.RecordAccountORPwdErrorInfo,
+			},
+		}
+		return resp, nil
+	}
+	if err != nil {
+		log.Error("controller.FindUserByEmail failed ", err.Error())
+		return nil, err
+	}
+
+	if !utils.ValidPassword(req.UserLoginInfo.Password, user.Salt, user.Password) {
+		resp := &pbAccount.LoginResp{
+			CommonResp: &pbPublic.CommonResp{
+				Status: constant.Fail,
+				Code:   constant.RecordAccountORPwdError,
+				Info:   constant.RecordAccountORPwdErrorInfo,
+			},
+		}
+		return resp, nil
+	}
+	log.Debug("user passed utils.ValidPassword ", user.Email)
+
+	flag := false
+	for _, str := range config.Config.Admin.Emails {
+		if str == req.UserLoginInfo.Email {
+			flag = true
+			break
+		}
+	}
+	// TODO(qingw1230): 改用 JWT
+	token := utils.Md5Encode(user.UserID + utils.GenerateRandomStr(constant.LENGTH_20))
+	// TODO(qingw1230): 多设备登录检测
+	tokenStruct := base_info.TokenToRedis{
+		Token:    token,
+		UserID:   user.UserID,
+		NickName: user.NickName,
+		Admin:    flag,
+	}
+	db.DB.SetUserToken(tokenStruct)
+
+	resp := &pbAccount.LoginResp{
+		CommonResp:           &pbPublic.CommonResp{},
+		UserLoginSuccessInfo: &pbPublic.UserLoginSuccessInfo{},
+	}
+	copier.Copy(resp.CommonResp, &constant.CommonSuccessResp)
+	copier.Copy(resp.UserLoginSuccessInfo, user)
+	resp.UserLoginSuccessInfo.Token = token
+	resp.UserLoginSuccessInfo.Admin = flag
+	return resp, nil
+}
+
+type rpcAccount struct {
 	pbAccount.UnimplementedAccountServer
 	rpcPort         int
 	rpcRegisterName string
@@ -65,9 +128,9 @@ type rpcAccout struct {
 	zkAddr          []string
 }
 
-func NewRpcAccountServer(port int) *rpcAccout {
+func NewRpcAccountServer(port int) *rpcAccount {
 	log.NewPrivateLog("account")
-	return &rpcAccout{
+	return &rpcAccount{
 		rpcPort:         port,
 		rpcRegisterName: config.Config.RpcRegisterName.AccountName,
 		zkSchema:        config.Config.Zookeeper.ZKSchema,
@@ -75,7 +138,7 @@ func NewRpcAccountServer(port int) *rpcAccout {
 	}
 }
 
-func (rpc *rpcAccout) Run() {
+func (rpc *rpcAccount) Run() {
 	log.Info("rpc account start...")
 	address := utils.ServerIP + ":" + strconv.Itoa(rpc.rpcPort)
 	ln, err := net.Listen("tcp", address)
