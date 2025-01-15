@@ -1,5 +1,7 @@
 package base_info
 
+import "github.com/qingw1230/study-im-server/pkg/proto/public"
+
 type RegisterReq struct {
 	Email       string `json:"email" binding:"required,email"`
 	NickName    string `json:"nickName" binding:"required"`
@@ -25,6 +27,14 @@ type LoginResp struct {
 	Sex               int    `json:"sex"`
 	AreaName          string `json:"areaName"`
 	AreaCode          string `json:"areaCode"`
+}
+
+type GetUserInfoReq struct {
+	UserID string `json:"userId" binding:"required"`
+}
+
+type GetUserInfoResp struct {
+	PublicUserInfo *public.PublicUserInfo
 }
 
 type TokenToRedis struct {

@@ -1,11 +1,11 @@
 package constant
 
 const (
-	UserInfoJoinTypeJOIN = iota
+	UserInfoJoinTypeJOIN = iota + 1
 	UserInfoJoinTypeAPPLY
 )
 
 const (
-	UserInfoStatusENABLE = iota
+	UserInfoStatusENABLE = iota + 1
 	UserInfoStatusDISABLE
 )

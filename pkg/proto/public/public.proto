@@ -30,3 +30,11 @@ message UserLoginSuccessInfo {
   string areaName = 8;
   string areaCode = 9;
 }
+
+message PublicUserInfo {
+  string userID = 1;
+  string nickName = 2;
+  int32 sex = 3;
+  string areaName = 4;
+  string areaCode = 5;
+}

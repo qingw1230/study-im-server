@@ -19,6 +19,20 @@ func IsUserExist(email string) bool {
 	return err != gorm.ErrRecordNotFound
 }
 
+func FindUserByID(id string) (*db.UserInfo, error) {
+	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
+	if err != nil {
+		return nil, err
+	}
+
+	var user db.UserInfo
+	err = dbConn.Table(constant.DBTableUserInfo).Where("user_id = ?", id).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
 func FindUserByEmail(email string) (*db.UserInfo, error) {
 	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
 	if err != nil {

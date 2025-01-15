@@ -38,4 +38,5 @@ const (
 
 	RecordEmailAlreadyRegisterErrorInfo = "邮箱已注册"
 	RecordAccountORPwdErrorInfo         = "账号或密码错误"
+	RecordAccountNotExistsInfo          = "账号不存在"
 )

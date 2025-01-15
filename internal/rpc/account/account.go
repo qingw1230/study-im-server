@@ -120,6 +120,34 @@ func (rpc *rpcAccount) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAcc
 	return resp, nil
 }
 
+func (rpc *rpcAccount) GetUserInfo(_ context.Context, req *pbAccount.GetUserInfoReq) (*pbAccount.GetUserInfoResp, error) {
+	log.Info("call rpcAccount.GetUserInfo, args: ", req.String())
+
+	user, err := controller.FindUserByID(req.UserID)
+	if err == gorm.ErrRecordNotFound {
+		resp := &pbAccount.GetUserInfoResp{
+			CommonResp: &pbPublic.CommonResp{
+				Status: constant.Success,
+				Code:   constant.RecordNotExists,
+				Info:   constant.RecordAccountNotExistsInfo,
+			},
+		}
+		return resp, nil
+	}
+	if err != nil {
+		log.Error("controller.FindUserByID failed ", err.Error())
+		return nil, err
+	}
+
+	resp := &pbAccount.GetUserInfoResp{
+		CommonResp:     &pbPublic.CommonResp{},
+		PublicUserInfo: &pbPublic.PublicUserInfo{},
+	}
+	copier.Copy(resp.CommonResp, &constant.CommonSuccessResp)
+	copier.Copy(resp.PublicUserInfo, user)
+	return resp, nil
+}
+
 type rpcAccount struct {
 	pbAccount.UnimplementedAccountServer
 	rpcPort         int

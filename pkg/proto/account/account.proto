@@ -20,7 +20,17 @@ message LoginResp {
   server_api_params.UserLoginSuccessInfo UserLoginSuccessInfo = 2;
 }
 
+message GetUserInfoReq {
+  string userID = 1;
+}
+
+message GetUserInfoResp {
+  server_api_params.CommonResp CommonResp = 1;
+  server_api_params.PublicUserInfo PublicUserInfo = 2;
+}
+
 service Account {
   rpc Register(RegisterReq) returns (RegisterResp);
   rpc Login(LoginReq) returns (LoginResp);
+  rpc GetUserInfo(GetUserInfoReq) returns (GetUserInfoResp);
 }
