@@ -125,14 +125,7 @@ func (rpc *rpcAccount) GetUserInfo(_ context.Context, req *pbAccount.GetUserInfo
 
 	user, err := controller.FindUserByID(req.UserID)
 	if err == gorm.ErrRecordNotFound {
-		resp := &pbAccount.GetUserInfoResp{
-			CommonResp: &pbPublic.CommonResp{
-				Status: constant.Success,
-				Code:   constant.RecordNotExists,
-				Info:   constant.RecordAccountNotExistsInfo,
-			},
-		}
-		return resp, nil
+		return nil, nil
 	}
 	if err != nil {
 		log.Error("controller.FindUserByID failed ", err.Error())
@@ -143,7 +136,6 @@ func (rpc *rpcAccount) GetUserInfo(_ context.Context, req *pbAccount.GetUserInfo
 		CommonResp:     &pbPublic.CommonResp{},
 		PublicUserInfo: &pbPublic.PublicUserInfo{},
 	}
-	copier.Copy(resp.CommonResp, &constant.CommonSuccessResp)
 	copier.Copy(resp.PublicUserInfo, user)
 	return resp, nil
 }

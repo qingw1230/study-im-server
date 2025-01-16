@@ -180,10 +180,9 @@ func GetUserInfo(c *gin.Context) {
 	}
 	log.Info("Login rpc client.Login call success")
 
-	if reply.CommonResp.Code == constant.RecordNotExists {
-		resp := base_info.CommonResp{}
-		copier.Copy(&resp, reply.CommonResp)
-		c.JSON(http.StatusOK, resp)
+	// reply 和 err 同时为 nil，说明用户不存在
+	if reply == nil {
+		c.JSON(http.StatusOK, constant.CommonSuccessResp)
 		return
 	}
 	c.JSON(http.StatusOK, constant.NewSuccessRespWithData(reply.PublicUserInfo))
