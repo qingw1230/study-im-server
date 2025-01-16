@@ -2,7 +2,6 @@ package db
 
 import (
 	"github.com/gomodule/redigo/redis"
-	"github.com/qingw1230/study-im-server/pkg/base_info"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 )
 
@@ -46,17 +45,6 @@ func (d *DataBases) GetCheckCode(id string) (string, error) {
 	d.Exec("DEL", key)
 	ans, _ := redis.String(reply, err)
 	return ans, err
-}
-
-func (d *DataBases) SetUserToken(token base_info.TokenToRedis) error {
-	key1 := tokenToUserInfo + token.Token
-	_, err1 := d.Exec("SET", key1, token, "EX", redisTimeOneDay)
-	if err1 != nil {
-		return err1
-	}
-	key2 := userIDToToken + token.UserID
-	_, err2 := d.Exec("SET", key2, token.Token, "EX", redisTimeOneDay)
-	return err2
 }
 
 // AddTokenFlag 添加用户 token

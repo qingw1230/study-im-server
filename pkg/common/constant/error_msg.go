@@ -46,6 +46,7 @@ const (
 )
 
 var (
+	CreateTokenMsg      = errors.New("create token failed")
 	ParseTokenMsg       = errors.New("parse token failed")
 	TokenExpiredMsg     = errors.New("token is timed out, please login again")
 	TokenInvalidMsg     = errors.New("token has been invalidated")

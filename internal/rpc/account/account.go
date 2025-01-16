@@ -8,12 +8,12 @@ import (
 
 	"github.com/jinzhu/copier"
 	"github.com/jinzhu/gorm"
-	"github.com/qingw1230/study-im-server/pkg/base_info"
 	"github.com/qingw1230/study-im-server/pkg/common/config"
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/db"
 	"github.com/qingw1230/study-im-server/pkg/common/db/controller"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
+	"github.com/qingw1230/study-im-server/pkg/common/token_verify"
 	pbAccount "github.com/qingw1230/study-im-server/pkg/proto/account"
 	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
 	"github.com/qingw1230/study-im-server/pkg/utils"
@@ -98,16 +98,19 @@ func (rpc *rpcAccount) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAcc
 			break
 		}
 	}
-	// TODO(qingw1230): 改用 JWT
-	token := utils.Md5Encode(user.UserID + utils.GenerateRandomStr(constant.LENGTH_20))
+
 	// TODO(qingw1230): 多设备登录检测
-	tokenStruct := base_info.TokenToRedis{
-		Token:    token,
-		UserID:   user.UserID,
-		NickName: user.NickName,
-		Admin:    flag,
+	token, _, err := token_verify.CreateToken(user.UserID)
+	if err != nil {
+		resp := &pbAccount.LoginResp{
+			CommonResp: &pbPublic.CommonResp{
+				Status: constant.Fail,
+				Code:   constant.TokenError,
+				Info:   constant.CreateTokenMsg.Error(),
+			},
+		}
+		return resp, nil
 	}
-	db.DB.SetUserToken(tokenStruct)
 
 	resp := &pbAccount.LoginResp{
 		CommonResp:           &pbPublic.CommonResp{},

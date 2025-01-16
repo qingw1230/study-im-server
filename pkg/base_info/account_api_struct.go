@@ -36,10 +36,3 @@ type GetUserInfoReq struct {
 type GetUserInfoResp struct {
 	PublicUserInfo *public.PublicUserInfo
 }
-
-type TokenToRedis struct {
-	Token    string `json:"token"`
-	UserID   string `json:"userId"`
-	NickName string `json:"nickName"`
-	Admin    bool   `json:"admin"`
-}
