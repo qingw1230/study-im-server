@@ -38,8 +38,10 @@ const (
 )
 
 const (
-	RequestCheckCodeErrorInfo = "验证码错误"
+	RequestCheckCodeErrorInfo   = "验证码错误"
+	RequestTokenAccessErrorInfo = "没有访问权限"
 
+	RecordMySQLCommonErrorInfo          = "MySQL 数据库通用错误"
 	RecordEmailAlreadyRegisterErrorInfo = "邮箱已注册"
 	RecordAccountORPwdErrorInfo         = "账号或密码错误"
 	RecordAccountNotExistsInfo          = "账号不存在"

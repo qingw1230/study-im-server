@@ -14,6 +14,11 @@ const (
 	LENGTH_20 = 20
 )
 
+// 字符串常量
+const (
+	STR_TOKEN = "token"
+)
+
 // token
 const (
 	NormalToken = iota

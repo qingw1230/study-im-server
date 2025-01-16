@@ -5,9 +5,10 @@ const (
 	CommonError = 10000
 
 	// 请求参数相关的
-	RequestParamsError    = 10001
-	RequestBindJSONError  = 10002
-	RequestCheckCodeError = 10003
+	RequestParamsError      = 10001
+	RequestBindJSONError    = 10002
+	RequestCheckCodeError   = 10003
+	RequestTokenAccessError = 10004
 
 	// token 相关的
 	TokenError       = 10100
@@ -17,7 +18,8 @@ const (
 	TokenNotValidYet = 10104
 	TokenUnknown     = 10105
 
-	// 数据库记录相关的
+	// MySQL 数据库相关的
+	RecordMySQLCommonError  = 11000
 	RecordAlreadyExists     = 11001
 	RecordNotExists         = 11002
 	RecordAccountORPwdError = 11003

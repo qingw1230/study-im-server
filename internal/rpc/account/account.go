@@ -20,12 +20,12 @@ import (
 	"google.golang.org/grpc"
 )
 
-func (rpc *rpcAccount) Register(_ context.Context, req *pbAccount.RegisterReq) (*pbAccount.RegisterResp, error) {
-	log.Info("call rpcAccount.Register, args: ", req.String())
+func (s *accountServer) Register(_ context.Context, req *pbAccount.RegisterReq) (*pbAccount.RegisterResp, error) {
+	log.Info("call Register, args: ", req.String())
 
 	// 确保用户不存在
 	if controller.IsUserExist(req.UserRegisterInfo.Email) {
-		log.Error("controller.IsUserExist failed ", req.UserRegisterInfo.Email)
+		log.Error("IsUserExist failed ", req.UserRegisterInfo.Email)
 		resp := &pbAccount.RegisterResp{
 			CommonResp: &pbPublic.CommonResp{
 				Status: constant.Fail,
@@ -53,14 +53,14 @@ func (rpc *rpcAccount) Register(_ context.Context, req *pbAccount.RegisterReq) (
 		return nil, err
 	}
 
-	log.Info("call rpcAccount.Register success")
+	log.Info("call Register success")
 	resp := &pbAccount.RegisterResp{CommonResp: &pbPublic.CommonResp{}}
 	copier.Copy(resp.CommonResp, constant.CommonSuccessResp)
 	return resp, nil
 }
 
-func (rpc *rpcAccount) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAccount.LoginResp, error) {
-	log.Info("call rpcAccount.Login, args: ", req.String())
+func (s *accountServer) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAccount.LoginResp, error) {
+	log.Info("call Login, args: ", req.String())
 
 	// 确保用户存在
 	user, err := controller.FindUserByEmail(req.UserLoginInfo.Email)
@@ -75,7 +75,7 @@ func (rpc *rpcAccount) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAcc
 		return resp, nil
 	}
 	if err != nil {
-		log.Error("controller.FindUserByEmail failed ", err.Error())
+		log.Error("FindUserByEmail failed ", err.Error())
 		return nil, err
 	}
 
@@ -89,15 +89,7 @@ func (rpc *rpcAccount) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAcc
 		}
 		return resp, nil
 	}
-	log.Debug("user passed utils.ValidPassword ", user.Email)
-
-	flag := false
-	for _, str := range config.Config.Admin.Emails {
-		if str == req.UserLoginInfo.Email {
-			flag = true
-			break
-		}
-	}
+	log.Debug("user passed ValidPassword ", user.Email)
 
 	// TODO(qingw1230): 多设备登录检测
 	token, _, err := token_verify.CreateToken(user.UserID)
@@ -119,19 +111,19 @@ func (rpc *rpcAccount) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAcc
 	copier.Copy(resp.CommonResp, &constant.CommonSuccessResp)
 	copier.Copy(resp.UserLoginSuccessInfo, user)
 	resp.UserLoginSuccessInfo.Token = token
-	resp.UserLoginSuccessInfo.Admin = flag
+	resp.UserLoginSuccessInfo.Admin = utils.IsContain(user.UserID, config.Config.Admin.UserIDs)
 	return resp, nil
 }
 
-func (rpc *rpcAccount) GetUserInfo(_ context.Context, req *pbAccount.GetUserInfoReq) (*pbAccount.GetUserInfoResp, error) {
-	log.Info("call rpcAccount.GetUserInfo, args: ", req.String())
+func (s *accountServer) GetUserInfo(_ context.Context, req *pbAccount.GetUserInfoReq) (*pbAccount.GetUserInfoResp, error) {
+	log.Info("call GetUserInfo, args: ", req.String())
 
 	user, err := controller.FindUserByID(req.UserID)
 	if err == gorm.ErrRecordNotFound {
 		return nil, nil
 	}
 	if err != nil {
-		log.Error("controller.FindUserByID failed ", err.Error())
+		log.Error("FindUserByID failed ", err.Error())
 		return nil, err
 	}
 
@@ -143,7 +135,7 @@ func (rpc *rpcAccount) GetUserInfo(_ context.Context, req *pbAccount.GetUserInfo
 	return resp, nil
 }
 
-type rpcAccount struct {
+type accountServer struct {
 	pbAccount.UnimplementedAccountServer
 	rpcPort         int
 	rpcRegisterName string
@@ -151,9 +143,9 @@ type rpcAccount struct {
 	zkAddr          []string
 }
 
-func NewRpcAccountServer(port int) *rpcAccount {
+func NewRpcAccountServer(port int) *accountServer {
 	log.NewPrivateLog("account")
-	return &rpcAccount{
+	return &accountServer{
 		rpcPort:         port,
 		rpcRegisterName: config.Config.RpcRegisterName.AccountName,
 		zkSchema:        config.Config.Zookeeper.ZKSchema,
@@ -161,18 +153,20 @@ func NewRpcAccountServer(port int) *rpcAccount {
 	}
 }
 
-func (rpc *rpcAccount) Run() {
+func (s *accountServer) Run() {
 	log.Info("rpc account start...")
-	address := utils.ServerIP + ":" + strconv.Itoa(rpc.rpcPort)
+	address := utils.ServerIP + ":" + strconv.Itoa(s.rpcPort)
 	ln, err := net.Listen("tcp", address)
 	if err != nil {
 		log.Error("listen network failed ", err.Error(), address)
+		return
 	}
+	defer ln.Close()
 
 	server := grpc.NewServer()
 	defer server.GracefulStop()
 
-	pbAccount.RegisterAccountServer(server, rpc)
+	pbAccount.RegisterAccountServer(server, s)
 	// TODO(qingw1230): 将 rpc 服务注册进 zk
 	err = server.Serve(ln)
 	if err != nil {

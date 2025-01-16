@@ -9,6 +9,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/db"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
+	"github.com/qingw1230/study-im-server/pkg/utils"
 )
 
 type Claims struct {
@@ -136,4 +137,20 @@ func VerifyToken(token, userID string) (bool, error) {
 		return false, &constant.ErrTokenUnknown
 	}
 	return true, nil
+}
+
+func GetUserIDFromToken(token string) (bool, string) {
+	claims, err := ParseToken(token)
+	if err != nil {
+		return false, ""
+	}
+	return true, claims.UserID
+}
+
+// CheckAccess 检查是否有访问权限
+func CheckAccess(opUserID, ownerUserID string) bool {
+	if utils.IsContain(opUserID, config.Config.Admin.UserIDs) {
+		return true
+	}
+	return opUserID == ownerUserID
 }

@@ -22,14 +22,16 @@ type config struct {
 
 	RpcPort struct {
 		AccountPort []int `yaml:"accountPort"`
+		FriendPort  []int `yaml:"friendPort"`
 	} `yaml:"rpcport"`
 
 	RpcRegisterName struct {
 		AccountName string `yaml:"accountName"`
+		FriendName  string `yaml:"friendName"`
 	} `yaml:"rpcregistername"`
 
 	Admin struct {
-		Emails []string `yaml:"emails"`
+		UserIDs []string `yaml:"userIDs"`
 	} `yaml:"admin"`
 
 	TokenPolicy struct {

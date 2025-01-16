@@ -71,22 +71,6 @@ func (UserContact) TableName() string {
 	return "user_contact"
 }
 
-// UserContactApply 联系人申请表
-type UserContactApply struct {
-	ApplyID       int    `gorm:"column:apply_id;type:int(11) auto_increment;not null;primary_key"`
-	ApplyUserID   string `gorm:"column:apply_user_id;type:varchar(12);not null;unique_index:idx_key"`
-	ReceiveUserID string `gorm:"column:receive_user_id;type:varchar(12);not null;unique_index:idx_key"`
-	ContactType   int    `gorm:"column:contact_type;type:tinyint(1);not null"`
-	ContactID     string `gorm:"column:contact_id;type:varchar(12);unique_index:idx_key"`
-	LastApplyTime int    `gorm:"column:last_apply_time;type:int(11);index:idx_last_apply_time"`
-	Status        int    `gorm:"column:status;type:tinyint(1)"`
-	ApplyInfo     string `gorm:"column:apply_info;type:varchar(100)"`
-}
-
-func (UserContactApply) TableName() string {
-	return "user_contact_apply"
-}
-
 // FriendRequest 好友申请表
 type FriendRequest struct {
 	ApplyID      int       `gorm:"column:apply_id;type:int(11) auto_increment;not null;primary_key"`
@@ -98,4 +82,8 @@ type FriendRequest struct {
 	HandleUserID string    `gorm:"column:handle_user_id;type:varchar(12)"`
 	HandleMsg    string    `gorm:"column:handle_msg;type:varchar(255)"`
 	Ex           string    `gorm:"column:ex;type:varchar(1024)"`
+}
+
+func (FriendRequest) TableName() string {
+	return constant.DBTableFrindRequest
 }

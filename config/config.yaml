@@ -3,12 +3,14 @@ serverip: 0.0.0.0
 
 rpcport:
   accountPort: [ 10100 ]
+  friendPort: [ 10200 ]
 
 rpcregistername:
   accountName: Account
+  friendName: Friend
 
 admin:
-  emails : [ 1366502108@qq.com ]
+  userIDs : [ U30170892524 ]
 
 tokenpolicy:
   secret: study-im-server
