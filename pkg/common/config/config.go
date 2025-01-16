@@ -32,6 +32,11 @@ type config struct {
 		Emails []string `yaml:"emails"`
 	} `yaml:"admin"`
 
+	TokenPolicy struct {
+		Secret       string `yaml:"secret"`
+		AccessExpire int64  `yaml:"accessExpire"`
+	} `yaml:"tokenpolicy"`
+
 	Log struct {
 		StorageLocation     string `yaml:"storageLocation"`
 		RotationTime        int    `yaml:"rotationTime"`

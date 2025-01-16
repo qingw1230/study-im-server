@@ -13,3 +13,11 @@ const (
 	LENGTH_11 = 11
 	LENGTH_20 = 20
 )
+
+// token
+const (
+	NormalToken = iota
+	InvalidToken
+	KickedToken
+	ExpiredToken
+)

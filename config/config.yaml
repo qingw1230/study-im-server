@@ -10,6 +10,10 @@ rpcregistername:
 admin:
   emails : [ 1366502108@qq.com ]
 
+tokenpolicy:
+  secret: study-im-server
+  accessExpire: 1
+
 log:
   storageLocation: ./logs/
   rotationTime: 24
