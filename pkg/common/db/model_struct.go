@@ -1,5 +1,11 @@
 package db
 
+import (
+	"time"
+
+	"github.com/qingw1230/study-im-server/pkg/common/constant"
+)
+
 // UserInfo 用户信息表
 type UserInfo struct {
 	// 新版本添加主键使用: primaryKey
@@ -21,7 +27,7 @@ type UserInfo struct {
 }
 
 func (UserInfo) TableName() string {
-	return "user_info"
+	return constant.DBTableUserInfo
 }
 
 // UserInfoBeauty 靓号表
@@ -79,4 +85,17 @@ type UserContactApply struct {
 
 func (UserContactApply) TableName() string {
 	return "user_contact_apply"
+}
+
+// FriendRequest 好友申请表
+type FriendRequest struct {
+	ApplyID      int       `gorm:"column:apply_id;type:int(11) auto_increment;not null;primary_key"`
+	FromUserID   string    `gorm:"column:form_user_id;type:varchar(12);not null;unique_index:idx_key"`
+	ToUserID     string    `gorm:"column:to_user_id;type:varchar(12);not null;unique_index:idx_key"`
+	HandleResult int8      `gorm:"column:handle_result;type:tinyint(1)"`
+	ReqMsg       string    `gorm:"column:req_msg;type:varchar(255)"`
+	CreateTime   time.Time `gorm:"column:create_time;type:datetime"`
+	HandleUserID string    `gorm:"column:handle_user_id;type:varchar(12)"`
+	HandleMsg    string    `gorm:"column:handle_msg;type:varchar(255)"`
+	Ex           string    `gorm:"column:ex;type:varchar(1024)"`
 }

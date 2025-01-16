@@ -1,0 +1,19 @@
+syntax = "proto3";
+import "public/public.proto";
+package pbFriend;
+option go_package = "github.com/qingw1230/study-im-server/pkg/proto/friend";
+
+message AddFriendReq {
+  string OpUserID = 1;
+  string FromUserID = 2;
+  string ToUserID = 3;
+  string ReqMsg = 4;
+}
+
+message AddFriendResp {
+  server_api_params.CommonResp CommonResp = 1;
+}
+
+service Friend {
+  rpc AddFriend(AddFriendReq) returns (AddFriendResp);
+}

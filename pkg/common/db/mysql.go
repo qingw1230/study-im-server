@@ -45,10 +45,7 @@ func initMySQLDB() {
 
 	db.AutoMigrate(
 		&UserInfo{},
-	// &UserInfoBeauty{},
-	// &GroupInfo{},
-	// &UserContact{},
-	// &UserContactApply{},
+		&FriendRequest{},
 	)
 	db.Set("gorm:table_options", "CHARSET=utf8mb4")
 	db.Set("gorm:table_options", "collation=utf8mb4_general_ci")

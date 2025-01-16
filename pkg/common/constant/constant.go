@@ -4,6 +4,7 @@ package constant
 const (
 	DBTableUserInfo       = "user_info"
 	DBTableUserInfoBeauty = "user_info_beauty"
+	DBTableFrindRequest   = "friend_request"
 )
 
 // 数字常量
