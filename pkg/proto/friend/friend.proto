@@ -28,6 +28,14 @@ message AddFriendResponseResp {
   server_api_params.CommonResp CommonResp = 1;
 }
 
+message DeleteFriendReq {
+  CommonID CommonID = 1;
+}
+
+message DeleteFriendResp {
+  server_api_params.CommonResp CommonResp = 1;
+}
+
 message GetFriendListReq {
   CommonID CommonID = 1;
 }
@@ -40,5 +48,6 @@ message GetFriendListResp {
 service Friend {
   rpc AddFriend(AddFriendReq) returns (AddFriendResp);
   rpc AddFriendResponse(AddFriendResponseReq) returns (AddFriendResponseResp);
+  rpc DeleteFriend(DeleteFriendReq) returns (DeleteFriendResp);
   rpc GetFriendList(GetFriendListReq) returns (GetFriendListResp);
 }

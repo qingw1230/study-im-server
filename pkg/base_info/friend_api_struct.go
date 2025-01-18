@@ -26,6 +26,14 @@ type AddFriendResponseResp struct {
 	CommonResp
 }
 
+type DeleteFriendReq struct {
+	CommonID
+}
+
+type DeleteFriendResp struct {
+	CommonResp
+}
+
 type GetFriendListReq struct {
 	FromUserID string `json:"fromUserID" binding:"required"`
 }

@@ -17,6 +17,18 @@ func InsertToFriend(toInsertFollow *db.Friend) error {
 	return dbConn.Table(constant.DBTableFriend).Create(toInsertFollow).Error
 }
 
+// DeleteSingleFriendRelation 删除单向好友关系
+func DeleteSingleFriendRelation(ownerUserID, friendUserID string) error {
+	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
+	if err != nil {
+		return err
+	}
+	return dbConn.
+		Table(constant.DBTableFriend).
+		Where("owner_user_id = ? AND friend_user_id = ?", ownerUserID, friendUserID).
+		Delete(&db.Friend{}).Error
+}
+
 // GetFriendListByUserID 根据 UserID 获取好友列表
 func GetFriendListByUserID(ownerUserID string) ([]db.Friend, error) {
 	dbConn, err := db.DB.MySQLDB.DefaultGormDB()

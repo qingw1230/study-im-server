@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	Friend_AddFriend_FullMethodName         = "/pbFriend.Friend/AddFriend"
 	Friend_AddFriendResponse_FullMethodName = "/pbFriend.Friend/AddFriendResponse"
+	Friend_DeleteFriend_FullMethodName      = "/pbFriend.Friend/DeleteFriend"
 	Friend_GetFriendList_FullMethodName     = "/pbFriend.Friend/GetFriendList"
 )
 
@@ -30,6 +31,7 @@ const (
 type FriendClient interface {
 	AddFriend(ctx context.Context, in *AddFriendReq, opts ...grpc.CallOption) (*AddFriendResp, error)
 	AddFriendResponse(ctx context.Context, in *AddFriendResponseReq, opts ...grpc.CallOption) (*AddFriendResponseResp, error)
+	DeleteFriend(ctx context.Context, in *DeleteFriendReq, opts ...grpc.CallOption) (*DeleteFriendResp, error)
 	GetFriendList(ctx context.Context, in *GetFriendListReq, opts ...grpc.CallOption) (*GetFriendListResp, error)
 }
 
@@ -61,6 +63,16 @@ func (c *friendClient) AddFriendResponse(ctx context.Context, in *AddFriendRespo
 	return out, nil
 }
 
+func (c *friendClient) DeleteFriend(ctx context.Context, in *DeleteFriendReq, opts ...grpc.CallOption) (*DeleteFriendResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteFriendResp)
+	err := c.cc.Invoke(ctx, Friend_DeleteFriend_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *friendClient) GetFriendList(ctx context.Context, in *GetFriendListReq, opts ...grpc.CallOption) (*GetFriendListResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetFriendListResp)
@@ -77,6 +89,7 @@ func (c *friendClient) GetFriendList(ctx context.Context, in *GetFriendListReq, 
 type FriendServer interface {
 	AddFriend(context.Context, *AddFriendReq) (*AddFriendResp, error)
 	AddFriendResponse(context.Context, *AddFriendResponseReq) (*AddFriendResponseResp, error)
+	DeleteFriend(context.Context, *DeleteFriendReq) (*DeleteFriendResp, error)
 	GetFriendList(context.Context, *GetFriendListReq) (*GetFriendListResp, error)
 	mustEmbedUnimplementedFriendServer()
 }
@@ -93,6 +106,9 @@ func (UnimplementedFriendServer) AddFriend(context.Context, *AddFriendReq) (*Add
 }
 func (UnimplementedFriendServer) AddFriendResponse(context.Context, *AddFriendResponseReq) (*AddFriendResponseResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddFriendResponse not implemented")
+}
+func (UnimplementedFriendServer) DeleteFriend(context.Context, *DeleteFriendReq) (*DeleteFriendResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteFriend not implemented")
 }
 func (UnimplementedFriendServer) GetFriendList(context.Context, *GetFriendListReq) (*GetFriendListResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFriendList not implemented")
@@ -154,6 +170,24 @@ func _Friend_AddFriendResponse_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Friend_DeleteFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteFriendReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FriendServer).DeleteFriend(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Friend_DeleteFriend_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FriendServer).DeleteFriend(ctx, req.(*DeleteFriendReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Friend_GetFriendList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetFriendListReq)
 	if err := dec(in); err != nil {
@@ -186,6 +220,10 @@ var Friend_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddFriendResponse",
 			Handler:    _Friend_AddFriendResponse_Handler,
+		},
+		{
+			MethodName: "DeleteFriend",
+			Handler:    _Friend_DeleteFriend_Handler,
 		},
 		{
 			MethodName: "GetFriendList",

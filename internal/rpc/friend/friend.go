@@ -26,13 +26,7 @@ func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) 
 	// 确保有权限
 	if !token_verify.CheckAccess(req.CommonID.OpUserID, req.CommonID.FromUserID) {
 		log.Error("CheckAccess false ", req.CommonID.OpUserID, req.CommonID.FromUserID)
-		return &pbFriend.AddFriendResp{
-			CommonResp: &pbPublic.CommonResp{
-				Status: constant.Fail,
-				Code:   constant.RequestTokenAccessError,
-				Info:   constant.RequestTokenAccessErrorInfo,
-			},
-		}, nil
+		return &pbFriend.AddFriendResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
 	}
 
 	// 保证要添加的好友存在
@@ -52,19 +46,11 @@ func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) 
 	err := controller.InsertFriendApplication(&friendRequest)
 	if err != nil {
 		log.Error("InsertFriendApplication failed ", err.Error(), friendRequest)
-		return &pbFriend.AddFriendResp{
-			CommonResp: &pbPublic.CommonResp{
-				Status: constant.Fail,
-				Code:   constant.RecordMySQLCommonError,
-				Info:   constant.RecordMySQLCommonErrorInfo,
-			},
-		}, nil
+		return &pbFriend.AddFriendResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
 	}
 
 	// TODO(qingw1230): 给被添加方发送通知
-	resp := &pbFriend.AddFriendResp{CommonResp: &pbPublic.CommonResp{}}
-	copier.Copy(resp.CommonResp, constant.CommonSuccessResp)
-	return resp, nil
+	return &pbFriend.AddFriendResp{CommonResp: &constant.PBCommonSuccessResp}, nil
 }
 
 func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFriendResponseReq) (*pbFriend.AddFriendResponseResp, error) {
@@ -72,13 +58,7 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 	// 确保有权限
 	if !token_verify.CheckAccess(req.CommonID.OpUserID, req.CommonID.FromUserID) {
 		log.Error("CheckAccess false ", req.CommonID.OpUserID, req.CommonID.FromUserID)
-		return &pbFriend.AddFriendResponseResp{
-			CommonResp: &pbPublic.CommonResp{
-				Status: constant.Fail,
-				Code:   constant.RequestTokenAccessError,
-				Info:   constant.RequestTokenAccessErrorInfo,
-			},
-		}, nil
+		return &pbFriend.AddFriendResponseResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
 	}
 
 	// 在同意或拒绝好友申请之前，先检查记录是否存在
@@ -148,9 +128,24 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 	}
 
 	// TODO(qingw1230): 通知或拒绝的通知
-	resp := &pbFriend.AddFriendResponseResp{CommonResp: &pbPublic.CommonResp{}}
-	copier.Copy(resp.CommonResp, constant.CommonSuccessResp)
-	return resp, nil
+	return &pbFriend.AddFriendResponseResp{CommonResp: &constant.PBCommonSuccessResp}, nil
+}
+
+func (s *friendServer) DeleteFriend(_ context.Context, req *pbFriend.DeleteFriendReq) (*pbFriend.DeleteFriendResp, error) {
+	log.Info("DeleteFriend args: ", req.String())
+	// 确保有权限
+	if !token_verify.CheckAccess(req.CommonID.OpUserID, req.CommonID.FromUserID) {
+		log.Error("CheckAccess false ", req.CommonID.OpUserID, req.CommonID.FromUserID)
+		return &pbFriend.DeleteFriendResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
+	}
+
+	err := controller.DeleteSingleFriendRelation(req.CommonID.FromUserID, req.CommonID.ToUserID)
+	if err != nil {
+		log.Error("DeleteSingleFriendRelation failed ", err.Error())
+		return &pbFriend.DeleteFriendResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
+	}
+
+	return &pbFriend.DeleteFriendResp{CommonResp: &constant.PBCommonSuccessResp}, nil
 }
 
 func (s *friendServer) GetFriendList(_ context.Context, req *pbFriend.GetFriendListReq) (*pbFriend.GetFriendListResp, error) {
@@ -158,24 +153,13 @@ func (s *friendServer) GetFriendList(_ context.Context, req *pbFriend.GetFriendL
 	// 确保有权限
 	if !token_verify.CheckAccess(req.CommonID.OpUserID, req.CommonID.FromUserID) {
 		log.Error("CheckAccess false ", req.CommonID.OpUserID, req.CommonID.FromUserID)
-		return &pbFriend.GetFriendListResp{
-			CommonResp: &pbPublic.CommonResp{
-				Status: constant.Fail,
-				Code:   constant.RequestTokenAccessError,
-				Info:   constant.RequestTokenAccessErrorInfo},
-		}, nil
+		return &pbFriend.GetFriendListResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
 	}
 
 	friends, err := controller.GetFriendListByUserID(req.CommonID.FromUserID)
 	if err != nil {
 		log.Error("GetFriendListByUserID failed ", err.Error(), req.CommonID.FromUserID)
-		return &pbFriend.GetFriendListResp{
-			CommonResp: &pbPublic.CommonResp{
-				Status: constant.Fail,
-				Code:   constant.RecordMySQLCommonError,
-				Info:   constant.RecordMySQLCommonErrorInfo,
-			},
-		}, nil
+		return &pbFriend.GetFriendListResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
 	}
 
 	var userInfoList []*pbPublic.FriendInfo
@@ -184,7 +168,10 @@ func (s *friendServer) GetFriendList(_ context.Context, req *pbFriend.GetFriendL
 		cp.FriendDBCopyIM(friendUserInfo, &user)
 		userInfoList = append(userInfoList, friendUserInfo)
 	}
-	return &pbFriend.GetFriendListResp{FriendInfoList: userInfoList}, nil
+	return &pbFriend.GetFriendListResp{
+		CommonResp:     &constant.PBCommonSuccessResp,
+		FriendInfoList: userInfoList,
+	}, nil
 }
 
 type friendServer struct {
