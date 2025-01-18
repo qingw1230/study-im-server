@@ -4,7 +4,9 @@ package pbAccount;
 option go_package = "github.com/qingw1230/study-im-server/pkg/proto/account";
 
 message RegisterReq {
-  server_api_params.UserRegisterInfo UserRegisterInfo = 1;
+  string email = 1;
+  string password = 2;
+  string nickName = 3;
 }
 
 message RegisterResp {

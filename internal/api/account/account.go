@@ -41,8 +41,8 @@ func Register(c *gin.Context) {
 	}
 	log.Info("Register Captcha.Verify success")
 
-	req := &rpc.RegisterReq{UserRegisterInfo: &public.UserRegisterInfo{}}
-	copier.Copy(req.UserRegisterInfo, &params)
+	req := &rpc.RegisterReq{}
+	copier.Copy(req, &params)
 	log.Info("Register rpc client.Register args: ", req.String())
 
 	// TODO(qingw1230): 使用服务发现建立连接

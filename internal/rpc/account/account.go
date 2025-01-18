@@ -24,8 +24,8 @@ func (s *accountServer) Register(_ context.Context, req *pbAccount.RegisterReq) 
 	log.Info("call Register args: ", req.String())
 
 	// 确保用户不存在
-	if controller.IsUserExist(req.UserRegisterInfo.Email) {
-		log.Error("IsUserExist failed ", req.UserRegisterInfo.Email)
+	if controller.IsUserExist(req.Email) {
+		log.Error("IsUserExist failed ", req.Email)
 		resp := &pbAccount.RegisterResp{
 			CommonResp: &pbPublic.CommonResp{
 				Status: constant.Fail,
@@ -37,7 +37,7 @@ func (s *accountServer) Register(_ context.Context, req *pbAccount.RegisterReq) 
 	}
 
 	var user db.UserInfo
-	copier.Copy(&user, req.UserRegisterInfo)
+	copier.Copy(&user, req)
 	user.UserID = utils.GenerateRandomID(constant.LENGTH_11)
 	user.Salt = utils.GenerateRandomStr(constant.LENGTH_10)
 	user.Password = utils.MakePassword(user.Password, user.Salt)
