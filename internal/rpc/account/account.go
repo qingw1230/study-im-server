@@ -63,7 +63,7 @@ func (s *accountServer) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAc
 	log.Info("call Login args: ", req.String())
 
 	// 确保用户存在
-	user, err := controller.FindUserByEmail(req.UserLoginInfo.Email)
+	user, err := controller.FindUserByEmail(req.Email)
 	if err == gorm.ErrRecordNotFound {
 		resp := &pbAccount.LoginResp{
 			CommonResp: &pbPublic.CommonResp{
@@ -79,7 +79,7 @@ func (s *accountServer) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAc
 		return nil, err
 	}
 
-	if !utils.ValidPassword(req.UserLoginInfo.Password, user.Salt, user.Password) {
+	if !utils.ValidPassword(req.Password, user.Salt, user.Password) {
 		resp := &pbAccount.LoginResp{
 			CommonResp: &pbPublic.CommonResp{
 				Status: constant.Fail,
@@ -105,13 +105,13 @@ func (s *accountServer) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAc
 	}
 
 	resp := &pbAccount.LoginResp{
-		CommonResp:           &pbPublic.CommonResp{},
-		UserLoginSuccessInfo: &pbPublic.UserLoginSuccessInfo{},
+		CommonResp: &pbPublic.CommonResp{},
+		UserInfo:   &pbPublic.UserInfo{},
 	}
 	copier.Copy(resp.CommonResp, &constant.CommonSuccessResp)
-	copier.Copy(resp.UserLoginSuccessInfo, user)
-	resp.UserLoginSuccessInfo.Token = token
-	resp.UserLoginSuccessInfo.Admin = utils.IsContain(user.UserID, config.Config.Admin.UserIDs)
+	copier.Copy(resp.UserInfo, user)
+	resp.UserInfo.Token = token
+	resp.UserInfo.Admin = utils.IsContain(user.UserID, config.Config.Admin.UserIDs)
 	return resp, nil
 }
 

@@ -8,12 +8,7 @@ message CommonResp {
   string info = 3;
 }
 
-message UserLoginInfo {
-  string email = 1;
-  string password = 2;
-}
-
-message UserLoginSuccessInfo {
+message UserInfo {
   string token = 1;
   bool admin = 2;
   string userID = 3;

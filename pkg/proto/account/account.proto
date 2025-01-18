@@ -14,12 +14,13 @@ message RegisterResp {
 }
 
 message LoginReq {
-  server_api_params.UserLoginInfo UserLoginInfo = 1;
+  string email = 1;
+  string password = 2;
 }
 
 message LoginResp {
   server_api_params.CommonResp CommonResp = 1;
-  server_api_params.UserLoginSuccessInfo UserLoginSuccessInfo = 2;
+  server_api_params.UserInfo UserInfo = 2;
 }
 
 message GetUserInfoReq {

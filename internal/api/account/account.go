@@ -11,7 +11,6 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	rpc "github.com/qingw1230/study-im-server/pkg/proto/account"
-	"github.com/qingw1230/study-im-server/pkg/proto/public"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -96,8 +95,8 @@ func Login(c *gin.Context) {
 	}
 	log.Info("Login Captcha.Verify success")
 
-	req := &rpc.LoginReq{UserLoginInfo: &public.UserLoginInfo{}}
-	copier.Copy(&req.UserLoginInfo, &params)
+	req := &rpc.LoginReq{}
+	copier.Copy(&req, &params)
 	log.Info("Login rpc client.Login args: ", req.String())
 
 	// TODO(qingw1230): 使用服务发现建立连接
@@ -123,7 +122,7 @@ func Login(c *gin.Context) {
 	}
 	log.Info("Login rpc client.Login call success")
 
-	c.JSON(http.StatusOK, constant.NewSuccessRespWithData(reply.UserLoginSuccessInfo))
+	c.JSON(http.StatusOK, constant.NewSuccessRespWithData(reply.UserInfo))
 }
 
 type Data struct {
