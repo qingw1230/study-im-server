@@ -14,6 +14,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/db/controller"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	"github.com/qingw1230/study-im-server/pkg/common/token_verify"
+	cp "github.com/qingw1230/study-im-server/pkg/common/utils"
 	pbFriend "github.com/qingw1230/study-im-server/pkg/proto/friend"
 	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
 	"github.com/qingw1230/study-im-server/pkg/utils"
@@ -150,6 +151,40 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 	resp := &pbFriend.AddFriendResponseResp{CommonResp: &pbPublic.CommonResp{}}
 	copier.Copy(resp.CommonResp, constant.CommonSuccessResp)
 	return resp, nil
+}
+
+func (s *friendServer) GetFriendList(_ context.Context, req *pbFriend.GetFriendListReq) (*pbFriend.GetFriendListResp, error) {
+	log.Info("call GetFriendList args: ", req.String())
+	// 确保有权限
+	if !token_verify.CheckAccess(req.CommonID.OpUserID, req.CommonID.FromUserID) {
+		log.Error("CheckAccess false ", req.CommonID.OpUserID, req.CommonID.FromUserID)
+		return &pbFriend.GetFriendListResp{
+			CommonResp: &pbPublic.CommonResp{
+				Status: constant.Fail,
+				Code:   constant.RequestTokenAccessError,
+				Info:   constant.RequestTokenAccessErrorInfo},
+		}, nil
+	}
+
+	friends, err := controller.GetFriendListByUserID(req.CommonID.FromUserID)
+	if err != nil {
+		log.Error("GetFriendListByUserID failed ", err.Error(), req.CommonID.FromUserID)
+		return &pbFriend.GetFriendListResp{
+			CommonResp: &pbPublic.CommonResp{
+				Status: constant.Fail,
+				Code:   constant.RecordMySQLCommonError,
+				Info:   constant.RecordMySQLCommonErrorInfo,
+			},
+		}, nil
+	}
+
+	var userInfoList []*pbPublic.FriendInfo
+	for _, user := range friends {
+		friendUserInfo := &pbPublic.FriendInfo{FriendInfo: &pbPublic.PublicUserInfo{}}
+		cp.FriendDBCopyIM(friendUserInfo, &user)
+		userInfoList = append(userInfoList, friendUserInfo)
+	}
+	return &pbFriend.GetFriendListResp{FriendInfoList: userInfoList}, nil
 }
 
 type friendServer struct {

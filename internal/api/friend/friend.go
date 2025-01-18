@@ -19,11 +19,7 @@ func AddFriend(c *gin.Context) {
 	params := base_info.AddFriendReq{}
 	if err := c.BindJSON(&params); err != nil {
 		log.Error("BindJSON failed ", err.Error())
-		c.JSON(http.StatusBadRequest, base_info.CommonResp{
-			Status: constant.Fail,
-			Code:   constant.RequestBindJSONError,
-			Info:   err.Error(),
-		})
+		c.JSON(http.StatusBadRequest, constant.NewBindJSONErrorRespWithInfo(err.Error()))
 		return
 	}
 	log.Info("AddFriend BindJSON success")
@@ -31,11 +27,7 @@ func AddFriend(c *gin.Context) {
 	ok, opUserID := token_verify.GetUserIDFromToken(c.Request.Header.Get(constant.STR_TOKEN))
 	if !ok {
 		log.Error("GetUserIDFromToken failed ", c.Request.Header.Get(constant.STR_TOKEN))
-		c.JSON(http.StatusInternalServerError, base_info.CommonResp{
-			Status: constant.Fail,
-			Code:   constant.TokenUnknown,
-			Info:   constant.TokenUnknownMsg.Error(),
-		})
+		c.JSON(http.StatusInternalServerError, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
 		return
 	}
 	req := &pbFriend.AddFriendReq{CommonID: &pbFriend.CommonID{}}
@@ -67,11 +59,7 @@ func AddFriendResponse(c *gin.Context) {
 	params := base_info.AddFriendResponseReq{}
 	if err := c.BindJSON(&params); err != nil {
 		log.Error("BindJSON failed ", err.Error())
-		c.JSON(http.StatusBadRequest, base_info.CommonResp{
-			Status: constant.Fail,
-			Code:   constant.RequestBindJSONError,
-			Info:   err.Error(),
-		})
+		c.JSON(http.StatusBadRequest, constant.NewBindJSONErrorRespWithInfo(err.Error()))
 		return
 	}
 	log.Info("AddFriendResponse BindJSON success")
@@ -79,11 +67,7 @@ func AddFriendResponse(c *gin.Context) {
 	ok, opUserID := token_verify.GetUserIDFromToken(c.Request.Header.Get(constant.STR_TOKEN))
 	if !ok {
 		log.Error("GetUserIDFromToken failed ", c.Request.Header.Get(constant.STR_TOKEN))
-		c.JSON(http.StatusInternalServerError, base_info.CommonResp{
-			Status: constant.Fail,
-			Code:   constant.TokenUnknown,
-			Info:   constant.TokenUnknownMsg.Error(),
-		})
+		c.JSON(http.StatusInternalServerError, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
 		return
 	}
 	req := &pbFriend.AddFriendResponseReq{}
@@ -107,5 +91,45 @@ func AddFriendResponse(c *gin.Context) {
 
 	resp := base_info.AddFriendResponseResp{CommonResp: base_info.CommonResp{}}
 	copier.Copy(&resp.CommonResp, reply.CommonResp)
+	c.JSON(http.StatusOK, resp)
+}
+
+func GetFriendList(c *gin.Context) {
+	params := base_info.GetFriendListReq{}
+	if err := c.BindJSON(&params); err != nil {
+		log.Error("BindJSON failed ", err.Error())
+		c.JSON(http.StatusBadRequest, constant.NewBindJSONErrorRespWithInfo(err.Error()))
+		return
+	}
+	log.Info("GetFriendList BindJSON success")
+
+	ok, opUserID := token_verify.GetUserIDFromToken(c.Request.Header.Get(constant.STR_TOKEN))
+	if !ok {
+		log.Error("GetUserIDFromToken failed ", c.Request.Header.Get(constant.STR_TOKEN))
+		c.JSON(http.StatusInternalServerError, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
+		return
+	}
+	req := &pbFriend.GetFriendListReq{CommonID: &pbFriend.CommonID{}}
+	req.CommonID.FromUserID = params.FromUserID
+	req.CommonID.OpUserID = opUserID
+	log.Info("GetFriendList args: ", req.String())
+
+	// TODO(qingw1230): 使用服务发现建立连接
+	conn, err := grpc.NewClient("127.0.0.1:10200", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Error("NewClient failed ", err.Error())
+		c.JSON(http.StatusInternalServerError, constant.CommonFailResp)
+		return
+	}
+	client := pbFriend.NewFriendClient(conn)
+	reply, err := client.GetFriendList(context.Background(), req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, constant.CommonFailResp)
+		return
+	}
+
+	resp := base_info.GetFriendListResp{CommonResp: base_info.CommonResp{}}
+	copier.Copy(&resp.CommonResp, constant.CommonSuccessResp)
+	resp.CommonResp.Data = reply.FriendInfoList
 	c.JSON(http.StatusOK, resp)
 }

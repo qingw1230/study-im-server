@@ -2,39 +2,7 @@ package constant
 
 import (
 	"errors"
-
-	"github.com/qingw1230/study-im-server/pkg/base_info"
 )
-
-var (
-	CommonSuccessResp = base_info.CommonResp{
-		Status: Success,
-		Code:   NoError,
-		Info:   SuccessInfo,
-	}
-
-	CommonFailResp = base_info.CommonResp{
-		Status: Fail,
-		Code:   CommonError,
-		Info:   FailInfo,
-	}
-
-	MySQLCommonFailResp = base_info.CommonResp{
-		Status: Fail,
-		Code:   RecordMySQLCommonError,
-		Info:   RecordMySQLCommonErrorInfo,
-	}
-)
-
-func NewSuccessRespWithData(data interface{}) *base_info.CommonResp {
-	resp := &base_info.CommonResp{
-		Status: Success,
-		Code:   NoError,
-		Info:   SuccessInfo,
-	}
-	resp.Data = data
-	return resp
-}
 
 const (
 	Success     = "success"

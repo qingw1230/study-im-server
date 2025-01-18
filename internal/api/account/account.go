@@ -19,11 +19,7 @@ func Register(c *gin.Context) {
 	params := base_info.RegisterReq{}
 	if err := c.BindJSON(&params); err != nil {
 		log.Error("BindJSON failed ", err.Error())
-		c.JSON(http.StatusBadRequest, base_info.CommonResp{
-			Status: constant.Fail,
-			Code:   constant.RequestBindJSONError,
-			Info:   err.Error(),
-		})
+		c.JSON(http.StatusBadRequest, constant.NewBindJSONErrorRespWithInfo(err.Error()))
 		return
 	}
 	log.Info("Register BindJSON success")
@@ -74,11 +70,7 @@ func Login(c *gin.Context) {
 	params := base_info.LoginReq{}
 	if err := c.BindJSON(&params); err != nil {
 		log.Error("BindJSON failed ", err.Error())
-		c.JSON(http.StatusBadRequest, base_info.CommonResp{
-			Status: constant.Fail,
-			Code:   constant.RequestBindJSONError,
-			Info:   err.Error(),
-		})
+		c.JSON(http.StatusBadRequest, constant.NewBindJSONErrorRespWithInfo(err.Error()))
 		return
 	}
 	log.Info("Login BindJSON success")
