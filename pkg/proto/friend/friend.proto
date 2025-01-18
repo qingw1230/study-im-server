@@ -14,6 +14,19 @@ message AddFriendResp {
   server_api_params.CommonResp CommonResp = 1;
 }
 
+message AddFriendResponseReq {
+  string OpUserID = 1;
+  string FromUserID = 2;
+  string ToUserID = 3;
+  int32 HandleResult = 4;
+  string HandleMsg = 5;
+}
+
+message AddFriendResponseResp {
+  server_api_params.CommonResp CommonResp = 1;
+}
+
 service Friend {
   rpc AddFriend(AddFriendReq) returns (AddFriendResp);
+  rpc AddFriendResponse(AddFriendResponseReq) returns (AddFriendResponseResp);
 }

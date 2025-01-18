@@ -21,7 +21,7 @@ import (
 )
 
 func (s *accountServer) Register(_ context.Context, req *pbAccount.RegisterReq) (*pbAccount.RegisterResp, error) {
-	log.Info("call Register, args: ", req.String())
+	log.Info("call Register args: ", req.String())
 
 	// 确保用户不存在
 	if controller.IsUserExist(req.UserRegisterInfo.Email) {
@@ -60,7 +60,7 @@ func (s *accountServer) Register(_ context.Context, req *pbAccount.RegisterReq) 
 }
 
 func (s *accountServer) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAccount.LoginResp, error) {
-	log.Info("call Login, args: ", req.String())
+	log.Info("call Login args: ", req.String())
 
 	// 确保用户存在
 	user, err := controller.FindUserByEmail(req.UserLoginInfo.Email)
@@ -116,7 +116,7 @@ func (s *accountServer) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAc
 }
 
 func (s *accountServer) GetUserInfo(_ context.Context, req *pbAccount.GetUserInfoReq) (*pbAccount.GetUserInfoResp, error) {
-	log.Info("call GetUserInfo, args: ", req.String())
+	log.Info("call GetUserInfo args: ", req.String())
 
 	user, err := controller.FindUserByID(req.UserID)
 	if err == gorm.ErrRecordNotFound {

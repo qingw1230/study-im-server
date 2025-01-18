@@ -30,8 +30,8 @@ func AddFriend(c *gin.Context) {
 
 	ok, opUserID := token_verify.GetUserIDFromToken(c.Request.Header.Get(constant.STR_TOKEN))
 	if !ok {
-		log.Error("token_verify.GetUserIDFromToken failed ", c.Request.Header.Get(constant.STR_TOKEN))
-		c.JSON(http.StatusBadRequest, base_info.CommonResp{
+		log.Error("GetUserIDFromToken failed ", c.Request.Header.Get(constant.STR_TOKEN))
+		c.JSON(http.StatusInternalServerError, base_info.CommonResp{
 			Status: constant.Fail,
 			Code:   constant.TokenUnknown,
 			Info:   constant.TokenUnknownMsg.Error(),
@@ -41,12 +41,12 @@ func AddFriend(c *gin.Context) {
 	req := &rpc.AddFriendReq{}
 	copier.Copy(req, &params)
 	req.OpUserID = opUserID
-	log.Info("client.AddFriend args: ", req.String())
+	log.Info("AddFriend args: ", req.String())
 
 	// TODO(qingw1230): 使用服务发现建立连接
 	conn, err := grpc.NewClient("127.0.0.1:10200", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Error("grpc.NewClient failed ", err.Error())
+		log.Error("NewClient failed ", err.Error())
 		c.JSON(http.StatusInternalServerError, constant.CommonFailResp)
 		return
 	}
@@ -57,7 +57,54 @@ func AddFriend(c *gin.Context) {
 		return
 	}
 
-	resp := base_info.CommonResp{}
-	copier.Copy(&resp, reply.CommonResp)
+	resp := base_info.AddFriendResp{CommonResp: base_info.CommonResp{}}
+	copier.Copy(&resp.CommonResp, reply.CommonResp)
+	c.JSON(http.StatusOK, resp)
+}
+
+func AddFriendResponse(c *gin.Context) {
+	params := base_info.AddFriendResponseReq{}
+	if err := c.BindJSON(&params); err != nil {
+		log.Error("BindJSON failed ", err.Error())
+		c.JSON(http.StatusBadRequest, base_info.CommonResp{
+			Status: constant.Fail,
+			Code:   constant.RequestBindJSONError,
+			Info:   err.Error(),
+		})
+		return
+	}
+	log.Info("AddFriendResponse BindJSON success")
+
+	ok, opUserID := token_verify.GetUserIDFromToken(c.Request.Header.Get(constant.STR_TOKEN))
+	if !ok {
+		log.Error("GetUserIDFromToken failed ", c.Request.Header.Get(constant.STR_TOKEN))
+		c.JSON(http.StatusInternalServerError, base_info.CommonResp{
+			Status: constant.Fail,
+			Code:   constant.TokenUnknown,
+			Info:   constant.TokenUnknownMsg.Error(),
+		})
+		return
+	}
+	req := &rpc.AddFriendResponseReq{}
+	copier.Copy(req, &params)
+	req.OpUserID = opUserID
+	log.Info("AddFriendResponse args: ", req.String())
+
+	// TODO(qingw1230): 使用服务发现建立连接
+	conn, err := grpc.NewClient("127.0.0.1:10200", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Error("NewClient failed ", err.Error())
+		c.JSON(http.StatusInternalServerError, constant.CommonFailResp)
+		return
+	}
+	client := rpc.NewFriendClient(conn)
+	reply, err := client.AddFriendResponse(context.Background(), req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, constant.CommonFailResp)
+		return
+	}
+
+	resp := base_info.AddFriendResponseResp{CommonResp: base_info.CommonResp{}}
+	copier.Copy(&resp.CommonResp, reply.CommonResp)
 	c.JSON(http.StatusOK, resp)
 }

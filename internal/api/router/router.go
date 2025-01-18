@@ -21,6 +21,7 @@ func Router() *gin.Engine {
 	friendRouterGroup := r.Group("/api/friend")
 	{
 		friendRouterGroup.POST("/add_friend", friend.AddFriend)
+		friendRouterGroup.POST("/add_friend_response", friend.AddFriendResponse)
 	}
 
 	groupRouterGroup := r.Group("/api/group")

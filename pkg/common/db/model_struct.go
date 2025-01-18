@@ -57,33 +57,35 @@ func (GroupInfo) TableName() string {
 	return "group_info"
 }
 
-// UserContact 用户联系人表
-type UserContact struct {
-	UserID         string `gorm:"column:user_id;type:varchar(12);not null;primary_key"`
-	ContactID      string `gorm:"column:contact_id;type:varchar(12);not null;primary_key;index:idx_contact_id"`
-	ContactType    int    `gorm:"column:cotact_type;type:tinyint(1)"`
-	CreateTime     int    `gorm:"column:create_time;type:int(11)"`
-	Status         int    `gorm:"column:status;type:tinyint(1)"`
-	LastUpdateTime int    `gorm:"column:last_update_time;type:timestamp;autoUpdateTime"`
+type Friend struct {
+	ID           int       `gorm:"column:id;type:int(11) auto_increment;not null;primary_key"`
+	OwnerUserID  string    `gorm:"column:owner_user_id;type:varchar(12);not null;unique_index:idx_key"`
+	FriendUserID string    `gorm:"column:friend_user_id;type:varchar(12);not null;unique_index:idx_key"`
+	Remark       string    `gorm:"column:remark;type:varchar(255)"`
+	CreateTime   time.Time `gorm:"column:create_time;type:datetime"`
+	AddSource    int32     `gorm:"column:add_source;type:int(11)"`
+	OpUserID     string    `gorm:"column:op_user_id;type:varchar(12)"`
+	Ex           string    `gorm:"column:ex;type:varchar(1024)"`
 }
 
-func (UserContact) TableName() string {
-	return "user_contact"
+func (Friend) TableName() string {
+	return constant.DBTableFriend
 }
 
 // FriendRequest 好友申请表
 type FriendRequest struct {
-	ApplyID      int       `gorm:"column:apply_id;type:int(11) auto_increment;not null;primary_key"`
-	FromUserID   string    `gorm:"column:form_user_id;type:varchar(12);not null;unique_index:idx_key"`
+	RequestID    int       `gorm:"column:request_id;type:int(11) auto_increment;not null;primary_key"`
+	FromUserID   string    `gorm:"column:from_user_id;type:varchar(12);not null;unique_index:idx_key"`
 	ToUserID     string    `gorm:"column:to_user_id;type:varchar(12);not null;unique_index:idx_key"`
 	HandleResult int8      `gorm:"column:handle_result;type:tinyint(1)"`
 	ReqMsg       string    `gorm:"column:req_msg;type:varchar(255)"`
-	CreateTime   time.Time `gorm:"column:create_time;type:datetime"`
 	HandleUserID string    `gorm:"column:handle_user_id;type:varchar(12)"`
 	HandleMsg    string    `gorm:"column:handle_msg;type:varchar(255)"`
+	CreateTime   time.Time `gorm:"column:create_time;type:datetime"`
+	HandleTime   time.Time `gorm:"column:handle_time;typd:datetime"`
 	Ex           string    `gorm:"column:ex;type:varchar(1024)"`
 }
 
 func (FriendRequest) TableName() string {
-	return constant.DBTableFrindRequest
+	return constant.DBTableFriendRequest
 }
