@@ -23,8 +23,8 @@ import (
 func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) (*pbFriend.AddFriendResp, error) {
 	log.Info("call AddFriend args: ", req.String())
 	// 确保有权限
-	if !token_verify.CheckAccess(req.OpUserID, req.FromUserID) {
-		log.Error("CheckAccess false ", req.OpUserID, req.FromUserID)
+	if !token_verify.CheckAccess(req.CommonID.OpUserID, req.CommonID.FromUserID) {
+		log.Error("CheckAccess false ", req.CommonID.OpUserID, req.CommonID.FromUserID)
 		return &pbFriend.AddFriendResp{
 			CommonResp: &pbPublic.CommonResp{
 				Status: constant.Fail,
@@ -35,7 +35,7 @@ func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) 
 	}
 
 	// 保证要添加的好友存在
-	if _, err := controller.FindUserByID(req.ToUserID); err != nil {
+	if _, err := controller.FindUserByID(req.CommonID.ToUserID); err != nil {
 		return &pbFriend.AddFriendResp{
 			CommonResp: &pbPublic.CommonResp{
 				Status: constant.Fail,
@@ -46,7 +46,8 @@ func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) 
 	}
 
 	friendRequest := db.FriendRequest{HandleResult: 0}
-	copier.Copy(&friendRequest, req)
+	copier.Copy(&friendRequest, req.CommonID)
+	friendRequest.ReqMsg = req.ReqMsg
 	err := controller.InsertFriendApplication(&friendRequest)
 	if err != nil {
 		log.Error("InsertFriendApplication failed ", err.Error(), friendRequest)
@@ -68,8 +69,8 @@ func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) 
 func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFriendResponseReq) (*pbFriend.AddFriendResponseResp, error) {
 	log.Info("call AddFriendResponse args: ", req.String())
 	// 确保有权限
-	if !token_verify.CheckAccess(req.OpUserID, req.FromUserID) {
-		log.Error("CheckAccess false ", req.OpUserID, req.FromUserID)
+	if !token_verify.CheckAccess(req.CommonID.OpUserID, req.CommonID.FromUserID) {
+		log.Error("CheckAccess false ", req.CommonID.OpUserID, req.CommonID.FromUserID)
 		return &pbFriend.AddFriendResponseResp{
 			CommonResp: &pbPublic.CommonResp{
 				Status: constant.Fail,
@@ -80,7 +81,7 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 	}
 
 	// 在同意或拒绝好友申请之前，先检查记录是否存在
-	friendRequest, err := controller.GetFriendApplicationByBothUserID(req.FromUserID, req.ToUserID)
+	friendRequest, err := controller.GetFriendApplicationByBothUserID(req.CommonID.FromUserID, req.CommonID.ToUserID)
 	if err != nil {
 		return &pbFriend.AddFriendResponseResp{
 			CommonResp: &pbPublic.CommonResp{
@@ -92,7 +93,7 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 	}
 	friendRequest.HandleResult = int8(req.HandleResult)
 	friendRequest.HandleTime = time.Now()
-	friendRequest.HandleUserID = req.OpUserID
+	friendRequest.HandleUserID = req.CommonID.OpUserID
 	friendRequest.HandleMsg = req.HandleMsg
 	err = controller.UpdateFriendApplication(friendRequest)
 	if err != nil {
@@ -104,12 +105,12 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 
 	if friendRequest.HandleResult == constant.FriendResponseAgree {
 		// 插入两条单向好友关系
-		friend, err := controller.GetFriendRelationFromFriend(req.FromUserID, req.ToUserID)
+		friend, err := controller.GetFriendRelationFromFriend(req.CommonID.FromUserID, req.CommonID.ToUserID)
 		log.Debug("GetFriendRelationFromFriend return ", friend, err)
 		if err == nil {
-			log.Warn("GetFriendRelationFromFriend exist ", req.FromUserID, req.ToUserID)
+			log.Warn("GetFriendRelationFromFriend exist ", req.CommonID.FromUserID, req.CommonID.ToUserID)
 		} else if err == gorm.ErrRecordNotFound {
-			toInsertFollow := db.Friend{OwnerUserID: req.FromUserID, FriendUserID: req.ToUserID, OpUserID: req.OpUserID}
+			toInsertFollow := db.Friend{OwnerUserID: req.CommonID.FromUserID, FriendUserID: req.CommonID.ToUserID, OpUserID: req.CommonID.OpUserID}
 			err = controller.InsertToFriend(&toInsertFollow)
 			if err != nil {
 				log.Error("InsertToFriend failed ", err.Error(), toInsertFollow)
@@ -124,11 +125,11 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 			return resp, nil
 		}
 
-		_, err = controller.GetFriendRelationFromFriend(req.ToUserID, req.FromUserID)
+		_, err = controller.GetFriendRelationFromFriend(req.CommonID.ToUserID, req.CommonID.FromUserID)
 		if err == nil {
-			log.Warn("GetFriendRelationFromFriend exist ", req.ToUserID, req.FromUserID)
+			log.Warn("GetFriendRelationFromFriend exist ", req.CommonID.ToUserID, req.CommonID.FromUserID)
 		} else if err == gorm.ErrRecordNotFound {
-			toInsertFollow := db.Friend{OwnerUserID: req.ToUserID, FriendUserID: req.FromUserID, OpUserID: req.OpUserID}
+			toInsertFollow := db.Friend{OwnerUserID: req.CommonID.ToUserID, FriendUserID: req.CommonID.FromUserID, OpUserID: req.CommonID.OpUserID}
 			err = controller.InsertToFriend(&toInsertFollow)
 			if err != nil {
 				log.Error("InsertToFriend failed ", err.Error(), toInsertFollow)

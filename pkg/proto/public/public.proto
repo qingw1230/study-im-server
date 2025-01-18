@@ -27,3 +27,13 @@ message PublicUserInfo {
   string areaName = 4;
   string areaCode = 5;
 }
+
+message FriendInfo {
+  string ownerUserID = 1;
+  string remark = 2;
+  uint32 createTime = 3;
+  PublicUserInfo friendInfo = 4;
+  int32 addSource = 5;
+  string opUserID = 6;
+  string ex = 7;
+}

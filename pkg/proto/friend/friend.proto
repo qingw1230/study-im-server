@@ -3,11 +3,15 @@ import "public/public.proto";
 package pbFriend;
 option go_package = "github.com/qingw1230/study-im-server/pkg/proto/friend";
 
-message AddFriendReq {
+message CommonID {
   string OpUserID = 1;
   string FromUserID = 2;
   string ToUserID = 3;
-  string ReqMsg = 4;
+}
+
+message AddFriendReq {
+  CommonID CommonID = 1;
+  string ReqMsg = 2;
 }
 
 message AddFriendResp {
@@ -15,18 +19,26 @@ message AddFriendResp {
 }
 
 message AddFriendResponseReq {
-  string OpUserID = 1;
-  string FromUserID = 2;
-  string ToUserID = 3;
-  int32 HandleResult = 4;
-  string HandleMsg = 5;
+  CommonID CommonID = 1;
+  int32 HandleResult = 2;
+  string HandleMsg = 3;
 }
 
 message AddFriendResponseResp {
   server_api_params.CommonResp CommonResp = 1;
 }
 
+message GetFriendListReq {
+  CommonID CommonID = 1;
+}
+
+message GetFriendListResp {
+  server_api_params.CommonResp CommonResp = 1;
+  repeated server_api_params.FriendInfo FriendInfoList = 2;
+}
+
 service Friend {
   rpc AddFriend(AddFriendReq) returns (AddFriendResp);
   rpc AddFriendResponse(AddFriendResponseReq) returns (AddFriendResponseResp);
+  rpc GetFriendList(GetFriendListReq) returns (GetFriendListResp);
 }

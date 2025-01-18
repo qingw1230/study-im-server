@@ -10,7 +10,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	"github.com/qingw1230/study-im-server/pkg/common/token_verify"
-	rpc "github.com/qingw1230/study-im-server/pkg/proto/friend"
+	pbFriend "github.com/qingw1230/study-im-server/pkg/proto/friend"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -38,9 +38,10 @@ func AddFriend(c *gin.Context) {
 		})
 		return
 	}
-	req := &rpc.AddFriendReq{}
-	copier.Copy(req, &params)
-	req.OpUserID = opUserID
+	req := &pbFriend.AddFriendReq{CommonID: &pbFriend.CommonID{}}
+	copier.Copy(req.CommonID, &params)
+	req.ReqMsg = params.ReqMsg
+	req.CommonID.OpUserID = opUserID
 	log.Info("AddFriend args: ", req.String())
 
 	// TODO(qingw1230): 使用服务发现建立连接
@@ -50,7 +51,7 @@ func AddFriend(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, constant.CommonFailResp)
 		return
 	}
-	client := rpc.NewFriendClient(conn)
+	client := pbFriend.NewFriendClient(conn)
 	reply, err := client.AddFriend(context.Background(), req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, constant.CommonFailResp)
@@ -85,9 +86,9 @@ func AddFriendResponse(c *gin.Context) {
 		})
 		return
 	}
-	req := &rpc.AddFriendResponseReq{}
+	req := &pbFriend.AddFriendResponseReq{}
 	copier.Copy(req, &params)
-	req.OpUserID = opUserID
+	req.CommonID.OpUserID = opUserID
 	log.Info("AddFriendResponse args: ", req.String())
 
 	// TODO(qingw1230): 使用服务发现建立连接
@@ -97,7 +98,7 @@ func AddFriendResponse(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, constant.CommonFailResp)
 		return
 	}
-	client := rpc.NewFriendClient(conn)
+	client := pbFriend.NewFriendClient(conn)
 	reply, err := client.AddFriendResponse(context.Background(), req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, constant.CommonFailResp)
