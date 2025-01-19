@@ -19,7 +19,7 @@ func Register(c *gin.Context) {
 	params := base_info.RegisterReq{}
 	if err := c.BindJSON(&params); err != nil {
 		log.Error("BindJSON failed ", err.Error())
-		c.JSON(http.StatusBadRequest, constant.NewBindJSONErrorRespWithInfo(err.Error()))
+		c.JSON(http.StatusOK, constant.NewBindJSONErrorRespWithInfo(err.Error()))
 		return
 	}
 	log.Info("Register BindJSON success")
@@ -27,7 +27,7 @@ func Register(c *gin.Context) {
 	// 校验验证码
 	if !captcha.Captcha.Verify(params.CheckCodeId, params.CheckCode) {
 		log.Error("Captcha.Verify failed ", params.Email)
-		c.JSON(http.StatusBadRequest, base_info.CommonResp{
+		c.JSON(http.StatusOK, base_info.CommonResp{
 			Status: constant.Fail,
 			Code:   constant.RequestCheckCodeError,
 			Info:   constant.RequestCheckCodeErrorInfo,
@@ -44,21 +44,21 @@ func Register(c *gin.Context) {
 	conn, err := grpc.NewClient("127.0.0.1:10100", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Error("grpc.NewClient failed ", err.Error())
-		c.JSON(http.StatusInternalServerError, constant.CommonFailResp)
+		c.JSON(http.StatusOK, constant.CommonFailResp)
 		return
 	}
 	client := rpc.NewAccountClient(conn)
 	reply, err := client.Register(context.Background(), req)
 	if err != nil {
 		log.Error("client.Register internal failed ", err.Error())
-		c.JSON(http.StatusInternalServerError, constant.CommonFailResp)
+		c.JSON(http.StatusOK, constant.CommonFailResp)
 		return
 	}
 	if reply.CommonResp.Status == constant.Fail {
 		log.Error("client.Register failed ", reply.CommonResp.Code)
 		resp := base_info.CommonResp{}
 		copier.Copy(&resp, reply.CommonResp)
-		c.JSON(http.StatusBadRequest, resp)
+		c.JSON(http.StatusOK, resp)
 		return
 	}
 	log.Info("Register rpc client.Register call success")
@@ -70,7 +70,7 @@ func Login(c *gin.Context) {
 	params := base_info.LoginReq{}
 	if err := c.BindJSON(&params); err != nil {
 		log.Error("BindJSON failed ", err.Error())
-		c.JSON(http.StatusBadRequest, constant.NewBindJSONErrorRespWithInfo(err.Error()))
+		c.JSON(http.StatusOK, constant.NewBindJSONErrorRespWithInfo(err.Error()))
 		return
 	}
 	log.Info("Login BindJSON success")
@@ -78,7 +78,7 @@ func Login(c *gin.Context) {
 	// 校验验证码
 	if !captcha.Captcha.Verify(params.CheckCodeId, params.CheckCode) {
 		log.Error("Captcha.Verify failed ", params.Email)
-		c.JSON(http.StatusBadRequest, base_info.CommonResp{
+		c.JSON(http.StatusOK, base_info.CommonResp{
 			Status: constant.Fail,
 			Code:   constant.RequestCheckCodeError,
 			Info:   constant.RequestCheckCodeErrorInfo,
@@ -95,21 +95,21 @@ func Login(c *gin.Context) {
 	conn, err := grpc.NewClient("127.0.0.1:10100", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Error("grpc.NewClient failed ", err.Error())
-		c.JSON(http.StatusInternalServerError, constant.CommonFailResp)
+		c.JSON(http.StatusOK, constant.CommonFailResp)
 		return
 	}
 	client := rpc.NewAccountClient(conn)
 	reply, err := client.Login(context.Background(), req)
 	if err != nil {
 		log.Error("client.Login internal failed ", err.Error())
-		c.JSON(http.StatusInternalServerError, constant.CommonFailResp)
+		c.JSON(http.StatusOK, constant.CommonFailResp)
 		return
 	}
 	if reply.CommonResp.Status == constant.Fail {
 		log.Error("client.Login failed ", reply.CommonResp.Code)
 		resp := base_info.CommonResp{}
 		copier.Copy(&resp, reply.CommonResp)
-		c.JSON(http.StatusBadRequest, resp)
+		c.JSON(http.StatusOK, resp)
 		return
 	}
 	log.Info("Login rpc client.Login call success")
@@ -141,7 +141,7 @@ func GetUserInfo(c *gin.Context) {
 	params := base_info.GetUserInfoReq{}
 	if err := c.BindJSON(&params); err != nil {
 		log.Error("BindJSON failed ", err.Error())
-		c.JSON(http.StatusBadRequest, base_info.CommonResp{
+		c.JSON(http.StatusOK, base_info.CommonResp{
 			Status: constant.Fail,
 			Code:   constant.RequestBindJSONError,
 			Info:   err.Error(),
@@ -159,14 +159,14 @@ func GetUserInfo(c *gin.Context) {
 	conn, err := grpc.NewClient("127.0.0.1:10100", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Error("grpc.NewClient failed ", err.Error())
-		c.JSON(http.StatusInternalServerError, constant.CommonFailResp)
+		c.JSON(http.StatusOK, constant.CommonFailResp)
 		return
 	}
 	client := rpc.NewAccountClient(conn)
 	reply, err := client.GetUserInfo(context.Background(), req)
 	if err != nil {
 		log.Error("client.GetUserInfo internal failed ", err.Error())
-		c.JSON(http.StatusInternalServerError, constant.CommonFailResp)
+		c.JSON(http.StatusOK, constant.CommonFailResp)
 		return
 	}
 	log.Info("Login rpc client.Login call success")
