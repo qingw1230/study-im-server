@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func GenerateRandomID(length int) string {
+func GenerateRandomId(length int) string {
 	return "U" + generateRandomNum(length)
 }
 

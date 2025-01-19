@@ -5,9 +5,7 @@ go 1.22.10
 require (
 	github.com/antonfisher/nested-logrus-formatter v1.3.1
 	github.com/gin-gonic/gin v1.10.0
-	github.com/gogo/protobuf v1.3.2
 	github.com/golang-jwt/jwt/v4 v4.5.1
-	github.com/golang/protobuf v1.5.4
 	github.com/gomodule/redigo v1.9.2
 	github.com/jinzhu/copier v0.4.0
 	github.com/jinzhu/gorm v1.9.16

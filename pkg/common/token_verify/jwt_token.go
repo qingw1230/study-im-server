@@ -13,14 +13,14 @@ import (
 )
 
 type Claims struct {
-	UserID string
+	UserId string
 	jwt.RegisteredClaims
 }
 
-func BuildClaims(userID string, ttl int64) Claims {
+func BuildClaims(userId string, ttl int64) Claims {
 	now := time.Now()
 	return Claims{
-		UserID: userID,
+		UserId: userId,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(now.Add(time.Duration(ttl*24) * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(now),
@@ -30,15 +30,15 @@ func BuildClaims(userID string, ttl int64) Claims {
 }
 
 // CreateToken 为用户创建 token，返回 token 过期时间和错误
-func CreateToken(userID string) (string, int64, error) {
-	claims := BuildClaims(userID, config.Config.TokenPolicy.AccessExpire)
+func CreateToken(userId string) (string, int64, error) {
+	claims := BuildClaims(userId, config.Config.TokenPolicy.AccessExpire)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(config.Config.TokenPolicy.Secret))
 	if err != nil {
 		return "", 0, err
 	}
 
-	m, err := db.DB.GetTokenMapByUid(userID)
+	m, err := db.DB.GetTokenMapByUid(userId)
 	if err != nil && err != redis.ErrNil {
 		return "", 0, err
 	}
@@ -51,13 +51,13 @@ func CreateToken(userID string) (string, int64, error) {
 		}
 	}
 	if len(deleteTokenKey) > 0 {
-		err = db.DB.DeleteTokenByUid(userID, deleteTokenKey)
+		err = db.DB.DeleteTokenByUid(userId, deleteTokenKey)
 		if err != nil {
 			return "", 0, err
 		}
 	}
 
-	err = db.DB.AddTokenFlag(userID, tokenString, constant.NormalToken)
+	err = db.DB.AddTokenFlag(userId, tokenString, constant.NormalToken)
 	if err != nil {
 		return "", 0, err
 	}
@@ -101,7 +101,7 @@ func ParseToken(tokenString string) (*Claims, error) {
 		return nil, err
 	}
 
-	m, err := db.DB.GetTokenMapByUid(claims.UserID)
+	m, err := db.DB.GetTokenMapByUid(claims.UserId)
 	if err != nil {
 		log.Error("get token from redis err ", err.Error())
 		return nil, &constant.ErrTokenInvalid
@@ -128,29 +128,29 @@ func ParseToken(tokenString string) (*Claims, error) {
 	return nil, &constant.ErrTokenUnknown
 }
 
-func VerifyToken(token, userID string) (bool, error) {
+func VerifyToken(token, userId string) (bool, error) {
 	claims, err := ParseToken(token)
 	if err != nil {
 		return false, err
 	}
-	if claims.UserID != userID {
+	if claims.UserId != userId {
 		return false, &constant.ErrTokenUnknown
 	}
 	return true, nil
 }
 
-func GetUserIDFromToken(token string) (bool, string) {
+func GetUserIdFromToken(token string) (bool, string) {
 	claims, err := ParseToken(token)
 	if err != nil {
 		return false, ""
 	}
-	return true, claims.UserID
+	return true, claims.UserId
 }
 
 // CheckAccess 检查是否有访问权限
-func CheckAccess(opUserID, ownerUserID string) bool {
-	if utils.IsContain(opUserID, config.Config.Admin.UserIDs) {
+func CheckAccess(opUserId, ownerUserId string) bool {
+	if utils.IsContain(opUserId, config.Config.Admin.UserIds) {
 		return true
 	}
-	return opUserID == ownerUserID
+	return opUserId == ownerUserId
 }

@@ -3,14 +3,14 @@ import "public/public.proto";
 package pbFriend;
 option go_package = "github.com/qingw1230/study-im-server/pkg/proto/friend";
 
-message CommonID {
-  string OpUserID = 1;
-  string FromUserID = 2;
-  string ToUserID = 3;
+message CommonId {
+  string OpUserId = 1;
+  string FromUserId = 2;
+  string ToUserId = 3;
 }
 
 message AddFriendReq {
-  CommonID CommonID = 1;
+  CommonId CommonId = 1;
   string ReqMsg = 2;
 }
 
@@ -19,7 +19,7 @@ message AddFriendResp {
 }
 
 message AddFriendResponseReq {
-  CommonID CommonID = 1;
+  CommonId CommonId = 1;
   int32 HandleResult = 2;
   string HandleMsg = 3;
 }
@@ -29,7 +29,7 @@ message AddFriendResponseResp {
 }
 
 message DeleteFriendReq {
-  CommonID CommonID = 1;
+  CommonId CommonId = 1;
 }
 
 message DeleteFriendResp {
@@ -37,7 +37,7 @@ message DeleteFriendResp {
 }
 
 message GetFriendListReq {
-  CommonID CommonID = 1;
+  CommonId CommonId = 1;
 }
 
 message GetFriendListResp {

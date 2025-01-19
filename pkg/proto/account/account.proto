@@ -24,7 +24,7 @@ message LoginResp {
 }
 
 message GetUserInfoReq {
-  string userID = 1;
+  string userId = 1;
 }
 
 message GetUserInfoResp {

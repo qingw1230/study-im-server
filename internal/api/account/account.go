@@ -25,7 +25,7 @@ func Register(c *gin.Context) {
 	log.Info("Register BindJSON success")
 
 	// 校验验证码
-	if !captcha.Captcha.Verify(params.CheckCodeID, params.CheckCode) {
+	if !captcha.Captcha.Verify(params.CheckCodeId, params.CheckCode) {
 		log.Error("Captcha.Verify failed ", params.Email)
 		c.JSON(http.StatusBadRequest, base_info.CommonResp{
 			Status: constant.Fail,
@@ -76,7 +76,7 @@ func Login(c *gin.Context) {
 	log.Info("Login BindJSON success")
 
 	// 校验验证码
-	if !captcha.Captcha.Verify(params.CheckCodeID, params.CheckCode) {
+	if !captcha.Captcha.Verify(params.CheckCodeId, params.CheckCode) {
 		log.Error("Captcha.Verify failed ", params.Email)
 		c.JSON(http.StatusBadRequest, base_info.CommonResp{
 			Status: constant.Fail,
@@ -118,7 +118,7 @@ func Login(c *gin.Context) {
 }
 
 type Data struct {
-	ID   string `json:"id"`
+	Id   string `json:"id"`
 	B64S string `json:"b64s"`
 }
 
@@ -130,7 +130,7 @@ func GetCheckCode(c *gin.Context) {
 		Code:   constant.NoError,
 		Info:   constant.SuccessInfo,
 		Data: Data{
-			ID:   id,
+			Id:   id,
 			B64S: b64s,
 		},
 	}
@@ -151,7 +151,7 @@ func GetUserInfo(c *gin.Context) {
 	log.Info("Login BindJSON success")
 
 	req := &rpc.GetUserInfoReq{
-		UserID: params.UserID,
+		UserId: params.UserId,
 	}
 	log.Info("GetUserInfo rpc client.GetUserInfo args: ", req.String())
 

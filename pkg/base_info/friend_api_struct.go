@@ -2,13 +2,13 @@ package base_info
 
 import "github.com/qingw1230/study-im-server/pkg/proto/public"
 
-type CommonID struct {
-	FromUserID string `json:"fromUserID" binding:"required"`
-	ToUserID   string `json:"toUserID" binding:"required"`
+type CommonId struct {
+	FromUserId string `json:"fromUserId" binding:"required"`
+	ToUserId   string `json:"toUserId" binding:"required"`
 }
 
 type AddFriendReq struct {
-	CommonID
+	CommonId
 	ReqMsg string `json:"reqMsg"`
 }
 
@@ -17,7 +17,7 @@ type AddFriendResp struct {
 }
 
 type AddFriendResponseReq struct {
-	CommonID
+	CommonId
 	HandleResult int32  `json:"handleResult" binding:"required,oneof=-1 0 1"`
 	HandleMsg    string `json:"handleMsg"`
 }
@@ -27,7 +27,7 @@ type AddFriendResponseResp struct {
 }
 
 type DeleteFriendReq struct {
-	CommonID
+	CommonId
 }
 
 type DeleteFriendResp struct {
@@ -35,7 +35,7 @@ type DeleteFriendResp struct {
 }
 
 type GetFriendListReq struct {
-	FromUserID string `json:"fromUserID" binding:"required"`
+	FromUserId string `json:"fromUserId" binding:"required"`
 }
 
 type GetFriendListResp struct {

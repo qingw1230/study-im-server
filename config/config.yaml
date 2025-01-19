@@ -10,7 +10,7 @@ rpcregistername:
   friendName: Friend
 
 admin:
-  userIDs : [ U30170892524 ]
+  userIds : [ U30170892524 ]
 
 tokenpolicy:
   secret: study-im-server

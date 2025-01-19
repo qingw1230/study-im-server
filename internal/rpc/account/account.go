@@ -38,7 +38,7 @@ func (s *accountServer) Register(_ context.Context, req *pbAccount.RegisterReq) 
 
 	var user db.UserInfo
 	copier.Copy(&user, req)
-	user.UserID = utils.GenerateRandomID(constant.LENGTH_11)
+	user.UserId = utils.GenerateRandomId(constant.LENGTH_11)
 	user.Salt = utils.GenerateRandomStr(constant.LENGTH_10)
 	user.Password = utils.MakePassword(user.Password, user.Salt)
 	user.JoinType = constant.UserInfoJoinTypeAPPLY
@@ -92,7 +92,7 @@ func (s *accountServer) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAc
 	log.Debug("user passed ValidPassword ", user.Email)
 
 	// TODO(qingw1230): 多设备登录检测
-	token, _, err := token_verify.CreateToken(user.UserID)
+	token, _, err := token_verify.CreateToken(user.UserId)
 	if err != nil {
 		resp := &pbAccount.LoginResp{
 			CommonResp: &pbPublic.CommonResp{
@@ -111,19 +111,19 @@ func (s *accountServer) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAc
 	copier.Copy(resp.CommonResp, &constant.CommonSuccessResp)
 	copier.Copy(resp.UserInfo, user)
 	resp.UserInfo.Token = token
-	resp.UserInfo.Admin = utils.IsContain(user.UserID, config.Config.Admin.UserIDs)
+	resp.UserInfo.Admin = utils.IsContain(user.UserId, config.Config.Admin.UserIds)
 	return resp, nil
 }
 
 func (s *accountServer) GetUserInfo(_ context.Context, req *pbAccount.GetUserInfoReq) (*pbAccount.GetUserInfoResp, error) {
 	log.Info("call GetUserInfo args: ", req.String())
 
-	user, err := controller.FindUserByID(req.UserID)
+	user, err := controller.FindUserById(req.UserId)
 	if err == gorm.ErrRecordNotFound {
 		return nil, nil
 	}
 	if err != nil {
-		log.Error("FindUserByID failed ", err.Error())
+		log.Error("FindUserById failed ", err.Error())
 		return nil, err
 	}
 

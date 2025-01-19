@@ -11,7 +11,7 @@ message CommonResp {
 message UserInfo {
   string token = 1;
   bool admin = 2;
-  string userID = 3;
+  string userId = 3;
   string nickName = 4;
   string personalSignature = 5;
   int32 joinType = 6;
@@ -21,7 +21,7 @@ message UserInfo {
 }
 
 message PublicUserInfo {
-  string userID = 1;
+  string userId = 1;
   string nickName = 2;
   int32 sex = 3;
   string areaName = 4;
@@ -29,11 +29,11 @@ message PublicUserInfo {
 }
 
 message FriendInfo {
-  string ownerUserID = 1;
+  string ownerUserId = 1;
   string remark = 2;
   uint32 createTime = 3;
   PublicUserInfo friendInfo = 4;
   int32 addSource = 5;
-  string opUserID = 6;
+  string opUserId = 6;
   string ex = 7;
 }

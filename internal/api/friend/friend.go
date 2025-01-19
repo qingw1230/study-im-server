@@ -24,16 +24,16 @@ func AddFriend(c *gin.Context) {
 	}
 	log.Info("AddFriend BindJSON success")
 
-	ok, opUserID := token_verify.GetUserIDFromToken(c.Request.Header.Get(constant.STR_TOKEN))
+	ok, opUserId := token_verify.GetUserIdFromToken(c.Request.Header.Get(constant.STR_TOKEN))
 	if !ok {
-		log.Error("GetUserIDFromToken failed ", c.Request.Header.Get(constant.STR_TOKEN))
+		log.Error("GetUserIdFromToken failed ", c.Request.Header.Get(constant.STR_TOKEN))
 		c.JSON(http.StatusInternalServerError, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
 		return
 	}
-	req := &pbFriend.AddFriendReq{CommonID: &pbFriend.CommonID{}}
-	copier.Copy(req.CommonID, &params)
+	req := &pbFriend.AddFriendReq{CommonId: &pbFriend.CommonId{}}
+	copier.Copy(req.CommonId, &params)
 	req.ReqMsg = params.ReqMsg
-	req.CommonID.OpUserID = opUserID
+	req.CommonId.OpUserId = opUserId
 	log.Info("AddFriend args: ", req.String())
 
 	// TODO(qingw1230): 使用服务发现建立连接
@@ -64,15 +64,15 @@ func AddFriendResponse(c *gin.Context) {
 	}
 	log.Info("AddFriendResponse BindJSON success")
 
-	ok, opUserID := token_verify.GetUserIDFromToken(c.Request.Header.Get(constant.STR_TOKEN))
+	ok, opUserId := token_verify.GetUserIdFromToken(c.Request.Header.Get(constant.STR_TOKEN))
 	if !ok {
-		log.Error("GetUserIDFromToken failed ", c.Request.Header.Get(constant.STR_TOKEN))
+		log.Error("GetUserIdFromToken failed ", c.Request.Header.Get(constant.STR_TOKEN))
 		c.JSON(http.StatusInternalServerError, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
 		return
 	}
 	req := &pbFriend.AddFriendResponseReq{}
 	copier.Copy(req, &params)
-	req.CommonID.OpUserID = opUserID
+	req.CommonId.OpUserId = opUserId
 	log.Info("AddFriendResponse args: ", req.String())
 
 	// TODO(qingw1230): 使用服务发现建立连接
@@ -103,15 +103,15 @@ func DeleteFriend(c *gin.Context) {
 	}
 	log.Info("DeleteFriend BindJSON success")
 
-	ok, opUserID := token_verify.GetUserIDFromToken(c.Request.Header.Get(constant.STR_TOKEN))
+	ok, opUserId := token_verify.GetUserIdFromToken(c.Request.Header.Get(constant.STR_TOKEN))
 	if !ok {
-		log.Error("GetUserIDFromToken failed ", c.Request.Header.Get(constant.STR_TOKEN))
+		log.Error("GetUserIdFromToken failed ", c.Request.Header.Get(constant.STR_TOKEN))
 		c.JSON(http.StatusInternalServerError, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
 		return
 	}
-	req := &pbFriend.DeleteFriendReq{CommonID: &pbFriend.CommonID{}}
-	copier.Copy(req.CommonID, &params)
-	req.CommonID.OpUserID = opUserID
+	req := &pbFriend.DeleteFriendReq{CommonId: &pbFriend.CommonId{}}
+	copier.Copy(req.CommonId, &params)
+	req.CommonId.OpUserId = opUserId
 	log.Info("DeleteFriend args: ", req.String())
 
 	// TODO(qingw1230): 使用服务发现建立连接
@@ -142,15 +142,15 @@ func GetFriendList(c *gin.Context) {
 	}
 	log.Info("GetFriendList BindJSON success")
 
-	ok, opUserID := token_verify.GetUserIDFromToken(c.Request.Header.Get(constant.STR_TOKEN))
+	ok, opUserId := token_verify.GetUserIdFromToken(c.Request.Header.Get(constant.STR_TOKEN))
 	if !ok {
-		log.Error("GetUserIDFromToken failed ", c.Request.Header.Get(constant.STR_TOKEN))
+		log.Error("GetUserIdFromToken failed ", c.Request.Header.Get(constant.STR_TOKEN))
 		c.JSON(http.StatusInternalServerError, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
 		return
 	}
-	req := &pbFriend.GetFriendListReq{CommonID: &pbFriend.CommonID{}}
-	req.CommonID.FromUserID = params.FromUserID
-	req.CommonID.OpUserID = opUserID
+	req := &pbFriend.GetFriendListReq{CommonId: &pbFriend.CommonId{}}
+	req.CommonId.FromUserId = params.FromUserId
+	req.CommonId.OpUserId = opUserId
 	log.Info("GetFriendList args: ", req.String())
 
 	// TODO(qingw1230): 使用服务发现建立连接

@@ -24,13 +24,13 @@ import (
 func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) (*pbFriend.AddFriendResp, error) {
 	log.Info("call AddFriend args: ", req.String())
 	// 确保有权限
-	if !token_verify.CheckAccess(req.CommonID.OpUserID, req.CommonID.FromUserID) {
-		log.Error("CheckAccess false ", req.CommonID.OpUserID, req.CommonID.FromUserID)
+	if !token_verify.CheckAccess(req.CommonId.OpUserId, req.CommonId.FromUserId) {
+		log.Error("CheckAccess false ", req.CommonId.OpUserId, req.CommonId.FromUserId)
 		return &pbFriend.AddFriendResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
 	}
 
 	// 保证要添加的好友存在
-	if _, err := controller.FindUserByID(req.CommonID.ToUserID); err != nil {
+	if _, err := controller.FindUserById(req.CommonId.ToUserId); err != nil {
 		return &pbFriend.AddFriendResp{
 			CommonResp: &pbPublic.CommonResp{
 				Status: constant.Fail,
@@ -41,7 +41,7 @@ func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) 
 	}
 
 	friendRequest := db.FriendRequest{HandleResult: 0}
-	copier.Copy(&friendRequest, req.CommonID)
+	copier.Copy(&friendRequest, req.CommonId)
 	friendRequest.ReqMsg = req.ReqMsg
 	err := controller.InsertFriendApplication(&friendRequest)
 	if err != nil {
@@ -56,13 +56,13 @@ func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) 
 func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFriendResponseReq) (*pbFriend.AddFriendResponseResp, error) {
 	log.Info("call AddFriendResponse args: ", req.String())
 	// 确保有权限
-	if !token_verify.CheckAccess(req.CommonID.OpUserID, req.CommonID.FromUserID) {
-		log.Error("CheckAccess false ", req.CommonID.OpUserID, req.CommonID.FromUserID)
+	if !token_verify.CheckAccess(req.CommonId.OpUserId, req.CommonId.FromUserId) {
+		log.Error("CheckAccess false ", req.CommonId.OpUserId, req.CommonId.FromUserId)
 		return &pbFriend.AddFriendResponseResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
 	}
 
 	// 在同意或拒绝好友申请之前，先检查记录是否存在
-	friendRequest, err := controller.GetFriendApplicationByBothUserID(req.CommonID.FromUserID, req.CommonID.ToUserID)
+	friendRequest, err := controller.GetFriendApplicationByBothUserId(req.CommonId.FromUserId, req.CommonId.ToUserId)
 	if err != nil {
 		return &pbFriend.AddFriendResponseResp{
 			CommonResp: &pbPublic.CommonResp{
@@ -74,7 +74,7 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 	}
 	friendRequest.HandleResult = int8(req.HandleResult)
 	friendRequest.HandleTime = time.Now()
-	friendRequest.HandleUserID = req.CommonID.OpUserID
+	friendRequest.HandleUserId = req.CommonId.OpUserId
 	friendRequest.HandleMsg = req.HandleMsg
 	err = controller.UpdateFriendApplication(friendRequest)
 	if err != nil {
@@ -86,12 +86,12 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 
 	if friendRequest.HandleResult == constant.FriendResponseAgree {
 		// 插入两条单向好友关系
-		friend, err := controller.GetFriendRelationFromFriend(req.CommonID.FromUserID, req.CommonID.ToUserID)
+		friend, err := controller.GetFriendRelationFromFriend(req.CommonId.FromUserId, req.CommonId.ToUserId)
 		log.Debug("GetFriendRelationFromFriend return ", friend, err)
 		if err == nil {
-			log.Warn("GetFriendRelationFromFriend exist ", req.CommonID.FromUserID, req.CommonID.ToUserID)
+			log.Warn("GetFriendRelationFromFriend exist ", req.CommonId.FromUserId, req.CommonId.ToUserId)
 		} else if err == gorm.ErrRecordNotFound {
-			toInsertFollow := db.Friend{OwnerUserID: req.CommonID.FromUserID, FriendUserID: req.CommonID.ToUserID, OpUserID: req.CommonID.OpUserID}
+			toInsertFollow := db.Friend{OwnerUserId: req.CommonId.FromUserId, FriendUserId: req.CommonId.ToUserId, OpUserId: req.CommonId.OpUserId}
 			err = controller.InsertToFriend(&toInsertFollow)
 			if err != nil {
 				log.Error("InsertToFriend failed ", err.Error(), toInsertFollow)
@@ -106,11 +106,11 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 			return resp, nil
 		}
 
-		_, err = controller.GetFriendRelationFromFriend(req.CommonID.ToUserID, req.CommonID.FromUserID)
+		_, err = controller.GetFriendRelationFromFriend(req.CommonId.ToUserId, req.CommonId.FromUserId)
 		if err == nil {
-			log.Warn("GetFriendRelationFromFriend exist ", req.CommonID.ToUserID, req.CommonID.FromUserID)
+			log.Warn("GetFriendRelationFromFriend exist ", req.CommonId.ToUserId, req.CommonId.FromUserId)
 		} else if err == gorm.ErrRecordNotFound {
-			toInsertFollow := db.Friend{OwnerUserID: req.CommonID.ToUserID, FriendUserID: req.CommonID.FromUserID, OpUserID: req.CommonID.OpUserID}
+			toInsertFollow := db.Friend{OwnerUserId: req.CommonId.ToUserId, FriendUserId: req.CommonId.FromUserId, OpUserId: req.CommonId.OpUserId}
 			err = controller.InsertToFriend(&toInsertFollow)
 			if err != nil {
 				log.Error("InsertToFriend failed ", err.Error(), toInsertFollow)
@@ -134,12 +134,12 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 func (s *friendServer) DeleteFriend(_ context.Context, req *pbFriend.DeleteFriendReq) (*pbFriend.DeleteFriendResp, error) {
 	log.Info("DeleteFriend args: ", req.String())
 	// 确保有权限
-	if !token_verify.CheckAccess(req.CommonID.OpUserID, req.CommonID.FromUserID) {
-		log.Error("CheckAccess false ", req.CommonID.OpUserID, req.CommonID.FromUserID)
+	if !token_verify.CheckAccess(req.CommonId.OpUserId, req.CommonId.FromUserId) {
+		log.Error("CheckAccess false ", req.CommonId.OpUserId, req.CommonId.FromUserId)
 		return &pbFriend.DeleteFriendResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
 	}
 
-	err := controller.DeleteSingleFriendRelation(req.CommonID.FromUserID, req.CommonID.ToUserID)
+	err := controller.DeleteSingleFriendRelation(req.CommonId.FromUserId, req.CommonId.ToUserId)
 	if err != nil {
 		log.Error("DeleteSingleFriendRelation failed ", err.Error())
 		return &pbFriend.DeleteFriendResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
@@ -151,14 +151,14 @@ func (s *friendServer) DeleteFriend(_ context.Context, req *pbFriend.DeleteFrien
 func (s *friendServer) GetFriendList(_ context.Context, req *pbFriend.GetFriendListReq) (*pbFriend.GetFriendListResp, error) {
 	log.Info("call GetFriendList args: ", req.String())
 	// 确保有权限
-	if !token_verify.CheckAccess(req.CommonID.OpUserID, req.CommonID.FromUserID) {
-		log.Error("CheckAccess false ", req.CommonID.OpUserID, req.CommonID.FromUserID)
+	if !token_verify.CheckAccess(req.CommonId.OpUserId, req.CommonId.FromUserId) {
+		log.Error("CheckAccess false ", req.CommonId.OpUserId, req.CommonId.FromUserId)
 		return &pbFriend.GetFriendListResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
 	}
 
-	friends, err := controller.GetFriendListByUserID(req.CommonID.FromUserID)
+	friends, err := controller.GetFriendListByUserId(req.CommonId.FromUserId)
 	if err != nil {
-		log.Error("GetFriendListByUserID failed ", err.Error(), req.CommonID.FromUserID)
+		log.Error("GetFriendListByUserId failed ", err.Error(), req.CommonId.FromUserId)
 		return &pbFriend.GetFriendListResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
 	}
 

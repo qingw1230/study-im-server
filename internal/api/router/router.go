@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/qingw1230/study-im-server/internal/api/account"
 	"github.com/qingw1230/study-im-server/internal/api/friend"
-	"github.com/qingw1230/study-im-server/internal/api/group"
 )
 
 func Router() *gin.Engine {
@@ -24,11 +23,6 @@ func Router() *gin.Engine {
 		friendRouterGroup.POST("/add_friend_response", friend.AddFriendResponse)
 		friendRouterGroup.POST("/delete_friend", friend.DeleteFriend)
 		friendRouterGroup.POST("/get_friend_list", friend.GetFriendList)
-	}
-
-	groupRouterGroup := r.Group("/api/group")
-	{
-		groupRouterGroup.POST("/create_group", group.CreateGroup)
 	}
 
 	return r

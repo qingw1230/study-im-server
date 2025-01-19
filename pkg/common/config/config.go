@@ -31,7 +31,7 @@ type config struct {
 	} `yaml:"rpcregistername"`
 
 	Admin struct {
-		UserIDs []string `yaml:"userIDs"`
+		UserIds []string `yaml:"userIds"`
 	} `yaml:"admin"`
 
 	TokenPolicy struct {

@@ -18,25 +18,25 @@ func InsertToFriend(toInsertFollow *db.Friend) error {
 }
 
 // DeleteSingleFriendRelation 删除单向好友关系
-func DeleteSingleFriendRelation(ownerUserID, friendUserID string) error {
+func DeleteSingleFriendRelation(ownerUserId, friendUserId string) error {
 	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
 	if err != nil {
 		return err
 	}
 	return dbConn.
 		Table(constant.DBTableFriend).
-		Where("owner_user_id = ? AND friend_user_id = ?", ownerUserID, friendUserID).
+		Where("owner_user_id = ? AND friend_user_id = ?", ownerUserId, friendUserId).
 		Delete(&db.Friend{}).Error
 }
 
-// GetFriendListByUserID 根据 UserID 获取好友列表
-func GetFriendListByUserID(ownerUserID string) ([]db.Friend, error) {
+// GetFriendListByUserId 根据 UserId 获取好友列表
+func GetFriendListByUserId(ownerUserId string) ([]db.Friend, error) {
 	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
 	if err != nil {
 		return nil, err
 	}
 	var friends []db.Friend
-	err = dbConn.Table(constant.DBTableFriend).Where("owner_user_id = ?", ownerUserID).Find(&friends).Error
+	err = dbConn.Table(constant.DBTableFriend).Where("owner_user_id = ?", ownerUserId).Find(&friends).Error
 	if err != nil {
 		return nil, err
 	}
@@ -44,13 +44,13 @@ func GetFriendListByUserID(ownerUserID string) ([]db.Friend, error) {
 }
 
 // GetFriendRelationFromFriend 从 Friend 表中获取好友关系
-func GetFriendRelationFromFriend(ownerUserID, friendUserID string) (*db.Friend, error) {
+func GetFriendRelationFromFriend(ownerUserId, friendUserId string) (*db.Friend, error) {
 	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
 	if err != nil {
 		return nil, err
 	}
 	var friend db.Friend
-	err = dbConn.Table(constant.DBTableFriend).Where("owner_user_id = ? AND friend_user_id = ?", ownerUserID, friendUserID).First(&friend).Error
+	err = dbConn.Table(constant.DBTableFriend).Where("owner_user_id = ? AND friend_user_id = ?", ownerUserId, friendUserId).First(&friend).Error
 	if err != nil {
 		return nil, err
 	}

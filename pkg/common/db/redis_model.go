@@ -10,9 +10,7 @@ const (
 	redisTimeOneDay    = 60 * 60 * 24
 
 	checkCode         = "STUDYIM:CHECK_CODE:"
-	tokenToUserInfo   = "STUDYIM:TOKEN_TO_USER_INFO:"
-	userIDToToken     = "STUDYIM:USER_ID_TO_TOKEN:"
-	userIDTokenStatus = "STUDYIM:USER_ID_TOKEN_STATUS:"
+	userIdTokenStatus = "STUDYIM:USER_ID_TOKEN_STATUS:"
 )
 
 func (d *DataBases) Exec(cmd string, key interface{}, args ...interface{}) (interface{}, error) {
@@ -48,21 +46,21 @@ func (d *DataBases) GetCheckCode(id string) (string, error) {
 }
 
 // AddTokenFlag 添加用户 token
-func (d *DataBases) AddTokenFlag(userID string, token string, flag int) error {
-	key := userIDTokenStatus + userID
+func (d *DataBases) AddTokenFlag(userId string, token string, flag int) error {
+	key := userIdTokenStatus + userId
 	log.Debug("add token key is ", key)
 	_, err := d.Exec("HSET", key, token, flag)
 	return err
 }
 
-func (d *DataBases) GetTokenMapByUid(userID string) (map[string]int, error) {
-	key := userIDTokenStatus + userID
+func (d *DataBases) GetTokenMapByUid(userId string) (map[string]int, error) {
+	key := userIdTokenStatus + userId
 	log.Debug("get token key is ", key)
 	return redis.IntMap(d.Exec("HGETALL", key))
 }
 
-func (d *DataBases) DeleteTokenByUid(userID string, fields []string) error {
-	key := userIDTokenStatus + userID
+func (d *DataBases) DeleteTokenByUid(userId string, fields []string) error {
+	key := userIdTokenStatus + userId
 	_, err := d.Exec("HDEL", key, redis.Args{}.Add().AddFlat(fields)...)
 	return err
 }

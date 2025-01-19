@@ -9,7 +9,7 @@ import (
 
 func FriendDBCopyIM(dst *public.FriendInfo, src *db.Friend) error {
 	copier.Copy(dst, src)
-	user, err := controller.FindUserByID(src.FriendUserID)
+	user, err := controller.FindUserById(src.FriendUserId)
 	if err != nil {
 		return err
 	}
