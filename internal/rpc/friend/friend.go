@@ -72,7 +72,7 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 			},
 		}, nil
 	}
-	friendRequest.HandleResult = int8(req.HandleResult)
+	friendRequest.HandleResult = req.HandleResult
 	friendRequest.HandleTime = time.Now()
 	friendRequest.HandleUserId = req.CommonId.OpUserId
 	friendRequest.HandleMsg = req.HandleMsg

@@ -8,6 +8,7 @@ const (
 	DBTableFriendRequest   = "friend_requests"
 	DBTableGroup           = "groups"
 	DBTableGroupMember     = "group_members"
+	DBTableGroupRequest    = "group_requests"
 )
 
 // 数字常量

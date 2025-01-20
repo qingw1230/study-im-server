@@ -62,11 +62,11 @@ type FriendRequest struct {
 	RequestId    int       `gorm:"column:request_id;type:int(11) auto_increment;not null;primary_key"`
 	FromUserId   string    `gorm:"column:from_user_id;type:varchar(12);not null;unique_index:idx_key"`
 	ToUserId     string    `gorm:"column:to_user_id;type:varchar(12);not null;unique_index:idx_key"`
-	HandleResult int8      `gorm:"column:handle_result;type:tinyint(1)"`
+	HandleResult int32     `gorm:"column:handle_result;type:tinyint(1)"`
 	ReqMsg       string    `gorm:"column:req_msg;type:varchar(255)"`
+	CreateTime   time.Time `gorm:"column:create_time;type:datetime"`
 	HandleUserId string    `gorm:"column:handle_user_id;type:varchar(12)"`
 	HandleMsg    string    `gorm:"column:handle_msg;type:varchar(255)"`
-	CreateTime   time.Time `gorm:"column:create_time;type:datetime"`
 	HandleTime   time.Time `gorm:"column:handle_time;typd:datetime"`
 	Ex           string    `gorm:"column:ex;type:varchar(1024)"`
 }
@@ -105,4 +105,21 @@ type GroupMember struct {
 
 func (GroupMember) TableName() string {
 	return constant.DBTableGroupMember
+}
+
+type GroupRequest struct {
+	RequestId    int       `gorm:"column:request_id;type:int(11) auto_increment;not null;primary_key"`
+	UserId       string    `gorm:"column:user_id;type:varchar(12);not null;unique_index:idx_key"`
+	GroupId      string    `gorm:"column:group_id;type:varchar(12);not null;unique_index:idx_key"`
+	HandleResult int32     `gorm:"column:handle_result;type:tinyint(1)"`
+	ReqMsg       string    `gorm:"column:req_msg;type:varchar(255)"`
+	CreateTime   time.Time `gorm:"column:create_time;type:datetime"`
+	HandleUserId string    `gorm:"column:handle_user_id;type:varchar(12)"`
+	HandleMsg    string    `gorm:"column:handle_msg;type:varchar(255)"`
+	HandleTime   time.Time `gorm:"column:handle_time;typd:datetime"`
+	Ex           string    `gorm:"column:ex;type:varchar(1024)"`
+}
+
+func (GroupRequest) TableName() string {
+	return constant.DBTableGroupRequest
 }
