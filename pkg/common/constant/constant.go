@@ -2,10 +2,10 @@ package constant
 
 // 数据库表名
 const (
-	DBTableUserInfo       = "user_info"
-	DBTableUserInfoBeauty = "user_info_beauty"
-	DBTableFriend         = "friend"
-	DBTableFriendRequest  = "friend_request"
+	DBTableUser            = "users"
+	DBTableUserLuckyNumber = "user_lucky_numbers"
+	DBTableFriend          = "friends"
+	DBTableFriendRequest   = "friend_requests"
 )
 
 // 数字常量

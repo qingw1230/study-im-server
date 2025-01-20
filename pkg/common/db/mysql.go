@@ -44,7 +44,7 @@ func initMySQLDB() {
 	}
 
 	db.AutoMigrate(
-		&UserInfo{},
+		&User{},
 		&Friend{},
 		&FriendRequest{},
 	)

@@ -36,17 +36,14 @@ func (s *accountServer) Register(_ context.Context, req *pbAccount.RegisterReq) 
 		return resp, nil
 	}
 
-	var user db.UserInfo
+	var user db.User
 	copier.Copy(&user, req)
 	user.UserId = utils.GenerateRandomId(constant.LENGTH_11)
 	user.Salt = utils.GenerateRandomStr(constant.LENGTH_10)
 	user.Password = utils.MakePassword(user.Password, user.Salt)
 	user.JoinType = constant.UserInfoJoinTypeAPPLY
-	user.Status = constant.UserInfoStatusENABLE
 	now := int(time.Now().Unix())
 	user.CreateTime = now
-	user.LastLoginTime = now
-	user.LastOffTime = now
 
 	err := controller.CreateUser(user)
 	if err != nil {

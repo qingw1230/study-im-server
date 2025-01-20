@@ -6,8 +6,8 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 )
 
-// UserInfo 用户信息表
-type UserInfo struct {
+// User 用户信息表
+type User struct {
 	// 新版本添加主键使用: primaryKey
 	// 新版本添加唯一索引使用: uniqueIndex
 	UserId            string `gorm:"column:user_id;type:varchar(12);not null;primary_key"`
@@ -15,46 +15,29 @@ type UserInfo struct {
 	Password          string `gorm:"column:password;type:varchar(32);not null"`
 	Salt              string `gorm:"column:salt;type:varchar(10);not null"`
 	NickName          string `gorm:"column:nick_name;type:varchar(20)"`
+	FaceUrl           string `gorm:"column:face_url;type:varchar(255)"`
 	PersonalSignature string `gorm:"column:personal_signature;type:varchar(50)"`
 	Sex               int    `gorm:"column:sex;type:tinyint(1)"`
 	JoinType          int    `gorm:"column:join_type;type:tinyint(1)"`
-	Status            int    `gorm:"column:status;type:tinyint(1)"`
 	AreaName          string `gorm:"column:area_name;type:varchar(50)"`
 	AreaCode          string `gorm:"column:area_code;type:varchar(50)"`
 	CreateTime        int    `gorm:"column:create_time;type:int(11)"`
-	LastLoginTime     int    `gorm:"column:last_login_time;type:int(11)"`
-	LastOffTime       int    `gorm:"column:last_off_time;type:int(11)"`
 }
 
-func (UserInfo) TableName() string {
-	return constant.DBTableUserInfo
+func (User) TableName() string {
+	return constant.DBTableUser
 }
 
-// UserInfoBeauty 靓号表
-type UserInfoBeauty struct {
+// UserLuckyNumber 靓号表
+type UserLuckyNumber struct {
 	Id     int    `gorm:"column:id;type:int(11) auto_increment;not null;primary_key"`
 	Email  string `gorm:"column:email;type:varchar(50);not null;unique_index:idx_key_email"`
 	UserId string `gorm:"column:user_id;type:varchar(12);not null;unique_index:idx_key_user_id"`
 	Status int    `gorm:"column:status;type:tinyint(1)"`
 }
 
-func (UserInfoBeauty) TableName() string {
-	return "user_info_beauty"
-}
-
-// GroupInfo 群信息表
-type GroupInfo struct {
-	GroupId      string `gorm:"column:group_id;type:varchar(12);not null;primary_key"`
-	GroupName    string `gorm:"column:group_name;type:varchar(20)"`
-	GroupOwnerId string `gorm:"column:group_owner_id;type:varchar(12)"`
-	CreateTime   int    `gorm:"column:create_time;type:int(11)"`
-	GroupNotice  string `gorm:"column:group_notice;type:varchar(500)"`
-	JoinType     int    `gorm:"column:join_type;type:tinyint(1)"`
-	Status       int    `gorm:"column:status;type:tinyint(1)"`
-}
-
-func (GroupInfo) TableName() string {
-	return "group_info"
+func (UserLuckyNumber) TableName() string {
+	return constant.DBTableUserLuckyNumber
 }
 
 type Friend struct {

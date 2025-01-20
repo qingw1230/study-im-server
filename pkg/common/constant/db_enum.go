@@ -6,11 +6,6 @@ const (
 )
 
 const (
-	UserInfoStatusENABLE = iota + 1
-	UserInfoStatusDISABLE
-)
-
-const (
 	FriendResponseAgree  = 1
 	FriendResponseRefuse = -1
 
