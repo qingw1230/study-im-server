@@ -10,6 +10,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/captcha"
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
+	"github.com/qingw1230/study-im-server/pkg/common/token_verify"
 	rpc "github.com/qingw1230/study-im-server/pkg/proto/account"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -141,17 +142,21 @@ func GetUserInfo(c *gin.Context) {
 	params := base_info.GetUserInfoReq{}
 	if err := c.BindJSON(&params); err != nil {
 		log.Error("BindJSON failed ", err.Error())
-		c.JSON(http.StatusOK, base_info.CommonResp{
-			Status: constant.Fail,
-			Code:   constant.RequestBindJSONError,
-			Info:   err.Error(),
-		})
+		c.JSON(http.StatusOK, constant.NewBindJSONErrorRespWithInfo(err.Error()))
 		return
 	}
 	log.Info("Login BindJSON success")
 
+	ok, opUserId := token_verify.GetUserIdFromToken(c.Request.Header.Get(constant.STR_TOKEN))
+	if !ok {
+		log.Error("GetUserIdFromToken failed ", c.Request.Header.Get(constant.STR_TOKEN))
+		c.JSON(http.StatusOK, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
+		return
+	}
+
 	req := &rpc.GetUserInfoReq{
-		UserId: params.UserId,
+		OpUserId: opUserId,
+		UserId:   params.UserId,
 	}
 	log.Info("GetUserInfo rpc client.GetUserInfo args: ", req.String())
 

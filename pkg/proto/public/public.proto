@@ -23,9 +23,11 @@ message UserInfo {
 message PublicUserInfo {
   string userId = 1;
   string nickName = 2;
-  int32 sex = 3;
-  string areaName = 4;
-  string areaCode = 5;
+  string personalSignature = 3;
+  int32 sex = 4;
+  string areaName = 5;
+  string areaCode = 6;
+  bool isFriend = 7;
 }
 
 message FriendInfo {

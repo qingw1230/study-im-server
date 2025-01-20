@@ -131,6 +131,8 @@ func (s *accountServer) GetUserInfo(_ context.Context, req *pbAccount.GetUserInf
 		CommonResp:     &pbPublic.CommonResp{},
 		PublicUserInfo: &pbPublic.PublicUserInfo{},
 	}
+	_, err = controller.GetFriendRelationFromFriend(req.OpUserId, req.UserId)
+	resp.PublicUserInfo.IsFriend = err == nil
 	copier.Copy(resp.PublicUserInfo, user)
 	return resp, nil
 }
