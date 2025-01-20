@@ -38,8 +38,8 @@ func (s *accountServer) Register(_ context.Context, req *pbAccount.RegisterReq) 
 
 	var user db.User
 	copier.Copy(&user, req)
-	user.UserId = utils.GenerateRandomId(constant.LENGTH_11)
-	user.Salt = utils.GenerateRandomStr(constant.LENGTH_10)
+	user.UserId = utils.GenerateUserId()
+	user.Salt = utils.GenerateRandomStrWithLength(constant.LENGTH_10)
 	user.Password = utils.MakePassword(user.Password, user.Salt)
 	user.JoinType = constant.UserInfoJoinTypeAPPLY
 	user.CreateTime = time.Now()

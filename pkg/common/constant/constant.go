@@ -15,7 +15,9 @@ const (
 const (
 	LENGTH_10 = 10
 	LENGTH_11 = 11
+	LENGTH_12 = 12
 	LENGTH_20 = 20
+	LENGTH_32 = 32
 )
 
 // 字符串常量

@@ -37,5 +37,18 @@ message FriendInfo {
   PublicUserInfo friendInfo = 4;
   int32 addSource = 5;
   string opUserId = 6;
-  string ex = 7;
+}
+
+message GroupInfo {
+  string groupId = 1;
+  string groupName = 2;
+  string faceUrl = 3;
+  string introduction = 4;
+  string notifacation = 5;
+  string ownerUserId = 6;
+  uint32 createTime = 7;
+  string ex = 8;
+  int32 status = 9;
+  string createUserId = 10;
+  int32 groupType = 11;
 }

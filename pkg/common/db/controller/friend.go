@@ -7,8 +7,8 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/db"
 )
 
-// InsertToFriend 向 Friend 表中插入单向好友关系
-func InsertToFriend(toInsertFollow *db.Friend) error {
+// InsertIntoFriend 向 Friend 表中插入单向好友关系
+func InsertIntoFriend(toInsertFollow *db.Friend) error {
 	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
 	if err != nil {
 		return err

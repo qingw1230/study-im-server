@@ -92,7 +92,7 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 			log.Warn("GetFriendRelationFromFriend exist ", req.CommonId.FromUserId, req.CommonId.ToUserId)
 		} else if err == gorm.ErrRecordNotFound {
 			toInsertFollow := db.Friend{OwnerUserId: req.CommonId.FromUserId, FriendUserId: req.CommonId.ToUserId, OpUserId: req.CommonId.OpUserId}
-			err = controller.InsertToFriend(&toInsertFollow)
+			err = controller.InsertIntoFriend(&toInsertFollow)
 			if err != nil {
 				log.Error("InsertToFriend failed ", err.Error(), toInsertFollow)
 				resp := &pbFriend.AddFriendResponseResp{CommonResp: &pbPublic.CommonResp{}}
@@ -111,7 +111,7 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 			log.Warn("GetFriendRelationFromFriend exist ", req.CommonId.ToUserId, req.CommonId.FromUserId)
 		} else if err == gorm.ErrRecordNotFound {
 			toInsertFollow := db.Friend{OwnerUserId: req.CommonId.ToUserId, FriendUserId: req.CommonId.FromUserId, OpUserId: req.CommonId.OpUserId}
-			err = controller.InsertToFriend(&toInsertFollow)
+			err = controller.InsertIntoFriend(&toInsertFollow)
 			if err != nil {
 				log.Error("InsertToFriend failed ", err.Error(), toInsertFollow)
 				resp := &pbFriend.AddFriendResponseResp{CommonResp: &pbPublic.CommonResp{}}
@@ -132,7 +132,7 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 }
 
 func (s *friendServer) DeleteFriend(_ context.Context, req *pbFriend.DeleteFriendReq) (*pbFriend.DeleteFriendResp, error) {
-	log.Info("DeleteFriend args: ", req.String())
+	log.Info("call DeleteFriend args: ", req.String())
 	// 确保有权限
 	if !token_verify.CheckAccess(req.CommonId.OpUserId, req.CommonId.FromUserId) {
 		log.Error("CheckAccess false ", req.CommonId.OpUserId, req.CommonId.FromUserId)

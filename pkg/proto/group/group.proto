@@ -1,0 +1,18 @@
+syntax = "proto3";
+import "public/public.proto";
+package pbGroup;
+option go_package = "github.com/qingw1230/study-im-server/pkg/proto/group";
+
+message CreateGroupReq {
+  server_api_params.GroupInfo GroupInfo = 1;
+  string opUserId = 2;
+  string ownerUserId = 3;
+}
+
+message CreateGroupResp {
+  server_api_params.CommonResp CommonResp = 1;
+}
+
+service Group {
+  rpc CreateGroup(CreateGroupReq) returns (CreateGroupResp);
+}

@@ -77,7 +77,7 @@ func (FriendRequest) TableName() string {
 
 type Group struct {
 	GroupId      string    `gorm:"column:group_id;type:varchar(12);not null;primary_key"`
-	GroupName    string    `gorm:"column:group_name;type:varchar(30)"`
+	GroupName    string    `gorm:"column:group_name;type:varchar(32)"`
 	FaceUrl      string    `gorm:"column:face_url;type:varchar(255)"`
 	Introduction string    `gorm:"column:introduction;type:varchar(255)"`
 	Notification string    `gorm:"column:notification;type:varchar(255)"`

@@ -4,13 +4,15 @@ serverip: 0.0.0.0
 rpcport:
   accountPort: [ 10100 ]
   friendPort: [ 10200 ]
+  groupPort: [ 10500 ]
 
 rpcregistername:
   accountName: Account
   friendName: Friend
+  groupName: Group
 
 admin:
-  userIds : [ U30170892524 ]
+  userIds : [ ]
 
 tokenpolicy:
   secret: study-im-server
