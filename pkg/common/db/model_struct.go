@@ -10,18 +10,19 @@ import (
 type User struct {
 	// 新版本添加主键使用: primaryKey
 	// 新版本添加唯一索引使用: uniqueIndex
-	UserId            string `gorm:"column:user_id;type:varchar(12);not null;primary_key"`
-	Email             string `gorm:"column:email;type:varchar(50);not null;unique_index:idx_key_email"`
-	Password          string `gorm:"column:password;type:varchar(32);not null"`
-	Salt              string `gorm:"column:salt;type:varchar(10);not null"`
-	NickName          string `gorm:"column:nick_name;type:varchar(20)"`
-	FaceUrl           string `gorm:"column:face_url;type:varchar(255)"`
-	PersonalSignature string `gorm:"column:personal_signature;type:varchar(50)"`
-	Sex               int    `gorm:"column:sex;type:tinyint(1)"`
-	JoinType          int    `gorm:"column:join_type;type:tinyint(1)"`
-	AreaName          string `gorm:"column:area_name;type:varchar(50)"`
-	AreaCode          string `gorm:"column:area_code;type:varchar(50)"`
-	CreateTime        int    `gorm:"column:create_time;type:int(11)"`
+	UserId            string    `gorm:"column:user_id;type:varchar(12);not null;primary_key"`
+	Email             string    `gorm:"column:email;type:varchar(50);not null;unique_index:idx_key_email"`
+	Password          string    `gorm:"column:password;type:varchar(32);not null"`
+	Salt              string    `gorm:"column:salt;type:varchar(10);not null"`
+	NickName          string    `gorm:"column:nick_name;type:varchar(20)"`
+	FaceUrl           string    `gorm:"column:face_url;type:varchar(255)"`
+	PersonalSignature string    `gorm:"column:personal_signature;type:varchar(50)"`
+	Sex               int       `gorm:"column:sex;type:tinyint(1)"`
+	JoinType          int       `gorm:"column:join_type;type:tinyint(1)"`
+	AreaName          string    `gorm:"column:area_name;type:varchar(50)"`
+	AreaCode          string    `gorm:"column:area_code;type:varchar(50)"`
+	CreateTime        time.Time `gorm:"column:create_time;type:datetime"`
+	Ex                string    `gorm:"column:ex;type:varchar(1024)"`
 }
 
 func (User) TableName() string {
@@ -34,6 +35,7 @@ type UserLuckyNumber struct {
 	Email  string `gorm:"column:email;type:varchar(50);not null;unique_index:idx_key_email"`
 	UserId string `gorm:"column:user_id;type:varchar(12);not null;unique_index:idx_key_user_id"`
 	Status int    `gorm:"column:status;type:tinyint(1)"`
+	Ex     string `gorm:"column:ex;type:varchar(1024)"`
 }
 
 func (UserLuckyNumber) TableName() string {
@@ -71,4 +73,36 @@ type FriendRequest struct {
 
 func (FriendRequest) TableName() string {
 	return constant.DBTableFriendRequest
+}
+
+type Group struct {
+	GroupId      string    `gorm:"column:group_id;type:varchar(12);not null;primary_key"`
+	GroupName    string    `gorm:"column:group_name;type:varchar(30)"`
+	FaceUrl      string    `gorm:"column:face_url;type:varchar(255)"`
+	Introduction string    `gorm:"column:introduction;type:varchar(255)"`
+	Notification string    `gorm:"column:notification;type:varchar(255)"`
+	CreateTime   time.Time `gorm:"column:create_time;type:datetime"`
+	Ex           string    `gorm:"column:ex;type:varchar(1024)"`
+	Status       int32     `gorm:"column:status;type:tinyint(1)"`
+	CreateUserId string    `gorm:"column:create_user_id;type:varchar(12)"`
+	GroupType    int32     `gorm:"column:group_type;type:tinyint(1)"`
+}
+
+func (Group) TableName() string {
+	return constant.DBTableGroup
+}
+
+type GroupMember struct {
+	GroupId    string    `gorm:"column:group_id;type:varchar(12);not null;primary_key"`
+	UserId     string    `gorm:"column:user_id;type:varchar(12);not null;primary_key"`
+	NickName   string    `gorm:"column:nick_name;type:varchar(20)"`
+	FaceUrl    string    `gorm:"column:face_url;type:varchar(255)"`
+	RoleLevel  int32     `gorm:"column:role_level;type:tinyint(1)"`
+	JoinTime   time.Time `gorm:"column:join_time;type:datetime"`
+	JoinSource int32     `gorm:"column:join_source;type:tinyint(1)"`
+	Ex         string    `gorm:"column:ex;type:varchar(1024)"`
+}
+
+func (GroupMember) TableName() string {
+	return constant.DBTableGroupMember
 }

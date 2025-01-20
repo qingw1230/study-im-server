@@ -42,8 +42,7 @@ func (s *accountServer) Register(_ context.Context, req *pbAccount.RegisterReq) 
 	user.Salt = utils.GenerateRandomStr(constant.LENGTH_10)
 	user.Password = utils.MakePassword(user.Password, user.Salt)
 	user.JoinType = constant.UserInfoJoinTypeAPPLY
-	now := int(time.Now().Unix())
-	user.CreateTime = now
+	user.CreateTime = time.Now()
 
 	err := controller.CreateUser(user)
 	if err != nil {

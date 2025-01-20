@@ -6,6 +6,8 @@ const (
 	DBTableUserLuckyNumber = "user_lucky_numbers"
 	DBTableFriend          = "friends"
 	DBTableFriendRequest   = "friend_requests"
+	DBTableGroup           = "groups"
+	DBTableGroupMember     = "group_members"
 )
 
 // 数字常量
