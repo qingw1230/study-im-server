@@ -98,6 +98,7 @@ func (s *groupServer) GetJoinedGroupList(_ context.Context, req *pbGroup.GetJoin
 		}
 	}
 
+	copier.Copy(resp.CommonResp, &constant.PBCommonSuccessResp)
 	log.Info("rpc GetJoinedGroupList return", resp.String())
 	return resp, nil
 }
