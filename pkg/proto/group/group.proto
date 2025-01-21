@@ -5,14 +5,25 @@ option go_package = "github.com/qingw1230/study-im-server/pkg/proto/group";
 
 message CreateGroupReq {
   server_api_params.GroupInfo GroupInfo = 1;
-  string opUserId = 2;
-  string ownerUserId = 3;
+  string OpUserId = 2;
+  string OwnerUserId = 3;
 }
 
 message CreateGroupResp {
   server_api_params.CommonResp CommonResp = 1;
 }
 
+message GetJoinedGroupListReq {
+  string FromUserId = 1;
+  string OpUserId = 2;
+}
+
+message GetJoinedGroupListResp {
+  server_api_params.CommonResp CommonResp = 1;
+  repeated server_api_params.GroupInfo GroupInfoList = 2;
+}
+
 service Group {
   rpc CreateGroup(CreateGroupReq) returns (CreateGroupResp);
+  rpc GetJoinedGroupList(GetJoinedGroupListReq) returns (GetJoinedGroupListResp);
 }

@@ -29,6 +29,7 @@ func Router() *gin.Engine {
 	groupRouterGroup := r.Group("/api/group")
 	{
 		groupRouterGroup.POST("/create_group", group.CreateGroup)
+		groupRouterGroup.POST("/get_joined_group_list", group.GetJoinedGroupList)
 	}
 
 	return r

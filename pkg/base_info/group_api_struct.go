@@ -1,5 +1,7 @@
 package base_info
 
+import "github.com/qingw1230/study-im-server/pkg/proto/public"
+
 type CreateGroupReq struct {
 	OwnerUserId  string `json:"ownerUserId" binding:"required"`
 	GroupName    string `json:"groupName" binding:"required"`
@@ -11,4 +13,13 @@ type CreateGroupReq struct {
 
 type CreateGroupResp struct {
 	CommonResp
+}
+
+type GetJoinedGroupListReq struct {
+	FromUserId string `json:"fromUserId" binding:"required"`
+}
+
+type GetJoinedGroupListResp struct {
+	CommonResp
+	GroupInfoList []*public.GroupInfo `json:"-"`
 }

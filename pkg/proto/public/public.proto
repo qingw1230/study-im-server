@@ -47,8 +47,9 @@ message GroupInfo {
   string notifacation = 5;
   string ownerUserId = 6;
   uint32 createTime = 7;
-  string ex = 8;
-  int32 status = 9;
-  string createUserId = 10;
-  int32 groupType = 11;
+  uint32 memberCount = 8;
+  string ex = 9;
+  int32 status = 10;
+  string createUserId = 11;
+  int32 groupType = 12;
 }

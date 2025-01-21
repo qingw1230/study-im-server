@@ -19,7 +19,7 @@ import (
 func CreateGroup(c *gin.Context) {
 	params := base_info.CreateGroupReq{}
 	if err := c.BindJSON(&params); err != nil {
-		log.Error("BindJSON failed ", err.Error())
+		log.Error("BindJSON failed", err.Error())
 		c.JSON(http.StatusOK, constant.NewBindJSONErrorRespWithInfo(err.Error()))
 		return
 	}
@@ -27,7 +27,7 @@ func CreateGroup(c *gin.Context) {
 
 	ok, opUserId := token_verify.GetUserIdFromToken(c.Request.Header.Get(constant.STR_TOKEN))
 	if !ok {
-		log.Error("GetUserIdFromToken failed ", c.Request.Header.Get(constant.STR_TOKEN))
+		log.Error("GetUserIdFromToken failed", c.Request.Header.Get(constant.STR_TOKEN))
 		c.JSON(http.StatusOK, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
 		return
 	}
@@ -54,5 +54,46 @@ func CreateGroup(c *gin.Context) {
 
 	resp := base_info.CreateGroupResp{CommonResp: base_info.CommonResp{}}
 	copier.Copy(&resp.CommonResp, reply.CommonResp)
+	c.JSON(http.StatusOK, resp)
+}
+
+func GetJoinedGroupList(c *gin.Context) {
+	params := base_info.GetJoinedGroupListReq{}
+	if err := c.BindJSON(&params); err != nil {
+		log.Error("BindJSON failed", err.Error())
+		c.JSON(http.StatusOK, constant.NewBindJSONErrorRespWithInfo(err.Error()))
+		return
+	}
+	log.Info("GetJoinedGroupList BindJSON success")
+
+	ok, opUserId := token_verify.GetUserIdFromToken(c.Request.Header.Get(constant.STR_TOKEN))
+	if !ok {
+		log.Error("GetUserIdFromToken failed", c.Request.Header.Get(constant.STR_TOKEN))
+		c.JSON(http.StatusOK, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
+		return
+	}
+	req := &pbGroup.GetJoinedGroupListReq{
+		FromUserId: params.FromUserId,
+		OpUserId:   opUserId,
+	}
+	log.Info("GetJoinedGroupList args:", req.String())
+
+	// TODO(qingw1230): 使用服务发现建立连接
+	conn, err := grpc.NewClient("127.0.0.1:10500", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Error("NewClient failed", err.Error())
+		c.JSON(http.StatusOK, constant.CommonFailResp)
+		return
+	}
+	client := pbGroup.NewGroupClient(conn)
+	reply, err := client.GetJoinedGroupList(context.Background(), req)
+	if err != nil {
+		c.JSON(http.StatusOK, constant.CommonFailResp)
+		return
+	}
+
+	resp := base_info.GetJoinedGroupListResp{CommonResp: base_info.CommonResp{}}
+	copier.Copy(&resp.CommonResp, reply.CommonResp)
+	resp.CommonResp.Data = reply.GroupInfoList
 	c.JSON(http.StatusOK, resp)
 }

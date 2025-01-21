@@ -16,3 +16,17 @@ func InsertIntoGroup(groupInfo *db.Group) error {
 	groupInfo.CreateTime = time.Now()
 	return dbConn.Table(constant.DBTableGroup).Create(groupInfo).Error
 }
+
+// GetGroupInfoByGroupId 根据 groupId 获取群聊信息
+func GetGroupInfoByGroupId(groupId string) (*db.Group, error) {
+	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
+	if err != nil {
+		return nil, err
+	}
+	var groupInfo *db.Group
+	err = dbConn.Table(constant.DBTableGroup).Where("group_id = ?", groupId).First(groupInfo).Error
+	if err != nil {
+		return nil, err
+	}
+	return groupInfo, nil
+}

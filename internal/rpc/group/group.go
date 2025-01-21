@@ -13,6 +13,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	"github.com/qingw1230/study-im-server/pkg/common/token_verify"
 	pbGroup "github.com/qingw1230/study-im-server/pkg/proto/group"
+	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
 	"github.com/qingw1230/study-im-server/pkg/utils"
 	"google.golang.org/grpc"
 )
@@ -20,7 +21,7 @@ import (
 func (s *groupServer) CreateGroup(_ context.Context, req *pbGroup.CreateGroupReq) (*pbGroup.CreateGroupResp, error) {
 	log.Info("call CreateGroup args: ", req.String())
 	if !token_verify.CheckAccess(req.OpUserId, req.GroupInfo.CreateUserId) {
-		log.Error("CheckAccess false ", req.OpUserId, req.GroupInfo.CreateUserId)
+		log.Error("CheckAccess failed", req.OpUserId, req.GroupInfo.CreateUserId)
 		return &pbGroup.CreateGroupResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
 	}
 
@@ -56,6 +57,40 @@ func (s *groupServer) CreateGroup(_ context.Context, req *pbGroup.CreateGroupReq
 
 	log.Info("rpc CreateGroup return ", req.String())
 	return &pbGroup.CreateGroupResp{CommonResp: &constant.PBCommonSuccessResp}, nil
+}
+
+func (s *groupServer) GetJoinedGroupList(_ context.Context, req *pbGroup.GetJoinedGroupListReq) (*pbGroup.GetJoinedGroupListResp, error) {
+	log.Info("GetJoinedGroupList args:", req.String())
+	if !token_verify.CheckAccess(req.OpUserId, req.FromUserId) {
+		log.Error("CheckAccess failed", req.OpUserId, req.FromUserId)
+		return &pbGroup.GetJoinedGroupListResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
+	}
+
+	joinedGroupIdList, err := controller.GetJoinedGroupIdListByUserId(req.FromUserId)
+	if err != nil {
+		log.Error("GetJoinedGroupIdListByUserId failed", err.Error(), req.FromUserId)
+		return &pbGroup.GetJoinedGroupListResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
+	}
+
+	resp := &pbGroup.GetJoinedGroupListResp{CommonResp: &pbPublic.CommonResp{}}
+	for _, groupId := range joinedGroupIdList {
+		var groupInfo pbPublic.GroupInfo
+		num, _ := controller.GetGroupMemberNumByGroupId(groupId)
+		owner, err1 := controller.GetGroupOwnerInfoByGroupId(groupId)
+		group, err2 := controller.GetGroupInfoByGroupId(groupId)
+		if num > 0 && owner != nil && err1 == nil && group != nil && err2 == nil {
+			copier.Copy(&groupInfo, group)
+			groupInfo.MemberCount = num
+			groupInfo.OwnerUserId = owner.UserId
+			resp.GroupInfoList = append(resp.GroupInfoList, &groupInfo)
+		} else {
+			log.Error("check nil", num, owner, group)
+			continue
+		}
+	}
+
+	log.Info("rpc GetJoinedGroupList return", resp.String())
+	return resp, nil
 }
 
 type groupServer struct {
