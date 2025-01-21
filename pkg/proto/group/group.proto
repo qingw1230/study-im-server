@@ -24,7 +24,18 @@ message GetJoinedGroupListResp {
   repeated server_api_params.GroupInfo GroupInfoList = 2;
 }
 
+message GetGroupInfoReq {
+  string GroupId = 1;
+  string OpUserId = 2;
+}
+
+message GetGroupInfoResp {
+  server_api_params.CommonResp CommonResp = 1;
+  server_api_params.GroupInfo GroupInfo = 2;
+}
+
 service Group {
   rpc CreateGroup(CreateGroupReq) returns (CreateGroupResp);
   rpc GetJoinedGroupList(GetJoinedGroupListReq) returns (GetJoinedGroupListResp);
+  rpc GetGroupInfo(GetGroupInfoReq) returns (GetGroupInfoResp);
 }

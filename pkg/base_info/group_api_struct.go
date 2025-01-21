@@ -24,3 +24,12 @@ type GetJoinedGroupListResp struct {
 	CommonResp
 	GroupInfoList []*public.GroupInfo `json:"-"`
 }
+
+type GetGroupInfoReq struct {
+	GroupId string `json:"groupId" binding:"required"`
+}
+
+type GetGroupInfoResp struct {
+	CommonResp
+	GroupInfo *public.GroupInfo `json:"-"`
+}

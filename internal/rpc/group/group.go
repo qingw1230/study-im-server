@@ -12,6 +12,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/db/controller"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	"github.com/qingw1230/study-im-server/pkg/common/token_verify"
+	cp "github.com/qingw1230/study-im-server/pkg/common/utils"
 	pbGroup "github.com/qingw1230/study-im-server/pkg/proto/group"
 	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
 	"github.com/qingw1230/study-im-server/pkg/utils"
@@ -100,6 +101,23 @@ func (s *groupServer) GetJoinedGroupList(_ context.Context, req *pbGroup.GetJoin
 
 	copier.Copy(resp.CommonResp, &constant.PBCommonSuccessResp)
 	log.Info("rpc GetJoinedGroupList return", resp.String())
+	return resp, nil
+}
+
+func (s *groupServer) GetGroupInfo(_ context.Context, req *pbGroup.GetGroupInfoReq) (*pbGroup.GetGroupInfoResp, error) {
+	log.Info("call rpc GetGroupInfo args:", req.String())
+	group, err := controller.GetGroupInfoByGroupId(req.GroupId)
+	if err != nil {
+		log.Error("GetGroupInfoByGroupId failed", req.GroupId)
+		return &pbGroup.GetGroupInfoResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
+	}
+	groupInfo := &pbPublic.GroupInfo{}
+	cp.GroupDBCopyIM(groupInfo, group)
+	resp := &pbGroup.GetGroupInfoResp{
+		CommonResp: &constant.PBCommonSuccessResp,
+		GroupInfo:  groupInfo,
+	}
+	log.Info("rpc GetGroupInfo return")
 	return resp, nil
 }
 
