@@ -56,8 +56,8 @@ func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) 
 func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFriendResponseReq) (*pbFriend.AddFriendResponseResp, error) {
 	log.Info("call AddFriendResponse args: ", req.String())
 	// 确保有权限
-	if !token_verify.CheckAccess(req.CommonId.OpUserId, req.CommonId.FromUserId) {
-		log.Error("CheckAccess false ", req.CommonId.OpUserId, req.CommonId.FromUserId)
+	if !token_verify.CheckAccess(req.CommonId.OpUserId, req.CommonId.ToUserId) {
+		log.Error("CheckAccess false ", req.CommonId.OpUserId, req.CommonId.ToUserId)
 		return &pbFriend.AddFriendResponseResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
 	}
 
