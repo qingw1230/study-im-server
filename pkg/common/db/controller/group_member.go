@@ -74,6 +74,21 @@ func GetGroupMemberListByUserId(userId string) ([]db.GroupMember, error) {
 	return groupMemberList, nil
 }
 
+// GetOwnedGroupIdListByUserId 根据 userId 获取创建的所有群聊的 GroupId
+func GetOwnedGroupIdListByUserId(userId string) ([]string, error) {
+	groupMemberList, err := GetGroupMemberListByUserId(userId)
+	if err != nil {
+		return nil, err
+	}
+	var groupIdList []string
+	for _, v := range groupMemberList {
+		if v.RoleLevel == constant.GroupOwner {
+			groupIdList = append(groupIdList, v.GroupId)
+		}
+	}
+	return groupIdList, nil
+}
+
 // GetJoinedGroupIdListByUserId 根据 userId 获取添加的所有群聊的 GroupId
 func GetJoinedGroupIdListByUserId(userId string) ([]string, error) {
 	groupMemberList, err := GetGroupMemberListByUserId(userId)

@@ -66,7 +66,16 @@ func (s *groupServer) GetJoinedGroupList(_ context.Context, req *pbGroup.GetJoin
 		return &pbGroup.GetJoinedGroupListResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
 	}
 
-	joinedGroupIdList, err := controller.GetJoinedGroupIdListByUserId(req.FromUserId)
+	var (
+		joinedGroupIdList []string
+		err               error
+	)
+	// 根据传入的 bool 值获取创建的或加入的
+	if req.RoleLevel == constant.GroupOwner {
+		joinedGroupIdList, err = controller.GetOwnedGroupIdListByUserId(req.FromUserId)
+	} else {
+		joinedGroupIdList, err = controller.GetJoinedGroupIdListByUserId(req.FromUserId)
+	}
 	if err != nil {
 		log.Error("GetJoinedGroupIdListByUserId failed", err.Error(), req.FromUserId)
 		return &pbGroup.GetJoinedGroupListResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil

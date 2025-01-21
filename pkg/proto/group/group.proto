@@ -15,7 +15,8 @@ message CreateGroupResp {
 
 message GetJoinedGroupListReq {
   string FromUserId = 1;
-  string OpUserId = 2;
+  int32 RoleLevel = 2;
+  string OpUserId = 3;
 }
 
 message GetJoinedGroupListResp {

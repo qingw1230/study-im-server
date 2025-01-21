@@ -74,6 +74,7 @@ func GetJoinedGroupList(c *gin.Context) {
 	}
 	req := &pbGroup.GetJoinedGroupListReq{
 		FromUserId: params.FromUserId,
+		RoleLevel:  params.RoleLevel,
 		OpUserId:   opUserId,
 	}
 	log.Info("GetJoinedGroupList args:", req.String())

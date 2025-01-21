@@ -23,10 +23,10 @@ func GetGroupInfoByGroupId(groupId string) (*db.Group, error) {
 	if err != nil {
 		return nil, err
 	}
-	var groupInfo *db.Group
-	err = dbConn.Table(constant.DBTableGroup).Where("group_id = ?", groupId).First(groupInfo).Error
+	var groupInfo db.Group
+	err = dbConn.Table(constant.DBTableGroup).Where("group_id = ?", groupId).First(&groupInfo).Error
 	if err != nil {
 		return nil, err
 	}
-	return groupInfo, nil
+	return &groupInfo, nil
 }

@@ -17,6 +17,7 @@ type CreateGroupResp struct {
 
 type GetJoinedGroupListReq struct {
 	FromUserId string `json:"fromUserId" binding:"required"`
+	RoleLevel  int32  `json:"roleLevel" binding:"required"`
 }
 
 type GetJoinedGroupListResp struct {
