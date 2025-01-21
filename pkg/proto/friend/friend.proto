@@ -45,9 +45,18 @@ message GetFriendListResp {
   repeated server_api_params.FriendInfo FriendInfoList = 2;
 }
 
+message AddBlacklistReq {
+  CommonId CommonId = 1;
+}
+
+message AddBlacklistResp {
+  server_api_params.CommonResp CommonResp = 1;
+}
+
 service Friend {
   rpc AddFriend(AddFriendReq) returns (AddFriendResp);
   rpc AddFriendResponse(AddFriendResponseReq) returns (AddFriendResponseResp);
   rpc DeleteFriend(DeleteFriendReq) returns (DeleteFriendResp);
   rpc GetFriendList(GetFriendListReq) returns (GetFriendListResp);
+  rpc AddBlacklist(AddBlacklistReq) returns (AddBlacklistResp);
 }

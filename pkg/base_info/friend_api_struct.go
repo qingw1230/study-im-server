@@ -42,3 +42,11 @@ type GetFriendListResp struct {
 	CommonResp
 	FriendInfoList []*public.FriendInfo `json:"-"`
 }
+
+type AddBlacklistReq struct {
+	CommonId
+}
+
+type AddBlacklistResp struct {
+	CommonResp
+}

@@ -24,6 +24,8 @@ func Router() *gin.Engine {
 		friendRouterGroup.POST("/add_friend_response", friend.AddFriendResponse)
 		friendRouterGroup.POST("/delete_friend", friend.DeleteFriend)
 		friendRouterGroup.POST("/get_friend_list", friend.GetFriendList)
+
+		friendRouterGroup.POST("/add_blacklist", friend.AddBlacklist)
 	}
 
 	groupRouterGroup := r.Group("/api/group")

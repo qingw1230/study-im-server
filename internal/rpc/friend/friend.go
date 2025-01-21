@@ -174,6 +174,28 @@ func (s *friendServer) GetFriendList(_ context.Context, req *pbFriend.GetFriendL
 	}, nil
 }
 
+func (s *friendServer) AddBlacklist(_ context.Context, req *pbFriend.AddBlacklistReq) (*pbFriend.AddBlacklistResp, error) {
+	log.Info("call rpc AddBlack args:", req.String())
+	if !token_verify.CheckAccess(req.CommonId.OpUserId, req.CommonId.FromUserId) {
+		log.Error("CheckAccess failed", req.CommonId.OpUserId, req.CommonId.FromUserId)
+		return &pbFriend.AddBlacklistResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
+	}
+
+	black := &db.Black{
+		OwnerUserId: req.CommonId.FromUserId,
+		BlockUserId: req.CommonId.ToUserId,
+		OpUserId:    req.CommonId.OpUserId,
+	}
+	err := controller.InsertIntoBlacklist(black)
+	if err != nil {
+		log.Error("InsertIntoBlacklist failed", err.Error())
+		return &pbFriend.AddBlacklistResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
+	}
+
+	log.Info("rpc AddBlack return")
+	return &pbFriend.AddBlacklistResp{CommonResp: &constant.PBCommonSuccessResp}, nil
+}
+
 type friendServer struct {
 	pbFriend.UnimplementedFriendServer
 	rpcPort         int

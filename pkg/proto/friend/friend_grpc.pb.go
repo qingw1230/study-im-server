@@ -23,6 +23,7 @@ const (
 	Friend_AddFriendResponse_FullMethodName = "/pbFriend.Friend/AddFriendResponse"
 	Friend_DeleteFriend_FullMethodName      = "/pbFriend.Friend/DeleteFriend"
 	Friend_GetFriendList_FullMethodName     = "/pbFriend.Friend/GetFriendList"
+	Friend_AddBlacklist_FullMethodName      = "/pbFriend.Friend/AddBlacklist"
 )
 
 // FriendClient is the client API for Friend service.
@@ -33,6 +34,7 @@ type FriendClient interface {
 	AddFriendResponse(ctx context.Context, in *AddFriendResponseReq, opts ...grpc.CallOption) (*AddFriendResponseResp, error)
 	DeleteFriend(ctx context.Context, in *DeleteFriendReq, opts ...grpc.CallOption) (*DeleteFriendResp, error)
 	GetFriendList(ctx context.Context, in *GetFriendListReq, opts ...grpc.CallOption) (*GetFriendListResp, error)
+	AddBlacklist(ctx context.Context, in *AddBlacklistReq, opts ...grpc.CallOption) (*AddBlacklistResp, error)
 }
 
 type friendClient struct {
@@ -83,6 +85,16 @@ func (c *friendClient) GetFriendList(ctx context.Context, in *GetFriendListReq, 
 	return out, nil
 }
 
+func (c *friendClient) AddBlacklist(ctx context.Context, in *AddBlacklistReq, opts ...grpc.CallOption) (*AddBlacklistResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AddBlacklistResp)
+	err := c.cc.Invoke(ctx, Friend_AddBlacklist_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // FriendServer is the server API for Friend service.
 // All implementations must embed UnimplementedFriendServer
 // for forward compatibility.
@@ -91,6 +103,7 @@ type FriendServer interface {
 	AddFriendResponse(context.Context, *AddFriendResponseReq) (*AddFriendResponseResp, error)
 	DeleteFriend(context.Context, *DeleteFriendReq) (*DeleteFriendResp, error)
 	GetFriendList(context.Context, *GetFriendListReq) (*GetFriendListResp, error)
+	AddBlacklist(context.Context, *AddBlacklistReq) (*AddBlacklistResp, error)
 	mustEmbedUnimplementedFriendServer()
 }
 
@@ -112,6 +125,9 @@ func (UnimplementedFriendServer) DeleteFriend(context.Context, *DeleteFriendReq)
 }
 func (UnimplementedFriendServer) GetFriendList(context.Context, *GetFriendListReq) (*GetFriendListResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFriendList not implemented")
+}
+func (UnimplementedFriendServer) AddBlacklist(context.Context, *AddBlacklistReq) (*AddBlacklistResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddBlacklist not implemented")
 }
 func (UnimplementedFriendServer) mustEmbedUnimplementedFriendServer() {}
 func (UnimplementedFriendServer) testEmbeddedByValue()                {}
@@ -206,6 +222,24 @@ func _Friend_GetFriendList_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Friend_AddBlacklist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddBlacklistReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FriendServer).AddBlacklist(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Friend_AddBlacklist_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FriendServer).AddBlacklist(ctx, req.(*AddBlacklistReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Friend_ServiceDesc is the grpc.ServiceDesc for Friend service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -228,6 +262,10 @@ var Friend_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetFriendList",
 			Handler:    _Friend_GetFriendList_Handler,
+		},
+		{
+			MethodName: "AddBlacklist",
+			Handler:    _Friend_AddBlacklist_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

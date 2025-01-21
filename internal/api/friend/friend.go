@@ -172,3 +172,43 @@ func GetFriendList(c *gin.Context) {
 	resp.CommonResp.Data = reply.FriendInfoList
 	c.JSON(http.StatusOK, resp)
 }
+
+func AddBlacklist(c *gin.Context) {
+	params := base_info.AddBlacklistReq{}
+	if err := c.BindJSON(&params); err != nil {
+		log.Error("BindJSON failed", err.Error())
+		c.JSON(http.StatusOK, constant.NewBindJSONErrorRespWithInfo(err.Error()))
+		return
+	}
+	log.Info("AddBlck BindJSON success")
+
+	ok, opUserId := token_verify.GetUserIdFromToken(c.Request.Header.Get(constant.STR_TOKEN))
+	if !ok {
+		log.Error("GetUserIdFromToken failed", c.Request.Header.Get(constant.STR_TOKEN))
+		c.JSON(http.StatusOK, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
+		return
+	}
+	req := &pbFriend.AddBlacklistReq{CommonId: &pbFriend.CommonId{}}
+	copier.Copy(req.CommonId, &params)
+	req.CommonId.OpUserId = opUserId
+	log.Info("AddBlack args:", req.String())
+
+	// TODO(qingw1230): 使用服务发现建立连接
+	conn, err := grpc.NewClient("127.0.0.1:10200", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Error("NewClient failed ", err.Error())
+		c.JSON(http.StatusOK, constant.CommonFailResp)
+		return
+	}
+	client := pbFriend.NewFriendClient(conn)
+	reply, err := client.AddBlacklist(context.Background(), req)
+	if err != nil {
+		log.Error("AddBlacklist failed", err.Error())
+		c.JSON(http.StatusOK, constant.CommonFailResp)
+		return
+	}
+
+	resp := base_info.AddBlacklistResp{CommonResp: base_info.CommonResp{}}
+	copier.Copy(&resp.CommonResp, reply.CommonResp)
+	c.JSON(http.StatusOK, resp)
+}

@@ -123,3 +123,16 @@ type GroupRequest struct {
 func (GroupRequest) TableName() string {
 	return constant.DBTableGroupRequest
 }
+
+type Black struct {
+	OwnerUserId string    `gorm:"column:owner_user_id;type:varchar(12);not null;primary_key"`
+	BlockUserId string    `gorm:"column:block_user_id;type:varchar(12);not null;primary_key"`
+	CreateTime  time.Time `gorm:"column:create_time;type:datetime"`
+	AddSource   int32     `gorm:"column:add_source;type:tinyint(1)"`
+	OpUserId    string    `gorm:"column:op_user_id;type:varchar(12)"`
+	Ex          string    `gorm:"column:ex;type:varchar(1024)"`
+}
+
+func (Black) TableName() string {
+	return constant.DBTableBlack
+}

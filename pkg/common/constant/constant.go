@@ -9,6 +9,7 @@ const (
 	DBTableGroup           = "groups"
 	DBTableGroupMember     = "group_members"
 	DBTableGroupRequest    = "group_requests"
+	DBTableBlack           = "blacks"
 )
 
 // 数字常量
