@@ -15,6 +15,14 @@ type CreateGroupResp struct {
 	CommonResp
 }
 
+type DeleteGroupReq struct {
+	GroupId string `json:"groupId" binding:"required"`
+}
+
+type DeleteGroupResp struct {
+	CommonResp
+}
+
 type SetGroupInfoReq struct {
 	GroupID      string `json:"groupId" binding:"required"`
 	GroupName    string `json:"groupName"`

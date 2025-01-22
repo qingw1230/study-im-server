@@ -17,6 +17,22 @@ func InsertIntoGroup(groupInfo *db.Group) error {
 	return dbConn.Table(constant.DBTableGroup).Create(groupInfo).Error
 }
 
+// DeleteGroup 删除指定群的所有信息
+func DeleteGroup(groupId string) error {
+	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
+	if err != nil {
+		return err
+	}
+	if err := dbConn.Table(constant.DBTableGroup).Where("group_id = ?", groupId).Delete(&db.Group{}).Error; err != nil {
+		return err
+	}
+	if err := dbConn.Table(constant.DBTableGroupMember).Where("group_id = ?", groupId).Delete(&db.GroupMember{}).Error; err != nil {
+		return err
+	}
+	// TODO(qingw1230): group_requests 表要怎么处理
+	return nil
+}
+
 // GetGroupInfoByGroupId 根据 groupId 获取群聊信息
 func GetGroupInfoByGroupId(groupId string) (*db.Group, error) {
 	dbConn, err := db.DB.MySQLDB.DefaultGormDB()

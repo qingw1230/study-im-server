@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	Group_CreateGroup_FullMethodName        = "/pbGroup.Group/CreateGroup"
+	Group_DeleteGroup_FullMethodName        = "/pbGroup.Group/DeleteGroup"
 	Group_GetJoinedGroupList_FullMethodName = "/pbGroup.Group/GetJoinedGroupList"
 	Group_GetGroupInfo_FullMethodName       = "/pbGroup.Group/GetGroupInfo"
 	Group_SetGroupInfo_FullMethodName       = "/pbGroup.Group/SetGroupInfo"
@@ -30,6 +31,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GroupClient interface {
 	CreateGroup(ctx context.Context, in *CreateGroupReq, opts ...grpc.CallOption) (*CreateGroupResp, error)
+	DeleteGroup(ctx context.Context, in *DeleteGroupReq, opts ...grpc.CallOption) (*DeleteGroupResp, error)
 	GetJoinedGroupList(ctx context.Context, in *GetJoinedGroupListReq, opts ...grpc.CallOption) (*GetJoinedGroupListResp, error)
 	GetGroupInfo(ctx context.Context, in *GetGroupInfoReq, opts ...grpc.CallOption) (*GetGroupInfoResp, error)
 	SetGroupInfo(ctx context.Context, in *SetGroupInfoReq, opts ...grpc.CallOption) (*SetGroupInfoResp, error)
@@ -47,6 +49,16 @@ func (c *groupClient) CreateGroup(ctx context.Context, in *CreateGroupReq, opts 
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CreateGroupResp)
 	err := c.cc.Invoke(ctx, Group_CreateGroup_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupClient) DeleteGroup(ctx context.Context, in *DeleteGroupReq, opts ...grpc.CallOption) (*DeleteGroupResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteGroupResp)
+	err := c.cc.Invoke(ctx, Group_DeleteGroup_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -88,6 +100,7 @@ func (c *groupClient) SetGroupInfo(ctx context.Context, in *SetGroupInfoReq, opt
 // for forward compatibility.
 type GroupServer interface {
 	CreateGroup(context.Context, *CreateGroupReq) (*CreateGroupResp, error)
+	DeleteGroup(context.Context, *DeleteGroupReq) (*DeleteGroupResp, error)
 	GetJoinedGroupList(context.Context, *GetJoinedGroupListReq) (*GetJoinedGroupListResp, error)
 	GetGroupInfo(context.Context, *GetGroupInfoReq) (*GetGroupInfoResp, error)
 	SetGroupInfo(context.Context, *SetGroupInfoReq) (*SetGroupInfoResp, error)
@@ -103,6 +116,9 @@ type UnimplementedGroupServer struct{}
 
 func (UnimplementedGroupServer) CreateGroup(context.Context, *CreateGroupReq) (*CreateGroupResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateGroup not implemented")
+}
+func (UnimplementedGroupServer) DeleteGroup(context.Context, *DeleteGroupReq) (*DeleteGroupResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteGroup not implemented")
 }
 func (UnimplementedGroupServer) GetJoinedGroupList(context.Context, *GetJoinedGroupListReq) (*GetJoinedGroupListResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetJoinedGroupList not implemented")
@@ -148,6 +164,24 @@ func _Group_CreateGroup_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GroupServer).CreateGroup(ctx, req.(*CreateGroupReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Group_DeleteGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteGroupReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).DeleteGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Group_DeleteGroup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).DeleteGroup(ctx, req.(*DeleteGroupReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -216,6 +250,10 @@ var Group_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateGroup",
 			Handler:    _Group_CreateGroup_Handler,
+		},
+		{
+			MethodName: "DeleteGroup",
+			Handler:    _Group_DeleteGroup_Handler,
 		},
 		{
 			MethodName: "GetJoinedGroupList",

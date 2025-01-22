@@ -13,6 +13,15 @@ message CreateGroupResp {
   server_api_params.CommonResp CommonResp = 1;
 }
 
+message DeleteGroupReq {
+  string GroupId = 1;
+  string OpUserId = 2;
+}
+
+message DeleteGroupResp {
+  server_api_params.CommonResp CommonResp = 1;
+}
+
 message GetJoinedGroupListReq {
   string FromUserId = 1;
   int32 RoleLevel = 2;
@@ -45,6 +54,7 @@ message SetGroupInfoResp {
 
 service Group {
   rpc CreateGroup(CreateGroupReq) returns (CreateGroupResp);
+  rpc DeleteGroup(DeleteGroupReq) returns (DeleteGroupResp);
   rpc GetJoinedGroupList(GetJoinedGroupListReq) returns (GetJoinedGroupListResp);
   rpc GetGroupInfo(GetGroupInfoReq) returns (GetGroupInfoResp);
   rpc SetGroupInfo(SetGroupInfoReq) returns (SetGroupInfoResp);

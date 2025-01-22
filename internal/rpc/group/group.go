@@ -60,6 +60,24 @@ func (s *groupServer) CreateGroup(_ context.Context, req *pbGroup.CreateGroupReq
 	return &pbGroup.CreateGroupResp{CommonResp: &constant.PBCommonSuccessResp}, nil
 }
 
+func (s *groupServer) DeleteGroup(_ context.Context, req *pbGroup.DeleteGroupReq) (*pbGroup.DeleteGroupResp, error) {
+	log.Info("call rpc DeleteGroup args:", req.String())
+	// 只能群主或 APP Admin 才能解散群
+	if !hasOwnerAccess(req.GroupId, req.OpUserId) {
+		log.Error("hasAccess failed", req.GroupId, req.OpUserId)
+		return &pbGroup.DeleteGroupResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
+	}
+
+	err := controller.DeleteGroup(req.GroupId)
+	if err != nil {
+		log.Error("DeleteGroup failed", err.Error(), req.GroupId)
+		return &pbGroup.DeleteGroupResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
+	}
+
+	log.Info("rpc DeleteGroup return")
+	return &pbGroup.DeleteGroupResp{CommonResp: &constant.PBCommonSuccessResp}, nil
+}
+
 func (s *groupServer) GetJoinedGroupList(_ context.Context, req *pbGroup.GetJoinedGroupListReq) (*pbGroup.GetJoinedGroupListResp, error) {
 	log.Info("GetJoinedGroupList args:", req.String())
 	if !token_verify.CheckAccess(req.OpUserId, req.FromUserId) {
@@ -121,24 +139,9 @@ func (s *groupServer) GetGroupInfo(_ context.Context, req *pbGroup.GetGroupInfoR
 	return resp, nil
 }
 
-func hasAccess(req *pbGroup.SetGroupInfoReq) bool {
-	if utils.IsContain(req.OpUserId, config.Config.Admin.UserIds) {
-		return true
-	}
-	groupUserInfo, err := controller.GetGroupMemberInfoByGroupIdAndUserId(req.GroupInfo.GroupId, req.OpUserId)
-	if err != nil {
-		log.Error("GetGroupMemberInfoByGroupIdAndUserId failed", err.Error(), req.GroupInfo.GroupId, req.OpUserId)
-		return false
-	}
-	if groupUserInfo.RoleLevel == constant.GroupOwner || groupUserInfo.RoleLevel == constant.GroupAdmin {
-		return true
-	}
-	return false
-}
-
 func (s *groupServer) SetGroupInfo(_ context.Context, req *pbGroup.SetGroupInfoReq) (*pbGroup.SetGroupInfoResp, error) {
 	log.Info("call rpc SetGroupInfo args:", req.String())
-	if !hasAccess(req) {
+	if !hasOwnerOrAdminAccess(req.GroupInfo.GroupId, req.OpUserId) {
 		log.Error("hasAccess failed", req.OpUserId)
 		return &pbGroup.SetGroupInfoResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
 	}
@@ -160,6 +163,38 @@ type groupServer struct {
 	rpcRegisterName string
 	zkSchema        string
 	zkAddr          []string
+}
+
+// hasOwnerAccess 检查是否是群拥有者
+func hasOwnerAccess(groupId, opUserId string) bool {
+	if utils.IsContain(opUserId, config.Config.Admin.UserIds) {
+		return true
+	}
+	groupUserInfo, err := controller.GetGroupMemberInfoByGroupIdAndUserId(groupId, opUserId)
+	if err != nil {
+		log.Error("GetGroupMemberInfoByGroupIdAndUserId failed", err.Error(), groupId, opUserId)
+		return false
+	}
+	if groupUserInfo.RoleLevel == constant.GroupOwner || groupUserInfo.RoleLevel == constant.GroupAdmin {
+		return true
+	}
+	return false
+}
+
+// hasOwnerOrAdminAccess 检查是否是群拥有者或管理员
+func hasOwnerOrAdminAccess(groupId, opUserId string) bool {
+	if utils.IsContain(opUserId, config.Config.Admin.UserIds) {
+		return true
+	}
+	groupUserInfo, err := controller.GetGroupMemberInfoByGroupIdAndUserId(groupId, opUserId)
+	if err != nil {
+		log.Error("GetGroupMemberInfoByGroupIdAndUserId failed", err.Error(), groupId, opUserId)
+		return false
+	}
+	if groupUserInfo.RoleLevel == constant.GroupOwner || groupUserInfo.RoleLevel == constant.GroupAdmin {
+		return true
+	}
+	return false
 }
 
 func NewGroupServer(port int) *groupServer {
