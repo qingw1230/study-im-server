@@ -40,11 +40,11 @@ func FriendRequestDBCopyIM(dst *pbPublic.FriendRequest, src *db.FriendRequest) e
 	if err != nil {
 		return err
 	}
-	dst.FromNickname = user.NickName
+	dst.FromNickName = user.NickName
 	dst.FromFaceURL = user.FaceUrl
 	dst.FromSex = int32(user.Sex)
 	user, err = controller.GetUserById(src.ToUserId)
-	dst.ToNickname = user.NickName
+	dst.ToNickName = user.NickName
 	dst.ToFaceURL = user.FaceUrl
 	dst.ToSex = int32(user.Sex)
 	dst.CreateTime = uint32(src.CreateTime.Unix())

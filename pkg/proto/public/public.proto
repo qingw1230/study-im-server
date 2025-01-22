@@ -56,11 +56,11 @@ message GroupInfo {
 
 message FriendRequest{
   string fromUserID = 1;
-  string fromNickname = 2;
+  string fromNickName = 2;
   string fromFaceURL = 3;
   int32 fromSex = 4;
   string toUserID = 5;
-  string toNickname = 6;
+  string toNickName = 6;
   string toFaceURL = 7;
   int32 toSex = 8;
   int32 handleResult = 9;
