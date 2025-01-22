@@ -60,6 +60,20 @@ func GetGroupOwnerInfoByGroupId(groupId string) (*db.GroupMember, error) {
 	return nil, nil
 }
 
+// GetGroupMemberInfoByGroupIdAndUserId 根据 groupId 和 userId 获取群成员信息
+func GetGroupMemberInfoByGroupIdAndUserId(groupId, userId string) (*db.GroupMember, error) {
+	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
+	if err != nil {
+		return nil, err
+	}
+	var groupMember db.GroupMember
+	err = dbConn.Table(constant.DBTableGroupMember).Where("group_id = ? AND user_id = ?", groupId, userId).First(&groupMember).Error
+	if err != nil {
+		return nil, err
+	}
+	return &groupMember, nil
+}
+
 // GetGroupMemberListByUserId 根据 userId 获取所有群聊的 GroupMember
 func GetGroupMemberListByUserId(userId string) ([]db.GroupMember, error) {
 	dbConn, err := db.DB.MySQLDB.DefaultGormDB()

@@ -15,6 +15,18 @@ type CreateGroupResp struct {
 	CommonResp
 }
 
+type SetGroupInfoReq struct {
+	GroupID      string `json:"groupId" binding:"required"`
+	GroupName    string `json:"groupName"`
+	FaceUrl      string `json:"faceUrl"`
+	Introduction string `json:"introduction"`
+	Notification string `json:"notification"`
+}
+
+type SetGroupInfoResp struct {
+	CommonResp
+}
+
 type GetJoinedGroupListReq struct {
 	FromUserId string `json:"fromUserId" binding:"required"`
 	RoleLevel  int32  `json:"roleLevel" binding:"required"`

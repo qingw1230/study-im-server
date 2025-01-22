@@ -121,6 +121,39 @@ func (s *groupServer) GetGroupInfo(_ context.Context, req *pbGroup.GetGroupInfoR
 	return resp, nil
 }
 
+func hasAccess(req *pbGroup.SetGroupInfoReq) bool {
+	if utils.IsContain(req.OpUserId, config.Config.Admin.UserIds) {
+		return true
+	}
+	groupUserInfo, err := controller.GetGroupMemberInfoByGroupIdAndUserId(req.GroupInfo.GroupId, req.OpUserId)
+	if err != nil {
+		log.Error("GetGroupMemberInfoByGroupIdAndUserId failed", err.Error(), req.GroupInfo.GroupId, req.OpUserId)
+		return false
+	}
+	if groupUserInfo.RoleLevel == constant.GroupOwner || groupUserInfo.RoleLevel == constant.GroupAdmin {
+		return true
+	}
+	return false
+}
+
+func (s *groupServer) SetGroupInfo(_ context.Context, req *pbGroup.SetGroupInfoReq) (*pbGroup.SetGroupInfoResp, error) {
+	log.Info("call rpc SetGroupInfo args:", req.String())
+	if !hasAccess(req) {
+		log.Error("hasAccess failed", req.OpUserId)
+		return &pbGroup.SetGroupInfoResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
+	}
+
+	var groupInfo db.Group
+	copier.Copy(&groupInfo, req.GroupInfo)
+	err := controller.SetGroupInfo(&groupInfo)
+	if err != nil {
+		log.Error("SetGroupInfo failed", err.Error())
+		return &pbGroup.SetGroupInfoResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
+	}
+	log.Info("rpc SetGroupInfo return")
+	return &pbGroup.SetGroupInfoResp{CommonResp: &constant.PBCommonSuccessResp}, nil
+}
+
 type groupServer struct {
 	pbGroup.UnimplementedGroupServer
 	rpcPort         int

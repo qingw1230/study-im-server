@@ -30,3 +30,11 @@ func GetGroupInfoByGroupId(groupId string) (*db.Group, error) {
 	}
 	return &groupInfo, nil
 }
+
+func SetGroupInfo(groupInfo *db.Group) error {
+	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
+	if err != nil {
+		return err
+	}
+	return dbConn.Table(constant.DBTableGroup).Where("group_id = ?", groupInfo.GroupId).Update(groupInfo).Error
+}
