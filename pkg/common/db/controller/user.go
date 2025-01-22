@@ -19,8 +19,8 @@ func IsUserExist(email string) bool {
 	return err != gorm.ErrRecordNotFound
 }
 
-// FindUserById 用 UserId 查找用户，找到了 err 为 nil，找不到不为 nil
-func FindUserById(id string) (*db.User, error) {
+// GetUserById 用 UserId 查找用户，找到了 err 为 nil，找不到不为 nil
+func GetUserById(id string) (*db.User, error) {
 	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
 	if err != nil {
 		return nil, err

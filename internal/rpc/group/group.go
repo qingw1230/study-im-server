@@ -27,7 +27,7 @@ func (s *groupServer) CreateGroup(_ context.Context, req *pbGroup.CreateGroupReq
 	}
 
 	// 确保群主存在
-	groupOwnerInfo, err := controller.FindUserById(req.OwnerUserId)
+	groupOwnerInfo, err := controller.GetUserById(req.OwnerUserId)
 	if err != nil {
 		log.Error("FindUserById failed ", err.Error(), req.OwnerUserId)
 		return &pbGroup.CreateGroupResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
@@ -108,7 +108,7 @@ func (s *groupServer) GetJoinedGroupList(_ context.Context, req *pbGroup.GetJoin
 		joinedGroupIdList []string
 		err               error
 	)
-	// 根据传入的 bool 值获取创建的或加入的
+	// 根据传入的值获取创建的或加入的
 	if req.RoleLevel == constant.GroupOwner {
 		joinedGroupIdList, err = controller.GetOwnedGroupIdListByUserId(req.FromUserId)
 	} else {

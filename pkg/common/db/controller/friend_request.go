@@ -8,6 +8,20 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/utils"
 )
 
+// GetReceivedFriendApplicationListByUserId 查找想要添加我的好友请求
+func GetReceivedFriendApplicationListByUserId(toUserId string) ([]db.FriendRequest, error) {
+	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
+	if err != nil {
+		return nil, err
+	}
+	var friendRequests []db.FriendRequest
+	err = dbConn.Table(constant.DBTableFriendRequest).Where("to_user_id = ?", toUserId).Find(&friendRequests).Error
+	if err != nil {
+		return nil, err
+	}
+	return friendRequests, nil
+}
+
 // InsertFriendApplication 插入一条好友申请记录
 func InsertFriendApplication(friendRequest *db.FriendRequest) error {
 	dbConn, err := db.DB.MySQLDB.DefaultGormDB()

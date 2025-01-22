@@ -114,7 +114,7 @@ func (s *accountServer) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAc
 func (s *accountServer) GetUserInfo(_ context.Context, req *pbAccount.GetUserInfoReq) (*pbAccount.GetUserInfoResp, error) {
 	log.Info("call GetUserInfo args: ", req.String())
 
-	user, err := controller.FindUserById(req.UserId)
+	user, err := controller.GetUserById(req.UserId)
 	if err == gorm.ErrRecordNotFound {
 		return nil, nil
 	}

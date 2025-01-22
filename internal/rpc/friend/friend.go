@@ -30,7 +30,7 @@ func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) 
 	}
 
 	// 保证要添加的好友存在
-	if _, err := controller.FindUserById(req.CommonId.ToUserId); err != nil {
+	if _, err := controller.GetUserById(req.CommonId.ToUserId); err != nil {
 		return &pbFriend.AddFriendResp{
 			CommonResp: &pbPublic.CommonResp{
 				Status: constant.Fail,
@@ -171,6 +171,33 @@ func (s *friendServer) GetFriendList(_ context.Context, req *pbFriend.GetFriendL
 	return &pbFriend.GetFriendListResp{
 		CommonResp:     &constant.PBCommonSuccessResp,
 		FriendInfoList: userInfoList,
+	}, nil
+}
+
+func (s friendServer) GetFriendApplyList(_ context.Context, req *pbFriend.GetFriendApplyListReq) (*pbFriend.GetFriendApplyListResp, error) {
+	log.Info("call rpc GetFriendApplyList args:", req.String())
+	if !token_verify.CheckAccess(req.CommonId.OpUserId, req.CommonId.FromUserId) {
+		log.Error("CheckAccess failed", req.CommonId.OpUserId, req.CommonId.FromUserId)
+		return &pbFriend.GetFriendApplyListResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
+	}
+
+	friendRequests, err := controller.GetReceivedFriendApplicationListByUserId(req.CommonId.FromUserId)
+	if err != nil {
+		log.Error("GetReceivedFriendApplicationListByUserId failed", err.Error(), req.CommonId.FromUserId)
+		return &pbFriend.GetFriendApplyListResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
+	}
+
+	var applyUserList []*pbPublic.FriendRequest
+	for _, fr := range friendRequests {
+		var pbFr pbPublic.FriendRequest
+		cp.FriendRequestDBCopyIM(&pbFr, &fr)
+		applyUserList = append(applyUserList, &pbFr)
+	}
+
+	log.Info("rpc GetFriendApplyListResp return")
+	return &pbFriend.GetFriendApplyListResp{
+		CommonResp:        &constant.PBCommonSuccessResp,
+		FriendRequestList: applyUserList,
 	}, nil
 }
 

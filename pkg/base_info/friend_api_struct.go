@@ -43,6 +43,15 @@ type GetFriendListResp struct {
 	FriendInfoList []*public.FriendInfo `json:"-"`
 }
 
+type GetFriendApplyListReq struct {
+	FromUserID string `json:"fromUserId" binding:"required"`
+}
+
+type GetFriendApplyListResp struct {
+	CommonResp
+	FriendRequestList []*public.FriendRequest `json:"-"`
+}
+
 type AddBlacklistReq struct {
 	CommonId
 }

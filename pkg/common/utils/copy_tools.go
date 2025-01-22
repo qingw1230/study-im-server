@@ -9,7 +9,7 @@ import (
 
 func FriendDBCopyIM(dst *pbPublic.FriendInfo, src *db.Friend) error {
 	copier.Copy(dst, src)
-	user, err := controller.FindUserById(src.FriendUserId)
+	user, err := controller.GetUserById(src.FriendUserId)
 	if err != nil {
 		return err
 	}
@@ -30,5 +30,24 @@ func GroupDBCopyIM(dst *pbPublic.GroupInfo, src *db.Group) error {
 		return err
 	}
 	dst.CreateTime = uint32(src.CreateTime.Unix())
+	return nil
+}
+
+// FriendRequestDBCopyIM 将 DB 的 FriendRequest 的数据拷贝到 pb 的 FriendRequest 中
+func FriendRequestDBCopyIM(dst *pbPublic.FriendRequest, src *db.FriendRequest) error {
+	copier.Copy(dst, src)
+	user, err := controller.GetUserById(src.FromUserId)
+	if err != nil {
+		return err
+	}
+	dst.FromNickname = user.NickName
+	dst.FromFaceURL = user.FaceUrl
+	dst.FromSex = int32(user.Sex)
+	user, err = controller.GetUserById(src.ToUserId)
+	dst.ToNickname = user.NickName
+	dst.ToFaceURL = user.FaceUrl
+	dst.ToSex = int32(user.Sex)
+	dst.CreateTime = uint32(src.CreateTime.Unix())
+	dst.HandleTime = uint32(src.HandleTime.Unix())
 	return nil
 }
