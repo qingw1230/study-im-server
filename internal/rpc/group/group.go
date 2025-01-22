@@ -78,6 +78,25 @@ func (s *groupServer) DeleteGroup(_ context.Context, req *pbGroup.DeleteGroupReq
 	return &pbGroup.DeleteGroupResp{CommonResp: &constant.PBCommonSuccessResp}, nil
 }
 
+func (s *groupServer) QuitGroup(_ context.Context, req *pbGroup.QuitGroupReq) (*pbGroup.QuitGroupResp, error) {
+	log.Info("call rpc QuitGroup args:", req.String())
+	_, err := controller.GetGroupMemberInfoByGroupIdAndUserId(req.GroupId, req.OpUserId)
+	if err != nil {
+		log.Error("GetGroupMemberInfoByGroupIdAndUserId failed", req.GroupId, req.OpUserId)
+		return &pbGroup.QuitGroupResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
+	}
+
+	err = controller.DeleteGroupMemberByGroupIdAndUserId(req.GroupId, req.OpUserId)
+	if err != nil {
+		log.Error("DeleteGroupMemberByGroupIdAndUserId", err.Error(), req.GroupId, req.OpUserId)
+		return &pbGroup.QuitGroupResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
+	}
+
+	log.Info("rpc QuitGroup return")
+	// TODO(qingw1230): 给群主和管理员发送通知信息
+	return &pbGroup.QuitGroupResp{CommonResp: &constant.PBCommonSuccessResp}, nil
+}
+
 func (s *groupServer) GetJoinedGroupList(_ context.Context, req *pbGroup.GetJoinedGroupListReq) (*pbGroup.GetJoinedGroupListResp, error) {
 	log.Info("GetJoinedGroupList args:", req.String())
 	if !token_verify.CheckAccess(req.OpUserId, req.FromUserId) {

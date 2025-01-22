@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	Group_CreateGroup_FullMethodName        = "/pbGroup.Group/CreateGroup"
 	Group_DeleteGroup_FullMethodName        = "/pbGroup.Group/DeleteGroup"
+	Group_QuitGroup_FullMethodName          = "/pbGroup.Group/QuitGroup"
 	Group_GetJoinedGroupList_FullMethodName = "/pbGroup.Group/GetJoinedGroupList"
 	Group_GetGroupInfo_FullMethodName       = "/pbGroup.Group/GetGroupInfo"
 	Group_SetGroupInfo_FullMethodName       = "/pbGroup.Group/SetGroupInfo"
@@ -32,6 +33,7 @@ const (
 type GroupClient interface {
 	CreateGroup(ctx context.Context, in *CreateGroupReq, opts ...grpc.CallOption) (*CreateGroupResp, error)
 	DeleteGroup(ctx context.Context, in *DeleteGroupReq, opts ...grpc.CallOption) (*DeleteGroupResp, error)
+	QuitGroup(ctx context.Context, in *QuitGroupReq, opts ...grpc.CallOption) (*QuitGroupResp, error)
 	GetJoinedGroupList(ctx context.Context, in *GetJoinedGroupListReq, opts ...grpc.CallOption) (*GetJoinedGroupListResp, error)
 	GetGroupInfo(ctx context.Context, in *GetGroupInfoReq, opts ...grpc.CallOption) (*GetGroupInfoResp, error)
 	SetGroupInfo(ctx context.Context, in *SetGroupInfoReq, opts ...grpc.CallOption) (*SetGroupInfoResp, error)
@@ -59,6 +61,16 @@ func (c *groupClient) DeleteGroup(ctx context.Context, in *DeleteGroupReq, opts 
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DeleteGroupResp)
 	err := c.cc.Invoke(ctx, Group_DeleteGroup_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupClient) QuitGroup(ctx context.Context, in *QuitGroupReq, opts ...grpc.CallOption) (*QuitGroupResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QuitGroupResp)
+	err := c.cc.Invoke(ctx, Group_QuitGroup_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -101,6 +113,7 @@ func (c *groupClient) SetGroupInfo(ctx context.Context, in *SetGroupInfoReq, opt
 type GroupServer interface {
 	CreateGroup(context.Context, *CreateGroupReq) (*CreateGroupResp, error)
 	DeleteGroup(context.Context, *DeleteGroupReq) (*DeleteGroupResp, error)
+	QuitGroup(context.Context, *QuitGroupReq) (*QuitGroupResp, error)
 	GetJoinedGroupList(context.Context, *GetJoinedGroupListReq) (*GetJoinedGroupListResp, error)
 	GetGroupInfo(context.Context, *GetGroupInfoReq) (*GetGroupInfoResp, error)
 	SetGroupInfo(context.Context, *SetGroupInfoReq) (*SetGroupInfoResp, error)
@@ -119,6 +132,9 @@ func (UnimplementedGroupServer) CreateGroup(context.Context, *CreateGroupReq) (*
 }
 func (UnimplementedGroupServer) DeleteGroup(context.Context, *DeleteGroupReq) (*DeleteGroupResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteGroup not implemented")
+}
+func (UnimplementedGroupServer) QuitGroup(context.Context, *QuitGroupReq) (*QuitGroupResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QuitGroup not implemented")
 }
 func (UnimplementedGroupServer) GetJoinedGroupList(context.Context, *GetJoinedGroupListReq) (*GetJoinedGroupListResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetJoinedGroupList not implemented")
@@ -182,6 +198,24 @@ func _Group_DeleteGroup_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GroupServer).DeleteGroup(ctx, req.(*DeleteGroupReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Group_QuitGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QuitGroupReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).QuitGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Group_QuitGroup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).QuitGroup(ctx, req.(*QuitGroupReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -254,6 +288,10 @@ var Group_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteGroup",
 			Handler:    _Group_DeleteGroup_Handler,
+		},
+		{
+			MethodName: "QuitGroup",
+			Handler:    _Group_QuitGroup_Handler,
 		},
 		{
 			MethodName: "GetJoinedGroupList",

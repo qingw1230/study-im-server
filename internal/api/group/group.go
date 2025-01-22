@@ -100,6 +100,49 @@ func DeleteGroup(c *gin.Context) {
 	log.Info("api DeletGroup return")
 }
 
+func QuitGroup(c *gin.Context) {
+	log.Info("call api QuitGroup")
+	params := base_info.QuitGroupReq{}
+	if err := c.BindJSON(&params); err != nil {
+		log.Error("BindJSON failed", err.Error())
+		c.JSON(http.StatusOK, constant.NewBindJSONErrorRespWithInfo(err.Error()))
+		return
+	}
+	log.Info("QuitGroup BindJSON success")
+
+	ok, opUserId := token_verify.GetUserIdFromToken(c.Request.Header.Get(constant.STR_TOKEN))
+	if !ok {
+		log.Error("GetUserIdFromToken failed", c.Request.Header.Get(constant.STR_TOKEN))
+		c.JSON(http.StatusOK, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
+		return
+	}
+	req := &pbGroup.QuitGroupReq{
+		GroupId:  params.GroupId,
+		OpUserId: opUserId,
+	}
+	log.Info("QuitGroup args:", req.String())
+
+	// TODO(qingw1230): 使用服务发现建立连接
+	conn, err := grpc.NewClient("127.0.0.1:10500", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Error("NewClient failed", err.Error())
+		c.JSON(http.StatusOK, constant.CommonFailResp)
+		return
+	}
+	client := pbGroup.NewGroupClient(conn)
+	reply, err := client.QuitGroup(context.Background(), req)
+	if err != nil {
+		log.Error("QuitGroup failed", err.Error())
+		c.JSON(http.StatusOK, constant.CommonFailResp)
+		return
+	}
+
+	resp := base_info.QuitGroupResp{CommonResp: base_info.CommonResp{}}
+	copier.Copy(&resp.CommonResp, reply.CommonResp)
+	c.JSON(http.StatusOK, resp)
+	log.Info("api QuitGroup return")
+}
+
 func GetJoinedGroupList(c *gin.Context) {
 	params := base_info.GetJoinedGroupListReq{}
 	if err := c.BindJSON(&params); err != nil {

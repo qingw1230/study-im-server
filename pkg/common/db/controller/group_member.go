@@ -20,6 +20,43 @@ func InsertIntoGroupMember(toInsertInfo *db.GroupMember) error {
 	return dbConn.Table(constant.DBTableGroupMember).Create(&toInsertInfo).Error
 }
 
+// GetGroupMemberListByUserId 根据 userId 获取所有群聊的 GroupMember
+func GetGroupMemberListByUserId(userId string) ([]db.GroupMember, error) {
+	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
+	if err != nil {
+		return nil, err
+	}
+	var groupMemberList []db.GroupMember
+	err = dbConn.Table(constant.DBTableGroupMember).Where("user_id = ?", userId).Find(&groupMemberList).Error
+	if err != nil {
+		return nil, err
+	}
+	return groupMemberList, nil
+}
+
+// GetGroupMemberInfoByGroupIdAndUserId 根据 groupId 和 userId 获取群成员信息
+func GetGroupMemberInfoByGroupIdAndUserId(groupId, userId string) (*db.GroupMember, error) {
+	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
+	if err != nil {
+		return nil, err
+	}
+	var groupMember db.GroupMember
+	err = dbConn.Table(constant.DBTableGroupMember).Where("group_id = ? AND user_id = ?", groupId, userId).First(&groupMember).Error
+	if err != nil {
+		return nil, err
+	}
+	return &groupMember, nil
+}
+
+// DeleteGroupMemberByGroupIdAndUserId 根据 groupId 和 userId 删除群成员信息
+func DeleteGroupMemberByGroupIdAndUserId(groupId, userId string) error {
+	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
+	if err != nil {
+		return err
+	}
+	return dbConn.Table(constant.DBTableGroupMember).Where("group_id = ? AND user_id = ?", groupId, userId).Delete(&db.GroupMember{}).Error
+}
+
 // GetGroupMemberNumByGroupId 根据 groupId 获取群成员数量
 func GetGroupMemberNumByGroupId(groupId string) (uint32, error) {
 	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
@@ -58,34 +95,6 @@ func GetGroupOwnerInfoByGroupId(groupId string) (*db.GroupMember, error) {
 		}
 	}
 	return nil, nil
-}
-
-// GetGroupMemberInfoByGroupIdAndUserId 根据 groupId 和 userId 获取群成员信息
-func GetGroupMemberInfoByGroupIdAndUserId(groupId, userId string) (*db.GroupMember, error) {
-	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
-	if err != nil {
-		return nil, err
-	}
-	var groupMember db.GroupMember
-	err = dbConn.Table(constant.DBTableGroupMember).Where("group_id = ? AND user_id = ?", groupId, userId).First(&groupMember).Error
-	if err != nil {
-		return nil, err
-	}
-	return &groupMember, nil
-}
-
-// GetGroupMemberListByUserId 根据 userId 获取所有群聊的 GroupMember
-func GetGroupMemberListByUserId(userId string) ([]db.GroupMember, error) {
-	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
-	if err != nil {
-		return nil, err
-	}
-	var groupMemberList []db.GroupMember
-	err = dbConn.Table(constant.DBTableGroupMember).Where("user_id = ?", userId).Find(&groupMemberList).Error
-	if err != nil {
-		return nil, err
-	}
-	return groupMemberList, nil
 }
 
 // GetOwnedGroupIdListByUserId 根据 userId 获取创建的所有群聊的 GroupId

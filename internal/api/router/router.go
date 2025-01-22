@@ -32,6 +32,7 @@ func Router() *gin.Engine {
 	{
 		groupRouterGroup.POST("/create_group", group.CreateGroup)
 		groupRouterGroup.POST("/delete_group", group.DeleteGroup)
+		groupRouterGroup.POST("/quit_group", group.QuitGroup)
 		groupRouterGroup.POST("/get_joined_group_list", group.GetJoinedGroupList)
 		groupRouterGroup.POST("/get_group_info", group.GetGroupInfo)
 		groupRouterGroup.POST("/set_group_info", group.SetGroupInfo)
