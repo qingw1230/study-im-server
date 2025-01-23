@@ -36,6 +36,7 @@ type UpdateUserInfoReq struct {
 	PersonalSignature string `json:"personalSignature" binding:"omitempty,max=50"`
 	Sex               int32  `json:"sex" binding:"omitempty,oneof=0 1 2"`
 	AreaName          string `json:"areaName" binding:"omitempty,max=50"`
+	AreaCode          string `json:"areaCode" binding:"omitempty,max=50"`
 	Email             string `json:"email" binding:"omitempty,max=50"`
 	Password          string `json:"password" binding:"omitempty,min=8,max=32"`
 }
