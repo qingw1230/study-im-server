@@ -112,14 +112,14 @@ func (s *accountServer) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAc
 }
 
 func (s *accountServer) GetUserInfo(_ context.Context, req *pbAccount.GetUserInfoReq) (*pbAccount.GetUserInfoResp, error) {
-	log.Info("call GetUserInfo args: ", req.String())
+	log.Info("call rpc GetUserInfo args:", req.String())
 
 	user, err := controller.GetUserById(req.UserId)
 	if err == gorm.ErrRecordNotFound {
 		return nil, nil
 	}
 	if err != nil {
-		log.Error("FindUserById failed ", err.Error())
+		log.Error("GetUserById failed", err.Error(), req.UserId)
 		return nil, err
 	}
 
@@ -130,6 +130,28 @@ func (s *accountServer) GetUserInfo(_ context.Context, req *pbAccount.GetUserInf
 	_, err = controller.GetFriendRelationFromFriend(req.OpUserId, req.UserId)
 	resp.PublicUserInfo.IsFriend = err == nil
 	copier.Copy(resp.PublicUserInfo, user)
+	return resp, nil
+}
+
+func (s *accountServer) GetSelfUserInfo(_ context.Context, req *pbAccount.GetSelfUserInfoReq) (*pbAccount.GetSelfUserInfoResp, error) {
+	log.Info("call rpc GetSelfUserInfo args:", req.String())
+	if !token_verify.CheckAccess(req.OpUserId, req.UserId) {
+		log.Error("CheckAccess failed", req.OpUserId, req.UserId)
+		return &pbAccount.GetSelfUserInfoResp{CommonResp: &constant.PBTokenAccessErrorResp, UserInfo: &pbPublic.UserInfo{}}, nil
+	}
+
+	user, err := controller.GetUserById(req.UserId)
+	if err != nil {
+		log.Error("GetUserById failed", err.Error(), req.UserId)
+		return nil, err
+	}
+
+	resp := &pbAccount.GetSelfUserInfoResp{
+		CommonResp: &constant.PBCommonSuccessResp,
+		UserInfo:   &pbPublic.UserInfo{},
+	}
+	copier.Copy(resp.UserInfo, user)
+	log.Info("rpc GetSelfUserInfo return")
 	return resp, nil
 }
 

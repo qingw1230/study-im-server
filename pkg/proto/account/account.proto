@@ -33,8 +33,19 @@ message GetUserInfoResp {
   server_api_params.PublicUserInfo PublicUserInfo = 2;
 }
 
+message GetSelfUserInfoReq {
+  string UserId = 1;
+  string OpUserId = 2;
+}
+
+message GetSelfUserInfoResp {
+  server_api_params.CommonResp CommonResp = 1;
+  server_api_params.UserInfo UserInfo = 2;
+}
+
 service Account {
   rpc Register(RegisterReq) returns (RegisterResp);
   rpc Login(LoginReq) returns (LoginResp);
   rpc GetUserInfo(GetUserInfoReq) returns (GetUserInfoResp);
+  rpc GetSelfUserInfo(GetSelfUserInfoReq) returns (GetSelfUserInfoResp);
 }

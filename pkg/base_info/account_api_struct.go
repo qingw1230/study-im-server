@@ -36,3 +36,12 @@ type GetUserInfoReq struct {
 type GetUserInfoResp struct {
 	PublicUserInfo *public.PublicUserInfo
 }
+
+type GetSelfUserInfoReq struct {
+	UserId string `json:"userId" binding:"required"`
+}
+
+type GetSelfUserInfoResp struct {
+	CommonResp
+	UserInfo *public.UserInfo `json:"-"`
+}

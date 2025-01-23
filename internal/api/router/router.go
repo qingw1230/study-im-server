@@ -16,6 +16,7 @@ func Router() *gin.Engine {
 		accountRouterGroup.POST("/login", account.Login)
 		accountRouterGroup.POST("/get_check_code", account.GetCheckCode)
 		accountRouterGroup.POST("/get_user_info", account.GetUserInfo)
+		accountRouterGroup.POST("/get_self_user_info", account.GetSelfUserInfo)
 	}
 
 	friendRouterGroup := r.Group("/api/friend")

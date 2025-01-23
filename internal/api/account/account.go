@@ -11,7 +11,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	"github.com/qingw1230/study-im-server/pkg/common/token_verify"
-	rpc "github.com/qingw1230/study-im-server/pkg/proto/account"
+	pbAccount "github.com/qingw1230/study-im-server/pkg/proto/account"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -37,7 +37,7 @@ func Register(c *gin.Context) {
 	}
 	log.Info("Register Captcha.Verify success")
 
-	req := &rpc.RegisterReq{}
+	req := &pbAccount.RegisterReq{}
 	copier.Copy(req, &params)
 	log.Info("Register rpc client.Register args: ", req.String())
 
@@ -48,7 +48,7 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusOK, constant.CommonFailResp)
 		return
 	}
-	client := rpc.NewAccountClient(conn)
+	client := pbAccount.NewAccountClient(conn)
 	reply, err := client.Register(context.Background(), req)
 	if err != nil {
 		log.Error("client.Register internal failed ", err.Error())
@@ -88,7 +88,7 @@ func Login(c *gin.Context) {
 	}
 	log.Info("Login Captcha.Verify success")
 
-	req := &rpc.LoginReq{}
+	req := &pbAccount.LoginReq{}
 	copier.Copy(&req, &params)
 	log.Info("Login rpc client.Login args: ", req.String())
 
@@ -99,7 +99,7 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusOK, constant.CommonFailResp)
 		return
 	}
-	client := rpc.NewAccountClient(conn)
+	client := pbAccount.NewAccountClient(conn)
 	reply, err := client.Login(context.Background(), req)
 	if err != nil {
 		log.Error("client.Login internal failed ", err.Error())
@@ -149,16 +149,15 @@ func GetUserInfo(c *gin.Context) {
 
 	ok, opUserId := token_verify.GetUserIdFromToken(c.Request.Header.Get(constant.STR_TOKEN))
 	if !ok {
-		log.Error("GetUserIdFromToken failed ", c.Request.Header.Get(constant.STR_TOKEN))
+		log.Error("GetUserIdFromToken failed", c.Request.Header.Get(constant.STR_TOKEN))
 		c.JSON(http.StatusOK, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
 		return
 	}
-
-	req := &rpc.GetUserInfoReq{
+	req := &pbAccount.GetUserInfoReq{
 		OpUserId: opUserId,
 		UserId:   params.UserId,
 	}
-	log.Info("GetUserInfo rpc client.GetUserInfo args: ", req.String())
+	log.Info("GetUserInfo args:", req.String())
 
 	// TODO(qingw1230): 使用服务发现建立连接
 	conn, err := grpc.NewClient("127.0.0.1:10100", grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -167,14 +166,13 @@ func GetUserInfo(c *gin.Context) {
 		c.JSON(http.StatusOK, constant.CommonFailResp)
 		return
 	}
-	client := rpc.NewAccountClient(conn)
+	client := pbAccount.NewAccountClient(conn)
 	reply, err := client.GetUserInfo(context.Background(), req)
 	if err != nil {
-		log.Error("client.GetUserInfo internal failed ", err.Error())
+		log.Error("GetUserInfo failed", err.Error())
 		c.JSON(http.StatusOK, constant.CommonFailResp)
 		return
 	}
-	log.Info("Login rpc client.Login call success")
 
 	// reply 和 err 同时为 nil，说明用户不存在
 	if reply == nil {
@@ -182,4 +180,48 @@ func GetUserInfo(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, constant.NewSuccessRespWithData(reply.PublicUserInfo))
+}
+
+func GetSelfUserInfo(c *gin.Context) {
+	log.Info("call api GetSelfUserInfo")
+	params := base_info.GetSelfUserInfoReq{}
+	if err := c.BindJSON(&params); err != nil {
+		log.Error("BindJSON failed", err.Error())
+		c.JSON(http.StatusOK, constant.NewBindJSONErrorRespWithInfo(err.Error()))
+		return
+	}
+	log.Info("GetSelfUserInfo BindJSON success")
+
+	ok, opUserId := token_verify.GetUserIdFromToken(c.Request.Header.Get(constant.STR_TOKEN))
+	if !ok {
+		log.Error("GetUserIdFromToken failed", c.Request.Header.Get(constant.STR_TOKEN))
+		c.JSON(http.StatusOK, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
+		return
+	}
+	req := &pbAccount.GetSelfUserInfoReq{
+		UserId:   params.UserId,
+		OpUserId: opUserId,
+	}
+	log.Info("GetSelfUserInfo args:", req.String())
+
+	// TODO(qingw1230): 使用服务发现建立连接
+	conn, err := grpc.NewClient("127.0.0.1:10100", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Error("grpc.NewClient failed ", err.Error())
+		c.JSON(http.StatusOK, constant.CommonFailResp)
+		return
+	}
+	client := pbAccount.NewAccountClient(conn)
+	reply, err := client.GetSelfUserInfo(context.Background(), req)
+	if err != nil {
+		log.Error("GetSelfUserInfo failed", err.Error())
+		c.JSON(http.StatusOK, constant.CommonFailResp)
+		return
+	}
+
+	resp := base_info.GetSelfUserInfoResp{CommonResp: base_info.CommonResp{}}
+	copier.Copy(&resp.CommonResp, reply.CommonResp)
+	resp.Data = reply.UserInfo
+	c.JSON(http.StatusOK, resp)
+	log.Info("api GetSelfUserInfo return")
 }
