@@ -23,6 +23,16 @@ message LoginResp {
   server_api_params.UserInfo UserInfo = 2;
 }
 
+
+message UpdateUserInfoReq {
+  server_api_params.UserInfo UserInfo = 1;
+  string opUserId = 2;
+}
+
+message UpdateUserInfoResp {
+  server_api_params.CommonResp CommonResp = 1;
+}
+
 message GetUserInfoReq {
   string opUserId = 1;
   string userId = 2;
@@ -46,6 +56,7 @@ message GetSelfUserInfoResp {
 service Account {
   rpc Register(RegisterReq) returns (RegisterResp);
   rpc Login(LoginReq) returns (LoginResp);
+  rpc UpdateUserInfo(UpdateUserInfoReq) returns (UpdateUserInfoResp);
   rpc GetUserInfo(GetUserInfoReq) returns (GetUserInfoResp);
   rpc GetSelfUserInfo(GetSelfUserInfoReq) returns (GetSelfUserInfoResp);
 }

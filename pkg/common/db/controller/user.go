@@ -14,8 +14,16 @@ func CreateUser(user db.User) error {
 	return dbConn.Table(constant.DBTableUser).Create(&user).Error
 }
 
+func UpdateUserInfo(user *db.User) error {
+	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
+	if err != nil {
+		return err
+	}
+	return dbConn.Table(constant.DBTableUser).Where("user_id = ?", user.UserId).Update(user).Error
+}
+
 func IsUserExist(email string) bool {
-	_, err := FindUserByEmail(email)
+	_, err := GetUserByEmail(email)
 	return err != gorm.ErrRecordNotFound
 }
 
@@ -34,7 +42,7 @@ func GetUserById(id string) (*db.User, error) {
 	return &user, nil
 }
 
-func FindUserByEmail(email string) (*db.User, error) {
+func GetUserByEmail(email string) (*db.User, error) {
 	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
 	if err != nil {
 		return nil, err

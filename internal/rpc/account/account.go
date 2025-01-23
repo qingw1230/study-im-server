@@ -59,7 +59,7 @@ func (s *accountServer) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAc
 	log.Info("call Login args: ", req.String())
 
 	// 确保用户存在
-	user, err := controller.FindUserByEmail(req.Email)
+	user, err := controller.GetUserByEmail(req.Email)
 	if err == gorm.ErrRecordNotFound {
 		resp := &pbAccount.LoginResp{
 			CommonResp: &pbPublic.CommonResp{
@@ -108,6 +108,26 @@ func (s *accountServer) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAc
 	copier.Copy(resp.UserInfo, user)
 	resp.UserInfo.Token = token
 	resp.UserInfo.Admin = utils.IsContain(user.UserId, config.Config.Admin.UserIds)
+	return resp, nil
+}
+
+func (s *accountServer) UpdateUserInfo(_ context.Context, req *pbAccount.UpdateUserInfoReq) (*pbAccount.UpdateUserInfoResp, error) {
+	log.Info("call rpc UpdateUesrInfo")
+	if !token_verify.CheckAccess(req.OpUserId, req.UserInfo.UserId) {
+		log.Error("CheckAccess failed", req.OpUserId, req.UserInfo.UserId)
+		return &pbAccount.UpdateUserInfoResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
+	}
+
+	var user db.User
+	copier.Copy(&user, req.UserInfo)
+	err := controller.UpdateUserInfo(&user)
+	if err != nil {
+		log.Error("UpdateUserInfo failed", err.Error())
+		return nil, err
+	}
+
+	resp := &pbAccount.UpdateUserInfoResp{CommonResp: &constant.PBCommonSuccessResp}
+	log.Info("rpc UpdateUserInfo return")
 	return resp, nil
 }
 

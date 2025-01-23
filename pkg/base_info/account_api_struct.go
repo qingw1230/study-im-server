@@ -29,6 +29,21 @@ type LoginResp struct {
 	AreaCode          string `json:"areaCode"`
 }
 
+type UpdateUserInfoReq struct {
+	UserId            string `json:"userId" binding:"required,min=1,max=12"`
+	NickName          string `json:"nickName" binding:"omitempty,min=1,max=20"`
+	FaceUrl           string `json:"faceUrl" binding:"omitempty,max=255"`
+	PersonalSignature string `json:"personalSignature" binding:"omitempty,max=50"`
+	Sex               int32  `json:"sex" binding:"omitempty,oneof=0 1 2"`
+	AreaName          string `json:"areaName" binding:"omitempty,max=50"`
+	Email             string `json:"email" binding:"omitempty,max=50"`
+	Password          string `json:"password" binding:"omitempty,min=8,max=32"`
+}
+
+type UpdateUserInfoResp struct {
+	CommonResp
+}
+
 type GetUserInfoReq struct {
 	UserId string `json:"userId" binding:"required"`
 }
