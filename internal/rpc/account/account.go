@@ -21,7 +21,7 @@ import (
 )
 
 func (s *accountServer) Register(_ context.Context, req *pbAccount.RegisterReq) (*pbAccount.RegisterResp, error) {
-	log.Info("call Register args: ", req.String())
+	log.Info("call rpc Register args:", req.String())
 
 	// 确保用户不存在
 	if controller.IsUserExist(req.Email) {
@@ -112,7 +112,7 @@ func (s *accountServer) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAc
 }
 
 func (s *accountServer) UpdateUserInfo(_ context.Context, req *pbAccount.UpdateUserInfoReq) (*pbAccount.UpdateUserInfoResp, error) {
-	log.Info("call rpc UpdateUesrInfo")
+	log.Info("call rpc UpdateUesrInfo args:", req.String())
 	if !token_verify.CheckAccess(req.OpUserId, req.UserInfo.UserId) {
 		log.Error("CheckAccess failed", req.OpUserId, req.UserInfo.UserId)
 		return &pbAccount.UpdateUserInfoResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
@@ -120,6 +120,8 @@ func (s *accountServer) UpdateUserInfo(_ context.Context, req *pbAccount.UpdateU
 
 	var user db.User
 	copier.Copy(&user, req.UserInfo)
+	user.Salt = utils.GenerateRandomStrWithLength(constant.LENGTH_10)
+	user.Password = utils.MakePassword(user.Password, user.Salt)
 	err := controller.UpdateUserInfo(&user)
 	if err != nil {
 		log.Error("UpdateUserInfo failed", err.Error())

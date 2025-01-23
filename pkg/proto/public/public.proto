@@ -12,12 +12,13 @@ message UserInfo {
   string token = 1;
   bool admin = 2;
   string userId = 3;
-  string nickName = 4;
-  string personalSignature = 5;
-  int32 joinType = 6;
-  int32 sex = 7;
-  string areaName = 8;
-  string areaCode = 9;
+  string password = 4;
+  string nickName = 5;
+  string personalSignature = 6;
+  int32 joinType = 7;
+  int32 sex = 8;
+  string areaName = 9;
+  string areaCode = 10;
 }
 
 message PublicUserInfo {
