@@ -4,7 +4,7 @@
 # output: 10023 2323 3434
 list_to_string(){
     ports_list=$*
-    sub_s1=`echo $ports_list | sed 's/ //g'`
+    sub_s1=$(echo $ports_list | sed 's/ //g')
     sub_s2=${sub_s1//,/ }
     sub_s3=${sub_s2#*[}
     sub_s4=${sub_s3%]*}
