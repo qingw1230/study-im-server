@@ -1,6 +1,9 @@
 #--------------- Internal service configuration ---------------#
 serverip: 0.0.0.0
 
+api:
+  apiPort: [ 10000 ]
+
 rpcport:
   accountPort: [ 10100 ]
   friendPort: [ 10200 ]
