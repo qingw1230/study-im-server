@@ -22,7 +22,7 @@ tokenpolicy:
   accessExpire: 1
 
 log:
-  storageLocation: ./logs/
+  storageLocation: ../logs/
   rotationTime: 24
   remainRotationCount: 5
   remainLogLevel: 6
