@@ -1,0 +1,49 @@
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    ports:
+      - 13306:3306
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+    environment:
+      MYSQL_ROOT_PASSWORD: qin1002.
+    restart: always
+
+  redis:
+    image: redis:5.0.7
+    container_name: redis
+    ports:
+      - "16379:6379"
+    environment:
+      TZ: Asia/Shanghai
+    restart: always
+    sysctls:
+      net.core.somaxconn: 1024
+    command: redis-server --requirepass qin1002. --appendonly yes
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    ports:
+      - "12181:2181"
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: yes
+      TZ: Asia/Shanghai
+    restart: always
+  
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    environment:
+      TZ: Asia/Shanghai
+      KAFKA_BROKER_ID: 0
+      KAFKA_ZOOKEEPER_CONNECT: 127.0.0.1:12181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://127.0.0.1:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+    restart: always
+    network_mode: "host"
+    depends_on:
+      - zookeeper
