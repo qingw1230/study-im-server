@@ -1,0 +1,26 @@
+syntax = "proto3";
+import "public/public.proto";
+package pbMsg;
+option go_package = "github.com/qingw1230/study-im-server/pkg/proto/msg";
+
+message MsgDataToMq{
+  string token = 1;
+  server_api_params.MsgData msgData = 2;
+}
+
+message SendMsgReq {
+  string token =1;
+  string operationID = 2;
+  server_api_params.MsgData msgData = 3;
+}
+
+message SendMsgResp {
+  server_api_params.CommonResp CommonResp = 1;
+  string serverMsgId = 2;
+  string clientMsgId = 3;
+  int64  sendTime = 4;
+}
+
+service Msg {
+  rpc SendMsg(SendMsgReq) returns(SendMsgResp);
+}
