@@ -37,3 +37,15 @@ mysql:
   dbMysqlUserName: root
   dbMysqlPassword: qin1002.
   dbMysqlDatabaseName: studyim
+
+redis:
+  dbAddress: 127.0.0.1:16379
+  dbPassword: qin1002. 
+
+kafka:
+  ws2mschat:
+    addr: [ 127.0.0.1:9092 ]
+    topic: "ws2ms_chat"
+  ms2pschat:
+    addr: [ 127.0.0.1:9092 ]
+    topic: "ms2ps_chat"

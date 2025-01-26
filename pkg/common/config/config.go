@@ -58,6 +58,22 @@ type config struct {
 		DBPassword     string   `yaml:"dbMysqlPassword"`
 		DBDatabaseName string   `yaml:"dbMysqlDatabaseName"`
 	} `yaml:"mysql"`
+
+	Redis struct {
+		DBAddress  string `yaml:"dbAddress"`
+		DBPassword string `yaml:"dbPassword"`
+	} `yaml:"redis"`
+
+	Kafka struct {
+		Ws2mschat struct {
+			Addr  []string `yaml:"addr"`
+			Topic string   `yaml:"topic"`
+		} `yaml:"ws2mschat"`
+		Ms2pschat struct {
+			Addr  []string `yaml:"addr"`
+			Topic string   `yaml:"topic"`
+		} `yaml:"ms2pschat"`
+	} `yaml:"kafka"`
 }
 
 func init() {
