@@ -20,14 +20,6 @@ message SendMsgResp {
   int64 sendTime = 4;
 }
 
-message TestReq {
-}
-
-message TestResp {
-  string text = 1;
-}
-
 service Msg {
   rpc SendMsg(SendMsgReq) returns (SendMsgResp);
-  rpc Test(TestReq) returns (TestResp);
 }
