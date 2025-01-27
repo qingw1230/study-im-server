@@ -23,4 +23,9 @@ const (
 	RecordAlreadyExists     = 11001
 	RecordNotExists         = 11002
 	RecordAccountORPwdError = 11003
+
+	// msg 相关的
+	MsgCommonError    = 12000
+	MsgUnknownError   = 12001
+	MsgKafkaSendError = 12002
 )

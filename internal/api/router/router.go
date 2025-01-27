@@ -5,6 +5,7 @@ import (
 	"github.com/qingw1230/study-im-server/internal/api/account"
 	"github.com/qingw1230/study-im-server/internal/api/friend"
 	"github.com/qingw1230/study-im-server/internal/api/group"
+	"github.com/qingw1230/study-im-server/internal/api/msg"
 )
 
 func Router() *gin.Engine {
@@ -39,6 +40,11 @@ func Router() *gin.Engine {
 		groupRouterGroup.POST("/get_joined_group_list", group.GetJoinedGroupList)
 		groupRouterGroup.POST("/get_group_info", group.GetGroupInfo)
 		groupRouterGroup.POST("/set_group_info", group.SetGroupInfo)
+	}
+
+	msgGroup := r.Group("/api/msg")
+	{
+		msgGroup.POST("/send_msg", msg.SendMsg)
 	}
 
 	return r

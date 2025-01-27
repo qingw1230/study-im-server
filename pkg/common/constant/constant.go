@@ -24,12 +24,29 @@ const (
 // 字符串常量
 const (
 	STR_TOKEN = "token"
+	SINGLE_   = "single_"
+	GROUP_    = "group_"
 )
 
 // token
 const (
-	NormalToken = iota
+	NormalToken = iota + 1
 	InvalidToken
 	KickedToken
 	ExpiredToken
+)
+
+const (
+	// MsgFrom
+	UserMsgType = 100
+	SysMsgType  = 200
+
+	// SessionType
+	SingleChatType = 1
+	GroupChatType  = 2
+
+	// MsgReceiveOpt
+	ReceiveMessage          = 1
+	NotReceiveMessage       = 2
+	ReceiveNotNotifyMessage = 3
 )

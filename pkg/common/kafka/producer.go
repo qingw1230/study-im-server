@@ -14,6 +14,7 @@ type Producer struct {
 }
 
 func NewKafkaProducer(addr []string, topic string) *Producer {
+	log.Debug("call NewKafkaProducer")
 	p := &Producer{
 		topic: topic,
 		addr:  addr,
@@ -26,9 +27,11 @@ func NewKafkaProducer(addr []string, topic string) *Producer {
 
 	producer, err := sarama.NewSyncProducer(p.addr, p.config)
 	if err != nil {
+		log.Error("NewSyncProducer failed", p.addr, p.topic)
 		panic(err.Error())
 	}
 	p.producer = producer
+	log.Debug("NewKafkaProducer return")
 	return p
 }
 

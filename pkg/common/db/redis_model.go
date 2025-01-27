@@ -2,15 +2,15 @@ package db
 
 import (
 	"github.com/gomodule/redigo/redis"
-	"github.com/qingw1230/study-im-server/pkg/common/log"
 )
 
 const (
 	redisTimeOneMintue = 60
 	redisTimeOneDay    = 60 * 60 * 24
 
-	checkCode         = "STUDYIM:CHECK_CODE:"
-	userIdTokenStatus = "STUDYIM:USER_ID_TOKEN_STATUS:"
+	checkCode                     = "STUDYIM:CHECK_CODE:"
+	userIdTokenStatus             = "STUDYIM:USER_ID_TOKEN_STATUS:"
+	conversationReceiveMessageOpt = "STUDYIM:CON_RECV_MSG_OPT:"
 )
 
 func (d *DataBases) Exec(cmd string, key interface{}, args ...interface{}) (interface{}, error) {
@@ -48,14 +48,12 @@ func (d *DataBases) GetCheckCode(id string) (string, error) {
 // AddTokenFlag 添加用户 token
 func (d *DataBases) AddTokenFlag(userId string, token string, flag int) error {
 	key := userIdTokenStatus + userId
-	log.Debug("add token key is ", key)
 	_, err := d.Exec("HSET", key, token, flag)
 	return err
 }
 
 func (d *DataBases) GetTokenMapByUid(userId string) (map[string]int, error) {
 	key := userIdTokenStatus + userId
-	log.Debug("get token key is ", key)
 	return redis.IntMap(d.Exec("HGETALL", key))
 }
 
@@ -63,4 +61,15 @@ func (d *DataBases) DeleteTokenByUid(userId string, fields []string) error {
 	key := userIdTokenStatus + userId
 	_, err := d.Exec("HDEL", key, redis.Args{}.Add().AddFlat(fields)...)
 	return err
+}
+
+func (d *DataBases) SetSingleConversationMsgOpt(userId, conversationId string, opt int) error {
+	key := conversationReceiveMessageOpt + userId
+	_, err := d.Exec("HSET", key, conversationId, opt)
+	return err
+}
+
+func (d *DataBases) GetSingleConversationMsgOpt(userId, conversationId string) (int, error) {
+	key := conversationReceiveMessageOpt + userId
+	return redis.Int(d.Exec("HGET", key, conversationId))
 }

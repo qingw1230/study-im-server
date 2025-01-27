@@ -7,11 +7,13 @@ api:
 rpcport:
   accountPort: [ 10100 ]
   friendPort: [ 10200 ]
+  offlineMessagePort: [ 10300 ]
   groupPort: [ 10500 ]
 
 rpcregistername:
   accountName: Account
   friendName: Friend
+  offlineMessageName: OfflineMessage
   groupName: Group
 
 admin:

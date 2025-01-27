@@ -20,6 +20,10 @@ const (
 	RecordEmailAlreadyRegisterErrorInfo = "邮箱已注册"
 	RecordAccountORPwdErrorInfo         = "账号或密码错误"
 	RecordAccountNotExistsInfo          = "账号不存在"
+
+	MsgCommonErrorInfo    = "msg 通用错误"
+	MsgUnknownErrorInfo   = "未知的 sessionTye"
+	MsgKafkaSendErrorInfo = "向 kafka 发送失败"
 )
 
 var (

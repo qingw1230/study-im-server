@@ -86,8 +86,7 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 
 	if friendRequest.HandleResult == constant.FriendResponseAgree {
 		// 插入两条单向好友关系
-		friend, err := controller.GetFriendRelationFromFriend(req.CommonId.FromUserId, req.CommonId.ToUserId)
-		log.Debug("GetFriendRelationFromFriend return ", friend, err)
+		_, err := controller.GetFriendRelationFromFriend(req.CommonId.FromUserId, req.CommonId.ToUserId)
 		if err == nil {
 			log.Warn("GetFriendRelationFromFriend exist ", req.CommonId.FromUserId, req.CommonId.ToUserId)
 		} else if err == gorm.ErrRecordNotFound {

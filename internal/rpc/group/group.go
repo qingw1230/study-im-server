@@ -176,14 +176,6 @@ func (s *groupServer) SetGroupInfo(_ context.Context, req *pbGroup.SetGroupInfoR
 	return &pbGroup.SetGroupInfoResp{CommonResp: &constant.PBCommonSuccessResp}, nil
 }
 
-type groupServer struct {
-	pbGroup.UnimplementedGroupServer
-	rpcPort         int
-	rpcRegisterName string
-	zkSchema        string
-	zkAddr          []string
-}
-
 // hasOwnerAccess 检查是否是群拥有者
 func hasOwnerAccess(groupId, opUserId string) bool {
 	if utils.IsContain(opUserId, config.Config.Admin.UserIds) {
@@ -214,6 +206,14 @@ func hasOwnerOrAdminAccess(groupId, opUserId string) bool {
 		return true
 	}
 	return false
+}
+
+type groupServer struct {
+	pbGroup.UnimplementedGroupServer
+	rpcPort         int
+	rpcRegisterName string
+	zkSchema        string
+	zkAddr          []string
 }
 
 func NewGroupServer(port int) *groupServer {
