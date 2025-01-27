@@ -10,17 +10,24 @@ message MsgDataToMq{
 
 message SendMsgReq {
   string token =1;
-  string operationID = 2;
-  server_api_params.MsgData msgData = 3;
+  server_api_params.MsgData msgData = 2;
 }
 
 message SendMsgResp {
   server_api_params.CommonResp CommonResp = 1;
   string serverMsgId = 2;
   string clientMsgId = 3;
-  int64  sendTime = 4;
+  int64 sendTime = 4;
+}
+
+message TestReq {
+}
+
+message TestResp {
+  string text = 1;
 }
 
 service Msg {
-  rpc SendMsg(SendMsgReq) returns(SendMsgResp);
+  rpc SendMsg(SendMsgReq) returns (SendMsgResp);
+  rpc Test(TestReq) returns (TestResp);
 }

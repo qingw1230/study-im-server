@@ -74,24 +74,23 @@ message FriendRequest{
 }
 
 message MsgData {
-  string sendId = 1;
+  string sendId = 1;          // client 设置
   string recvId = 2;
   string groupId = 3;
-  string clientMsgId = 4;
-  string serverMsgId = 5;     // timestamp + sendId + randNum rpc 处设置
-  int32 senderPlatformId = 6;
-  string senderNickname = 7;
-  string senderFaceUrl = 8;
-  int32  sessionType = 9;     // Single Group ... client 设置
-  int32 msgFrom = 10;
-  int32 contentType = 11;     // Test Picture Voice Video File ... client 设置
-  bytes content = 12;
-  uint32 seq = 14;
-  int64 sendTime = 15;        // timestamp rpc 处设置
-  int64 createTime = 16;
-  int32 status = 17;
-  map<string, bool> options = 18;
-  OfflinePushInfo offlinePushInfo = 19;
+  string clientMsgId = 4;     // client 设置
+  string serverMsgId = 5;     // rpc 设置 timestamp + sendId + randNum
+  string senderNickName = 6;
+  string senderFaceUrl = 7;
+  int32 sessionType = 8;      // client 设置 Single Group ...
+  int32 msgFrom = 9;          // client 设置 User Sys
+  int32 contentType = 10;     // client 设置 Test Picture Voice Video File ... 
+  bytes content = 11;         // client 设置
+  uint32 seq = 12;
+  int64 sendTime = 13;        // rpc 设置 timestamp
+  int64 createTime = 14;      // client 设置
+  int32 status = 15;
+  map<string, bool> options = 16;
+  OfflinePushInfo offlinePushInfo = 17;
 }
 
 message OfflinePushInfo{

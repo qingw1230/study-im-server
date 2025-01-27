@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	Msg_SendMsg_FullMethodName = "/pbMsg.Msg/SendMsg"
+	Msg_Test_FullMethodName    = "/pbMsg.Msg/Test"
 )
 
 // MsgClient is the client API for Msg service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MsgClient interface {
 	SendMsg(ctx context.Context, in *SendMsgReq, opts ...grpc.CallOption) (*SendMsgResp, error)
+	Test(ctx context.Context, in *TestReq, opts ...grpc.CallOption) (*TestResp, error)
 }
 
 type msgClient struct {
@@ -47,11 +49,22 @@ func (c *msgClient) SendMsg(ctx context.Context, in *SendMsgReq, opts ...grpc.Ca
 	return out, nil
 }
 
+func (c *msgClient) Test(ctx context.Context, in *TestReq, opts ...grpc.CallOption) (*TestResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TestResp)
+	err := c.cc.Invoke(ctx, Msg_Test_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility.
 type MsgServer interface {
 	SendMsg(context.Context, *SendMsgReq) (*SendMsgResp, error)
+	Test(context.Context, *TestReq) (*TestResp, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -64,6 +77,9 @@ type UnimplementedMsgServer struct{}
 
 func (UnimplementedMsgServer) SendMsg(context.Context, *SendMsgReq) (*SendMsgResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendMsg not implemented")
+}
+func (UnimplementedMsgServer) Test(context.Context, *TestReq) (*TestResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Test not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 func (UnimplementedMsgServer) testEmbeddedByValue()             {}
@@ -104,6 +120,24 @@ func _Msg_SendMsg_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_Test_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TestReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).Test(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_Test_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).Test(ctx, req.(*TestReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +148,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SendMsg",
 			Handler:    _Msg_SendMsg_Handler,
+		},
+		{
+			MethodName: "Test",
+			Handler:    _Msg_Test_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
