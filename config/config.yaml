@@ -29,6 +29,12 @@ log:
   remainRotationCount: 5
   remainLogLevel: 6
 
+longconnsvr:
+  wsPort: [ 17778 ]
+  websocketMaxConnNum: 10000
+  websocketMaxMsgLen: 4096
+  websocketTimeout: 1000
+
 #--------------- Infrastructure configuration ---------------#
 zookeeper:
   zkSchema: studyIM

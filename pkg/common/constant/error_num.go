@@ -28,4 +28,9 @@ const (
 	MsgCommonError    = 12000
 	MsgUnknownError   = 12001
 	MsgKafkaSendError = 12002
+
+	// ws 相关的
+	WSCommonError    = 13000
+	WSUnmarshalError = 13003
+	WSValidateError  = 13004
 )

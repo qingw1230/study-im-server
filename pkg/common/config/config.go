@@ -49,6 +49,13 @@ type config struct {
 		RemainLogLevel      uint   `yaml:"remainLogLevel"`
 	} `yaml:"log"`
 
+	LongConnSvr struct {
+		WebsocketPort       []int `yaml:"wsPort"`
+		WebsocketMaxConnNum int   `yaml:"websocketMaxConnNum"`
+		WebsocketMaxMsgLen  int   `yaml:"websocketMaxMsgLen"`
+		WebsocketTimeout    int   `yaml:"websocketTimeout"`
+	} `yaml:"longconnsvr"`
+
 	Zookeeper struct {
 		ZKSchema string   `yaml:"zkSchema"`
 		ZKAddr   []string `yaml:"zkAddr"`

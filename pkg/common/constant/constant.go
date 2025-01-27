@@ -23,9 +23,10 @@ const (
 
 // 字符串常量
 const (
-	STR_TOKEN = "token"
-	SINGLE_   = "single_"
-	GROUP_    = "group_"
+	STR_TOKEN   = "token"
+	STR_SEND_ID = "sendId"
+	STR_SINGLE_ = "single_"
+	STR_GROUP_  = "group_"
 )
 
 // token
@@ -49,4 +50,12 @@ const (
 	ReceiveMessage          = 1
 	NotReceiveMessage       = 2
 	ReceiveNotNotifyMessage = 3
+
+	// Websocket Protocol
+	WSGetNewestSeq     = 1001
+	WSPullMsgBySeqList = 1002
+	WSSendMsg          = 1003
+	WSPushMsg          = 2001
+	WSKickOnlineMsg    = 2002
+	WSDataError        = 3001
 )

@@ -24,6 +24,10 @@ const (
 	MsgCommonErrorInfo    = "msg 通用错误"
 	MsgUnknownErrorInfo   = "未知的 sessionTye"
 	MsgKafkaSendErrorInfo = "向 kafka 发送失败"
+
+	WSCommonErrorInfo    = "ws 通用错误"
+	WSUnmarshalErrorInfo = "反序列化失败"
+	WSValidateErrorInfo  = "字段验证失败"
 )
 
 var (

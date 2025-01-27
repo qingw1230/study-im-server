@@ -42,7 +42,7 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
     for j in ${ports_array}; do
         echo -e "${SKY_BLUE_PREFIX}${service_filename[$i]} Service is starting, port number:$j $COLOR_SUFFIX"
         ./${service_filename[$i]} -port $j &
-        sleep 5
+        sleep 2
         pid="netstat -ntlp | grep $j | awk '{printf \$7}'| cut -d/ -f1"
         echo -e "${RED_PREFIX}${service_filename[$i]} Service is started, port number:$j pid:$(eval $pid)$COLOR_SUFFIX"
     done
