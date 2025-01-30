@@ -76,7 +76,7 @@ func (ws *WsServer) readMsg(conn *UserConn) {
 			ws.delUserConn(conn)
 			return
 		}
-		log.Info("ReadMessage success")
+		log.Info("ReadMessage success, type", messageType)
 		ws.msgParse(conn, msg)
 	}
 }

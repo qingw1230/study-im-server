@@ -3,22 +3,34 @@ package msg_gateway
 import (
 	"encoding/json"
 
+	"github.com/gorilla/websocket"
+	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 )
 
 func (ws *WsServer) msgParse(conn *UserConn, binaryMsg []byte) {
 	m := Req{}
-	log.Info(binaryMsg)
 	err := json.Unmarshal(binaryMsg, &m)
 	log.Info(m)
 	if err != nil {
 
 	}
 
-	// switch m.ReqIdentifier {
-	// case constant.WSSendMsg:
-	// 	ws.sendMsgReq(conn, &m)
-	// }
+	switch m.ReqIdentifier {
+	case constant.WSHeartBeat:
+		ws.handleHeartBeat(conn, &m)
+	}
+}
+
+func (ws *WsServer) handleHeartBeat(conn *UserConn, m *Req) {
+	log.Info("ws call handleHeartBeat")
+	resp := Resp{
+		ReqIdentifier: constant.WSHeartBeat,
+		Code:          constant.NoError,
+		Info:          constant.SuccessInfo,
+	}
+	reply, _ := json.Marshal(resp)
+	ws.writeMsg(conn, websocket.TextMessage, reply)
 }
 
 // func (ws *WsServer) sendMsgReq(conn *UserConn, m *Req) {

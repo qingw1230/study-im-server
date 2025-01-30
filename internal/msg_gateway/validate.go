@@ -2,15 +2,12 @@ package msg_gateway
 
 type Req struct {
 	ReqIdentifier int32  `json:"reqIdentifier" validate:"required"`
-	Token         string `json:"token"`
 	SendId        string `json:"sendId" validate:"required"`
-	MsgIncr       string `json:"msgIncr" validate:"required"`
 	Data          []byte `json:"data"`
 }
 
 type Resp struct {
 	ReqIdentifier int32  `json:"reqIdentifier"`
-	MsgIncr       string `json:"msgIncr"`
 	Code          int32  `json:"code"`
 	Info          string `json:"info"`
 	Data          []byte `json:"data"`

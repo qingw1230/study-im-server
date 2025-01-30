@@ -52,6 +52,7 @@ const (
 	ReceiveNotNotifyMessage = 3
 
 	// Websocket Protocol
+	WSHeartBeat        = 1000
 	WSGetNewestSeq     = 1001
 	WSPullMsgBySeqList = 1002
 	WSSendMsg          = 1003
