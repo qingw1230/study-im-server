@@ -73,6 +73,12 @@ message FriendRequest{
   string ex = 15;
 }
 
+message UserSendMsgResp {
+  string serverMsgId = 1;
+  string clientMsgId = 2;
+  int64 sendTime = 3;
+}
+
 message MsgData {
   string sendId = 1;          // client 设置
   string recvId = 2;

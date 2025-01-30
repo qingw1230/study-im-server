@@ -72,7 +72,7 @@ func SendMsg(c *gin.Context) {
 	// TODO(qingw1230): 使用服务发现建立连接
 	conn, err := grpc.NewClient("127.0.0.1:10300", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Error("grpc.NewClient failed", err.Error())
+		log.Error("NewClient failed", err.Error())
 		c.JSON(http.StatusOK, constant.CommonFailResp)
 		return
 	}
