@@ -10,6 +10,7 @@ const (
 	DBTableGroupMember     = "group_members"
 	DBTableGroupRequest    = "group_requests"
 	DBTableBlack           = "blacks"
+	DBTableChatLog         = "chat_logs"
 )
 
 // 数字常量

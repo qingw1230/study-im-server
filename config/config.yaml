@@ -57,3 +57,7 @@ kafka:
   ms2pschat:
     addr: [ 127.0.0.1:9092 ]
     topic: "ms2ps_chat"
+  consumergroupid:
+    msgToMongo: mongo
+    msgToMySql: mysql
+    msgToPush: push

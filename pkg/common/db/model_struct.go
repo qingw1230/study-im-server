@@ -136,3 +136,24 @@ type Black struct {
 func (Black) TableName() string {
 	return constant.DBTableBlack
 }
+
+type ChatLog struct {
+	ServerMsgId    string    `gorm:"column:server_msg_id;type:char(64);not null;primary_key"`
+	ClientMsgId    string    `gorm:"column:client_msg_id;type:char(64)"`
+	SendId         string    `gorm:"column:send_id;type:varchar(12)"`
+	RecvId         string    `gorm:"column:recv_id;type:varchar(12)"`
+	SenderNickName string    `gorm:"column:sender_nick_name;type:varchar(20)"`
+	SenderFaceUrl  string    `gorm:"column:sender_face_url;type:varchar(255)"`
+	SessionType    int32     `gorm:"column:session_type"`
+	MsgFrom        int32     `gorm:"column:msg_from"`
+	ContentType    int32     `gorm:"column:content_type"`
+	Content        string    `gorm:"column:content;type:varchar(3000)"`
+	Status         int32     `gorm:"column:status"`
+	SendTime       time.Time `gorm:"column:send_time"`
+	CreateTime     time.Time `gorm:"column:create_time"`
+	Ex             string    `gorm:"column:ex;type:varchar(1024)"`
+}
+
+func (ChatLog) TableName() string {
+	return constant.DBTableChatLog
+}

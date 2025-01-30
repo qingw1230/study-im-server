@@ -82,6 +82,11 @@ type config struct {
 			Addr  []string `yaml:"addr"`
 			Topic string   `yaml:"topic"`
 		} `yaml:"ms2pschat"`
+		ConsumerGroupId struct {
+			MsgToMongo string `yaml:"msgToMongo"`
+			MsgToMySql string `yaml:"msgToMySql"`
+			MsgToPush  string `yaml:"msgToPush"`
+		}
 	} `yaml:"kafka"`
 }
 

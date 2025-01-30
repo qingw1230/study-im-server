@@ -18,7 +18,7 @@ type MyConsumerGroupConfig struct {
 	IsReturnErr    bool
 }
 
-func NewConsumerGroup(consumerConfig *MyConsumerGroupConfig, topics, addr []string, groupId string) *MyConsumerGroup {
+func NewMyConsumerGroup(consumerConfig *MyConsumerGroupConfig, topics, addr []string, groupId string) *MyConsumerGroup {
 	config := sarama.NewConfig()
 	config.Version = consumerConfig.KafkaVersion
 	config.Consumer.Offsets.Initial = consumerConfig.OffsetsInitial
