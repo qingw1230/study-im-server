@@ -30,15 +30,14 @@ func (s *msgServer) SendMsg(_ context.Context, req *pbMsg.SendMsgReq) (*pbMsg.Se
 
 	switch req.MsgData.SessionType {
 	case constant.SingleChatType:
-		isSend := modifyMessageByUserMessageReceiveOpt(req.MsgData.RecvId, req.MsgData.SendId, constant.SingleChatType, req)
-		if isSend {
-			msgToMq.MsgData = req.MsgData
-			err1 := s.sendMsgToKafka(&msgToMq, msgToMq.MsgData.RecvId)
-			if err1 != nil {
-				log.Error("sendMsgToKafka error", msgToMq.MsgData.RecvId, msgToMq.String())
-				return returnMsg(resp, req, constant.Fail, constant.MsgKafkaSendError, constant.MsgKafkaSendErrorInfo, "", 0)
-			}
+		msgToMq.MsgData = req.MsgData
+		err1 := s.sendMsgToKafka(&msgToMq, msgToMq.MsgData.RecvId)
+		if err1 != nil {
+			log.Error("sendMsgToKafka error", msgToMq.MsgData.RecvId, msgToMq.String())
+			return returnMsg(resp, req, constant.Fail, constant.MsgKafkaSendError, constant.MsgKafkaSendErrorInfo, "", 0)
 		}
+
+		// 给自己发消息，kafka 中只需要存一份
 		if msgToMq.MsgData.SendId != msgToMq.MsgData.RecvId {
 			err2 := s.sendMsgToKafka(&msgToMq, msgToMq.MsgData.SendId)
 			if err2 != nil {
@@ -53,7 +52,7 @@ func (s *msgServer) SendMsg(_ context.Context, req *pbMsg.SendMsgReq) (*pbMsg.Se
 	}
 }
 
-// sendMsgToKafka 将数据发送到 kafka
+// sendMsgToKafka 将数据发送到 kafka，key 为 userId
 func (s *msgServer) sendMsgToKafka(m *pbMsg.MsgDataToMq, key string) error {
 	partition, offset, err := s.producer.SendMessage(m, key)
 	if err != nil {
@@ -62,6 +61,7 @@ func (s *msgServer) sendMsgToKafka(m *pbMsg.MsgDataToMq, key string) error {
 	return err
 }
 
+// GetMsgId 使用时间戳、sendId 和随机值生成
 func GetMsgId(sendId string) string {
 	t := time.Now().Format("2006-01-02 15:04:05")
 	return t + "-" + sendId + "-" + strconv.Itoa(rand.Int())

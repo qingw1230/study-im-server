@@ -20,7 +20,7 @@ func InsertMessageToChatLog(msg *pbMsg.MsgDataToMq) error {
 	case constant.SingleChatType:
 		chatLog.RecvId = msg.MsgData.RecvId
 	}
-	chatLog.Content = string(msg.MsgData.Content)
+	chatLog.Content = msg.MsgData.Content
 	chatLog.CreateTime = utils.UnixMillSecondToTime(msg.MsgData.CreateTime)
 	chatLog.SendTime = utils.UnixMillSecondToTime(msg.MsgData.SendTime)
 	return dbConn.Table(constant.DBTableChatLog).Create(chatLog).Error

@@ -31,6 +31,7 @@ func (ws *WsServer) msgParse(conn *UserConn, binaryMsg []byte) {
 	}
 }
 
+// handleHeartBeat 处理 ws 收到的心跳消息
 func (ws *WsServer) handleHeartBeat(conn *UserConn, m *Req) {
 	log.Info("ws call handleHeartBeat")
 	resp := Resp{
@@ -43,6 +44,7 @@ func (ws *WsServer) handleHeartBeat(conn *UserConn, m *Req) {
 	ws.writeMsg(conn, websocket.TextMessage, reply)
 }
 
+// sendMsgReq 处理 ws 收到的发送消息请求
 func (ws *WsServer) sendMsgReq(conn *UserConn, m *Req) {
 	log.Info("ws call sendMsgReq")
 	nReply := pbMsg.SendMsgResp{CommonResp: &pbPublic.CommonResp{}}
@@ -100,7 +102,7 @@ func (ws *WsServer) sendMsg(conn *UserConn, mReply interface{}) {
 		log.Error("JSON Marshal failed", err.Error())
 		return
 	}
-	err = ws.writeMsg(conn, websocket.BinaryMessage, b)
+	err = ws.writeMsg(conn, websocket.TextMessage, b)
 	if err != nil {
 		log.Error("ws writeMsg failed", err.Error())
 	}

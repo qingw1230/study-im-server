@@ -65,6 +65,7 @@ func (ws *WsServer) wsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// readMsg 不断读取 ws 中的消息并处理
 func (ws *WsServer) readMsg(conn *UserConn) {
 	for {
 		messageType, msg, err := conn.ReadMessage()
