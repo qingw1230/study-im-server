@@ -1,0 +1,17 @@
+syntax = "proto3";
+import "public/public.proto";
+package pbPush;
+option go_package = "github.com/qingw1230/study-im-server/pkg/proto/push";
+
+message PushMsgReq {
+  server_api_params.MsgData msgData = 1;
+  string pushToUserId = 2;
+}
+
+message PushMsgResp {
+  int32 ResultCode = 1;
+}
+
+service PushMsgService {
+  rpc PushMsg(PushMsgReq) returns (PushMsgResp);
+}
