@@ -1,0 +1,23 @@
+syntax = "proto3";
+import "public/public.proto";
+package pbReply;
+option go_package = "github.com/qingw1230/study-im-server/pkg/proto/reply";
+
+message OnlinePushMsgReq {
+  server_api_params.MsgData msgData = 1;
+  string pushToUserId = 2;
+}
+
+message OnlinePushMsgResp{
+  repeated SingleMsgToUser resp = 1;
+}
+
+message SingleMsgToUser{
+  int64 ResultCode = 1;
+  string RecvId = 2;
+}
+
+service OnlineMessageRelayService {
+  rpc OnlinePushMsg(OnlinePushMsgReq) returns (OnlinePushMsgResp);
+}
+
