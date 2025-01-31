@@ -20,17 +20,21 @@ type config struct {
 	ServerIP string `yaml:"serverip"`
 
 	RpcPort struct {
-		AccountPort        []int `yaml:"accountPort"`
-		FriendPort         []int `yaml:"friendPort"`
-		OfflineMessagePort []int `yaml:"offlineMessagePort"`
-		GroupPort          []int `yaml:"groupPort"`
+		AccountPort            []int `yaml:"accountPort"`
+		FriendPort             []int `yaml:"friendPort"`
+		OfflineMessagePort     []int `yaml:"offlineMessagePort"`
+		OnlineMessageRelayPort []int `yaml:"onlineMessageRelayPort"`
+		GroupPort              []int `yaml:"groupPort"`
+		PushPort               []int `yaml:"pushPort"`
 	} `yaml:"rpcport"`
 
 	RpcRegisterName struct {
-		AccountName        string `yaml:"accountName"`
-		FriendName         string `yaml:"friendName"`
-		OfflineMessageName string `yaml:"offlineMessageName"`
-		GroupName          string `yaml:"groupName"`
+		AccountName            string `yaml:"accountName"`
+		FriendName             string `yaml:"friendName"`
+		OfflineMessageName     string `yaml:"offlineMessageName"`
+		PushName               string `yaml:"pushName"`
+		OnlineMessageRelayName string `yaml:"onlineMessageRelay"`
+		GroupName              string `yaml:"groupName"`
 	} `yaml:"rpcregistername"`
 
 	Admin struct {

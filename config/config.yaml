@@ -8,12 +8,16 @@ rpcport:
   accountPort: [ 10100 ]
   friendPort: [ 10200 ]
   offlineMessagePort: [ 10300 ]
+  onlineMessageRelayPort: [ 10400 ]
   groupPort: [ 10500 ]
+  pushPort: [ 10700 ]
 
 rpcregistername:
   accountName: Account
   friendName: Friend
   offlineMessageName: OfflineMessage
+  pushName: Push
+  onlineMessageRelayName: OnlineMessageRelay
   groupName: Group
 
 admin:

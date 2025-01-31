@@ -8,9 +8,10 @@ import (
 )
 
 var (
-	rw       *sync.RWMutex
-	validate *validator.Validate
-	ws       WsServer
+	rw        *sync.RWMutex
+	validate  *validator.Validate
+	ws        WsServer
+	rpcServer gatewayServer
 )
 
 func Init(rpcPort, wsPort int) {
@@ -18,8 +19,10 @@ func Init(rpcPort, wsPort int) {
 	rw = &sync.RWMutex{}
 	validate = validator.New()
 	ws.onInit(wsPort)
+	rpcServer.onInit(rpcPort)
 }
 
 func Run() {
 	go ws.run()
+	go rpcServer.run()
 }

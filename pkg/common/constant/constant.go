@@ -60,4 +60,8 @@ const (
 	WSPushMsg          = 2001
 	WSKickOnlineMsg    = 2002
 	WSDataError        = 3001
+
+	WSNoError    = 0
+	WSNoUserConn = -1
+	WSWriteError = -2
 )

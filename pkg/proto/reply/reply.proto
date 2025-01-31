@@ -20,4 +20,3 @@ message SingleMsgToUser{
 service OnlineMessageRelayService {
   rpc OnlinePushMsg(OnlinePushMsgReq) returns (OnlinePushMsgResp);
 }
-

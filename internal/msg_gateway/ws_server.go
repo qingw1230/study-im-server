@@ -58,7 +58,8 @@ func (ws *WsServer) wsHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		log.Info("Upgrade success")
-		sendId := r.Header.Get(constant.STR_SEND_ID)
+		query := r.URL.Query()
+		sendId := query[constant.STR_SEND_ID][0]
 		newConn := &UserConn{Conn: conn, mu: &sync.Mutex{}}
 		ws.addUserConn(sendId, newConn)
 		go ws.readMsg(newConn)
@@ -90,11 +91,12 @@ func (ws *WsServer) writeMsg(conn *UserConn, a int, msg []byte) error {
 
 // addUserConn 添加 userId 与 ws 连接的映射
 func (ws *WsServer) addUserConn(userId string, conn *UserConn) {
-	log.Info("call addUserConn")
+	log.Info("call addUserConn", userId)
 	rw.Lock()
 	defer rw.Unlock()
 	ws.wsUserToConn[userId] = conn
 	ws.wsConnToUser[conn] = userId
+	log.Info(ws.wsUserToConn[userId])
 	log.Info("addUserConn return")
 }
 
@@ -112,6 +114,16 @@ func (ws *WsServer) delUserConn(conn *UserConn) {
 		log.Error("close ws failed", err.Error())
 	}
 	log.Info("delUserConn return")
+}
+
+// getUserConn 根据 userId 获取相应的 ws 连接
+func (ws *WsServer) getUserConn(userId string) *UserConn {
+	rw.Lock()
+	defer rw.Unlock()
+	if conn, ok := ws.wsUserToConn[userId]; ok {
+		return conn
+	}
+	return nil
 }
 
 // headerCheck 检查 URL 参数部分的 token 和 sendId

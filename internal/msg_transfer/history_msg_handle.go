@@ -1,12 +1,17 @@
 package msg_transfer
 
 import (
+	"context"
+
 	"github.com/Shopify/sarama"
 	"github.com/qingw1230/study-im-server/pkg/common/config"
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/kafka"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	pbMsg "github.com/qingw1230/study-im-server/pkg/proto/msg"
+	pbPush "github.com/qingw1230/study-im-server/pkg/proto/push"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -46,9 +51,32 @@ func (mc *HistoryConsumerHandler) handleChatWs2Mongo(msg []byte, msgKey string) 
 			log.Error("single data insert to mongo failed", err.Error())
 			return
 		}
+		if msgKey != msgFromMq.MsgData.SendId {
+			go sendMessageToPush(&msgFromMq, msgKey)
+		}
 	}
 
 	log.Info("handleChatWs2Mongo return")
+}
+
+func sendMessageToPush(message *pbMsg.MsgDataToMq, pushToUserId string) {
+	log.Info("call sendMessageToPush")
+	rpcPushMsg := pbPush.PushMsgReq{
+		MsgData:      message.MsgData,
+		PushToUserId: pushToUserId,
+	}
+
+	conn, err := grpc.NewClient("127.0.0.1:10700", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Error("NewClient failed", err.Error())
+		return
+	}
+	client := pbPush.NewPushMsgServiceClient(conn)
+	_, err = client.PushMsg(context.Background(), &rpcPushMsg)
+	if err != nil {
+		log.Error("push rpc PushMsg failed", err.Error())
+		return
+	}
 }
 
 func (HistoryConsumerHandler) Setup(_ sarama.ConsumerGroupSession) error {
