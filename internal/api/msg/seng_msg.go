@@ -26,7 +26,7 @@ type paramsUserSendMsg struct {
 		SessionType int32                     `json:"sessionType" binding:"required"`
 		MsgFrom     int32                     `json:"msgFrom" binding:"required"`
 		ContentType int32                     `json:"contentType" binding:"required"`
-		Content     []byte                    `json:"content" binding:"required"`
+		Content     string                    `json:"content" binding:"required"`
 		ForceList   []string                  `json:"forceList"`
 		Options     map[string]bool           `json:"options" `
 		CreateTime  int64                     `json:"createTime" binding:"required"`
