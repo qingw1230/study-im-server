@@ -113,14 +113,14 @@ func (ws *WsServer) delUserConn(conn *UserConn) {
 	log.Info("delUserConn return")
 }
 
-// headerCheck 检查头部 token
+// headerCheck 检查 URL 参数部分的 token 和 sendId
 func (ws *WsServer) headerCheck(w http.ResponseWriter, r *http.Request) bool {
 	log.Info("call headerCheck")
 	query := r.URL.Query()
 	sendId := query[constant.STR_SEND_ID][0]
 	token := query[constant.STR_TOKEN][0]
 	if ok, err := token_verify.VerifyToken(token, sendId); !ok {
-		log.Error("VerifyToken failed", sendId, token)
+		log.Error("VerifyToken failed", err.Error(), sendId, token)
 		e := err.(*constant.ErrInfo)
 		http.Error(w, e.ErrMsg, e.ErrCode)
 		return false
