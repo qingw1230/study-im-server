@@ -8,6 +8,10 @@ message MsgDataToMq {
   server_api_params.MsgData msgData = 2;
 }
 
+message MsgDataToDb {
+  server_api_params.MsgData msgData = 1;
+}
+
 message SendMsgReq {
   string token =1;
   server_api_params.MsgData msgData = 2;

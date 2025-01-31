@@ -48,6 +48,7 @@ func (pc *PersistentConsumerHandler) handleChatWs2Mysql(msg []byte, msgKey strin
 			log.Error("InsertMessageToChatLog failed", err.Error())
 		}
 	}
+	log.Info("handleChatWs2Mysql return")
 }
 
 func (PersistentConsumerHandler) Setup(_ sarama.ConsumerGroupSession) error {

@@ -17,3 +17,7 @@ func UnixMillSecondToTime(millSecond int64) time.Time {
 func GetCurrentTimestampByMill() int64 {
 	return time.Now().UnixNano() / 1e6
 }
+
+func GetCurrentTimestampByNano() int64 {
+	return time.Now().UnixNano()
+}

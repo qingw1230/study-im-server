@@ -68,6 +68,16 @@ type config struct {
 		DBDatabaseName string   `yaml:"dbMysqlDatabaseName"`
 	} `yaml:"mysql"`
 
+	Mongo struct {
+		DBAddress           []string `yaml:"dbAddress"`
+		DBDirect            bool     `yaml:"dbDirect"`
+		DBTimeout           int      `yaml:"dbTimeout"`
+		DBDatabase          string   `yaml:"dbDatabase"`
+		DBSource            string   `yaml:"dbSource"`
+		DBMaxPoolSize       int      `yaml:"dbMaxPoolSize"`
+		DBRetainChatRecords int      `yaml:"dbRetainChatRecords"`
+	} `yaml:"mongo"`
+
 	Redis struct {
 		DBAddress  string `yaml:"dbAddress"`
 		DBPassword string `yaml:"dbPassword"`

@@ -46,6 +46,15 @@ mysql:
   dbMysqlPassword: qin1002.
   dbMysqlDatabaseName: studyim
 
+mongo:
+  dbAddress: [ 127.0.0.1:37017 ]
+  dbDirect: false
+  dbTimeout: 10
+  dbDatabase: studyIM
+  dbSource: admin
+  dbMaxPoolSize: 20
+  dbRetainChatRecords: 14
+
 redis:
   dbAddress: 127.0.0.1:16379
   dbPassword: qin1002. 
