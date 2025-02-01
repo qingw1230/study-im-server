@@ -8,6 +8,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/config"
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
+	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbPush "github.com/qingw1230/study-im-server/pkg/proto/push"
 	"github.com/qingw1230/study-im-server/pkg/utils"
 	"google.golang.org/grpc"
@@ -25,15 +26,15 @@ type pushServer struct {
 	pbPush.UnimplementedPushMsgServiceServer
 	rpcPort         int
 	rpcRegisterName string
-	zkSchema        string
-	zkAddr          []string
+	etcdSchema      string
+	etcdAddr        []string
 }
 
 func (s *pushServer) onInit(rpcPort int) {
 	s.rpcPort = rpcPort
 	s.rpcRegisterName = config.Config.RpcRegisterName.PushName
-	s.zkSchema = config.Config.Zookeeper.ZKSchema
-	s.zkAddr = config.Config.Zookeeper.ZKAddr
+	s.etcdSchema = config.Config.Etcd.EtcdSchema
+	s.etcdAddr = config.Config.Etcd.EtcdAddr
 }
 
 func (s *pushServer) run() {
@@ -50,7 +51,12 @@ func (s *pushServer) run() {
 	defer server.GracefulStop()
 
 	pbPush.RegisterPushMsgServiceServer(server, s)
-	// TODO(qingw1230): 将 rpc 服务注册进 zk
+	err = etcdv3.RegisterEtcd(s.etcdSchema, s.etcdAddr, utils.ServerIP, s.rpcPort, s.rpcRegisterName, etcdv3.TIME_TO_LIVE)
+	if err != nil {
+		log.Error("push RegisterEtcd failed", err.Error())
+		return
+	}
+	log.Info("rpc push register success")
 	err = server.Serve(ln)
 	if err != nil {
 		log.Error("Server failed", err.Error())

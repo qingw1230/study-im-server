@@ -1,6 +1,8 @@
 package logic
 
-import "github.com/qingw1230/study-im-server/pkg/common/log"
+import (
+	"github.com/qingw1230/study-im-server/pkg/common/log"
+)
 
 var (
 	rpcServer pushServer

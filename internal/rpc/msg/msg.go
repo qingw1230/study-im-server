@@ -7,6 +7,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/config"
 	"github.com/qingw1230/study-im-server/pkg/common/kafka"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
+	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbMsg "github.com/qingw1230/study-im-server/pkg/proto/msg"
 	"github.com/qingw1230/study-im-server/pkg/utils"
 	"google.golang.org/grpc"
@@ -17,8 +18,8 @@ type msgServer struct {
 	pbMsg.UnimplementedMsgServer
 	rpcPort         int
 	rpcRegisterName string
-	zkSchema        string
-	zkAddr          []string
+	etcdSchema      string
+	etcdAddr        []string
 	producer        *kafka.Producer
 }
 
@@ -27,8 +28,8 @@ func NewMsgServer(port int) *msgServer {
 	rpc := &msgServer{
 		rpcPort:         port,
 		rpcRegisterName: config.Config.RpcRegisterName.OfflineMessageName,
-		zkSchema:        config.Config.Zookeeper.ZKSchema,
-		zkAddr:          config.Config.Zookeeper.ZKAddr,
+		etcdSchema:      config.Config.Etcd.EtcdSchema,
+		etcdAddr:        config.Config.Etcd.EtcdAddr,
 	}
 	rpc.producer = kafka.NewKafkaProducer(config.Config.Kafka.Ws2mschat.Addr, config.Config.Kafka.Ws2mschat.Topic)
 	return rpc
@@ -51,7 +52,12 @@ func (s *msgServer) Run() {
 	reflection.Register(server)
 	printRegisteredServices(server)
 
-	// TODO(qingw1230): 将 rpc 服务注册进 zk
+	err = etcdv3.RegisterEtcd(s.etcdSchema, s.etcdAddr, utils.ServerIP, s.rpcPort, s.rpcRegisterName, etcdv3.TIME_TO_LIVE)
+	if err != nil {
+		log.Error("msg RegisterEtcd failed", err.Error())
+		return
+	}
+	log.Info("rpc account register success")
 	err = server.Serve(ln)
 	if err != nil {
 		log.Error("Server failed ", err.Error())

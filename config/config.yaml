@@ -16,9 +16,9 @@ rpcregistername:
   accountName: Account
   friendName: Friend
   offlineMessageName: OfflineMessage
-  pushName: Push
   onlineMessageRelayName: OnlineMessageRelay
   groupName: Group
+  pushName: Push
 
 admin:
   userIds : [ ]
@@ -45,7 +45,7 @@ zookeeper:
   zkAddr: [ 127.0.0.1:12181 ]
 
 etcd:
-  etcdSchema: studyIM
+  etcdSchema: studyim
   etcdAddr: [ 127.0.0.1:12379 ]
 
 mysql:

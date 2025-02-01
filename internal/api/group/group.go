@@ -14,8 +14,6 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbGroup "github.com/qingw1230/study-im-server/pkg/proto/group"
 	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 func CreateGroup(c *gin.Context) {
@@ -41,7 +39,6 @@ func CreateGroup(c *gin.Context) {
 	req.OwnerUserId = params.OwnerUserId
 	log.Info("CreateGroup args:", req.String())
 
-	// TODO(qingw1230): 使用服务发现建立连接
 	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.GroupName)
 	client := pbGroup.NewGroupClient(conn)
 	reply, err := client.CreateGroup(context.Background(), req)
@@ -79,13 +76,7 @@ func DeleteGroup(c *gin.Context) {
 	}
 	log.Info("DeleteGroup args:", req.String())
 
-	// TODO(qingw1230): 使用服务发现建立连接
-	conn, err := grpc.NewClient("127.0.0.1:10500", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Error("NewClient failed", err.Error())
-		c.JSON(http.StatusOK, constant.CommonFailResp)
-		return
-	}
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.GroupName)
 	client := pbGroup.NewGroupClient(conn)
 	reply, err := client.DeleteGroup(context.Background(), req)
 	if err != nil {
@@ -122,13 +113,7 @@ func QuitGroup(c *gin.Context) {
 	}
 	log.Info("QuitGroup args:", req.String())
 
-	// TODO(qingw1230): 使用服务发现建立连接
-	conn, err := grpc.NewClient("127.0.0.1:10500", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Error("NewClient failed", err.Error())
-		c.JSON(http.StatusOK, constant.CommonFailResp)
-		return
-	}
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.GroupName)
 	client := pbGroup.NewGroupClient(conn)
 	reply, err := client.QuitGroup(context.Background(), req)
 	if err != nil {
@@ -165,13 +150,7 @@ func GetJoinedGroupList(c *gin.Context) {
 	}
 	log.Info("GetJoinedGroupList args:", req.String())
 
-	// TODO(qingw1230): 使用服务发现建立连接
-	conn, err := grpc.NewClient("127.0.0.1:10500", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Error("NewClient failed", err.Error())
-		c.JSON(http.StatusOK, constant.CommonFailResp)
-		return
-	}
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.GroupName)
 	client := pbGroup.NewGroupClient(conn)
 	reply, err := client.GetJoinedGroupList(context.Background(), req)
 	if err != nil {
@@ -206,13 +185,7 @@ func GetGroupInfo(c *gin.Context) {
 	}
 	log.Info("GetGroupInfo args:", req.String())
 
-	// TODO(qingw1230): 使用服务发现建立连接
-	conn, err := grpc.NewClient("127.0.0.1:10500", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Error("NewClient failed", err.Error())
-		c.JSON(http.StatusOK, constant.CommonFailResp)
-		return
-	}
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.GroupName)
 	client := pbGroup.NewGroupClient(conn)
 	reply, err := client.GetGroupInfo(context.Background(), req)
 	if err != nil {
@@ -247,13 +220,7 @@ func SetGroupInfo(c *gin.Context) {
 	req.OpUserId = opUserId
 	log.Info("SetGroupInfo args:", req.String())
 
-	// TODO(qingw1230): 使用服务发现建立连接
-	conn, err := grpc.NewClient("127.0.0.1:10500", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Error("NewClient failed", err.Error())
-		c.JSON(http.StatusOK, constant.CommonFailResp)
-		return
-	}
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.GroupName)
 	client := pbGroup.NewGroupClient(conn)
 	reply, err := client.SetGroupInfo(context.Background(), req)
 	if err != nil {

@@ -7,12 +7,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
 	"github.com/qingw1230/study-im-server/pkg/base_info"
+	"github.com/qingw1230/study-im-server/pkg/common/config"
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
+	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbMsg "github.com/qingw1230/study-im-server/pkg/proto/msg"
 	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 type paramsUserSendMsg struct {
@@ -69,13 +69,7 @@ func SendMsg(c *gin.Context) {
 	token := c.Request.Header.Get(constant.STR_TOKEN)
 	req := newUserSendMsgReq(token, &params)
 	log.Info("SendMsg args:", req.String())
-	// TODO(qingw1230): 使用服务发现建立连接
-	conn, err := grpc.NewClient("127.0.0.1:10300", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Error("NewClient failed", err.Error())
-		c.JSON(http.StatusOK, constant.CommonFailResp)
-		return
-	}
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.OfflineMessageName)
 	client := pbMsg.NewMsgClient(conn)
 	reply, err := client.SendMsg(context.Background(), req)
 	if err != nil {

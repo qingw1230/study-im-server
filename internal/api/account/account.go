@@ -8,13 +8,13 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/qingw1230/study-im-server/pkg/base_info"
 	"github.com/qingw1230/study-im-server/pkg/common/captcha"
+	"github.com/qingw1230/study-im-server/pkg/common/config"
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	"github.com/qingw1230/study-im-server/pkg/common/token_verify"
+	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbAccount "github.com/qingw1230/study-im-server/pkg/proto/account"
 	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 func Register(c *gin.Context) {
@@ -42,13 +42,7 @@ func Register(c *gin.Context) {
 	copier.Copy(req, &params)
 	log.Info("Register rpc client.Register args: ", req.String())
 
-	// TODO(qingw1230): 使用服务发现建立连接
-	conn, err := grpc.NewClient("127.0.0.1:10100", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Error("grpc.NewClient failed ", err.Error())
-		c.JSON(http.StatusOK, constant.CommonFailResp)
-		return
-	}
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.AccountName)
 	client := pbAccount.NewAccountClient(conn)
 	reply, err := client.Register(context.Background(), req)
 	if err != nil {
@@ -93,13 +87,7 @@ func Login(c *gin.Context) {
 	copier.Copy(&req, &params)
 	log.Info("Login rpc client.Login args: ", req.String())
 
-	// TODO(qingw1230): 使用服务发现建立连接
-	conn, err := grpc.NewClient("127.0.0.1:10100", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Error("grpc.NewClient failed ", err.Error())
-		c.JSON(http.StatusOK, constant.CommonFailResp)
-		return
-	}
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.AccountName)
 	client := pbAccount.NewAccountClient(conn)
 	reply, err := client.Login(context.Background(), req)
 	if err != nil {
@@ -160,13 +148,7 @@ func UpdateUserInfo(c *gin.Context) {
 	req.OpUserId = opUserId
 	log.Info("UpdateUserInfo args:", req.String())
 
-	// TODO(qingw1230): 使用服务发现建立连接
-	conn, err := grpc.NewClient("127.0.0.1:10100", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Error("grpc.NewClient failed ", err.Error())
-		c.JSON(http.StatusOK, constant.CommonFailResp)
-		return
-	}
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.AccountName)
 	client := pbAccount.NewAccountClient(conn)
 	reply, err := client.UpdateUserInfo(context.Background(), req)
 	if err != nil {
@@ -202,13 +184,7 @@ func GetUserInfo(c *gin.Context) {
 	}
 	log.Info("GetUserInfo args:", req.String())
 
-	// TODO(qingw1230): 使用服务发现建立连接
-	conn, err := grpc.NewClient("127.0.0.1:10100", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Error("grpc.NewClient failed ", err.Error())
-		c.JSON(http.StatusOK, constant.CommonFailResp)
-		return
-	}
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.AccountName)
 	client := pbAccount.NewAccountClient(conn)
 	reply, err := client.GetUserInfo(context.Background(), req)
 	if err != nil {
@@ -247,13 +223,7 @@ func GetSelfUserInfo(c *gin.Context) {
 	}
 	log.Info("GetSelfUserInfo args:", req.String())
 
-	// TODO(qingw1230): 使用服务发现建立连接
-	conn, err := grpc.NewClient("127.0.0.1:10100", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Error("grpc.NewClient failed ", err.Error())
-		c.JSON(http.StatusOK, constant.CommonFailResp)
-		return
-	}
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.AccountName)
 	client := pbAccount.NewAccountClient(conn)
 	reply, err := client.GetSelfUserInfo(context.Background(), req)
 	if err != nil {

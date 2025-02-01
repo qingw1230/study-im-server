@@ -32,9 +32,9 @@ type config struct {
 		AccountName            string `yaml:"accountName"`
 		FriendName             string `yaml:"friendName"`
 		OfflineMessageName     string `yaml:"offlineMessageName"`
-		PushName               string `yaml:"pushName"`
-		OnlineMessageRelayName string `yaml:"onlineMessageRelay"`
+		OnlineMessageRelayName string `yaml:"onlineMessageRelayName"`
 		GroupName              string `yaml:"groupName"`
+		PushName               string `yaml:"pushName"`
 	} `yaml:"rpcregistername"`
 
 	Admin struct {

@@ -7,12 +7,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
 	"github.com/qingw1230/study-im-server/pkg/base_info"
+	"github.com/qingw1230/study-im-server/pkg/common/config"
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	"github.com/qingw1230/study-im-server/pkg/common/token_verify"
+	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbFriend "github.com/qingw1230/study-im-server/pkg/proto/friend"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 func AddFriend(c *gin.Context) {
@@ -36,13 +36,7 @@ func AddFriend(c *gin.Context) {
 	req.CommonId.OpUserId = opUserId
 	log.Info("AddFriend args: ", req.String())
 
-	// TODO(qingw1230): 使用服务发现建立连接
-	conn, err := grpc.NewClient("127.0.0.1:10200", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Error("NewClient failed ", err.Error())
-		c.JSON(http.StatusOK, constant.CommonFailResp)
-		return
-	}
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.FriendName)
 	client := pbFriend.NewFriendClient(conn)
 	reply, err := client.AddFriend(context.Background(), req)
 	if err != nil {
@@ -75,13 +69,7 @@ func AddFriendResponse(c *gin.Context) {
 	req.CommonId.OpUserId = opUserId
 	log.Info("AddFriendResponse args: ", req.String())
 
-	// TODO(qingw1230): 使用服务发现建立连接
-	conn, err := grpc.NewClient("127.0.0.1:10200", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Error("NewClient failed ", err.Error())
-		c.JSON(http.StatusOK, constant.CommonFailResp)
-		return
-	}
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.FriendName)
 	client := pbFriend.NewFriendClient(conn)
 	reply, err := client.AddFriendResponse(context.Background(), req)
 	if err != nil {
@@ -114,13 +102,7 @@ func DeleteFriend(c *gin.Context) {
 	req.CommonId.OpUserId = opUserId
 	log.Info("DeleteFriend args: ", req.String())
 
-	// TODO(qingw1230): 使用服务发现建立连接
-	conn, err := grpc.NewClient("127.0.0.1:10200", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Error("NewClient failed ", err.Error())
-		c.JSON(http.StatusOK, constant.CommonFailResp)
-		return
-	}
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.FriendName)
 	client := pbFriend.NewFriendClient(conn)
 	reply, err := client.DeleteFriend(context.Background(), req)
 	if err != nil {
@@ -153,13 +135,7 @@ func GetFriendList(c *gin.Context) {
 	req.CommonId.OpUserId = opUserId
 	log.Info("GetFriendList args: ", req.String())
 
-	// TODO(qingw1230): 使用服务发现建立连接
-	conn, err := grpc.NewClient("127.0.0.1:10200", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Error("NewClient failed ", err.Error())
-		c.JSON(http.StatusOK, constant.CommonFailResp)
-		return
-	}
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.FriendName)
 	client := pbFriend.NewFriendClient(conn)
 	reply, err := client.GetFriendList(context.Background(), req)
 	if err != nil {
@@ -195,13 +171,7 @@ func GetFriendApplyList(c *gin.Context) {
 	}}
 	log.Info("GetFriendApplyList args:", req.String())
 
-	// TODO(qingw1230): 使用服务发现建立连接
-	conn, err := grpc.NewClient("127.0.0.1:10200", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Error("NewClient failed ", err.Error())
-		c.JSON(http.StatusOK, constant.CommonFailResp)
-		return
-	}
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.FriendName)
 	client := pbFriend.NewFriendClient(conn)
 	reply, err := client.GetFriendApplyList(context.Background(), req)
 	if err != nil {
@@ -237,13 +207,7 @@ func AddBlacklist(c *gin.Context) {
 	req.CommonId.OpUserId = opUserId
 	log.Info("AddBlack args:", req.String())
 
-	// TODO(qingw1230): 使用服务发现建立连接
-	conn, err := grpc.NewClient("127.0.0.1:10200", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Error("NewClient failed ", err.Error())
-		c.JSON(http.StatusOK, constant.CommonFailResp)
-		return
-	}
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.FriendName)
 	client := pbFriend.NewFriendClient(conn)
 	reply, err := client.AddBlacklist(context.Background(), req)
 	if err != nil {

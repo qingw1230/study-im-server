@@ -6,12 +6,12 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/jinzhu/copier"
+	"github.com/qingw1230/study-im-server/pkg/common/config"
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
+	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbMsg "github.com/qingw1230/study-im-server/pkg/proto/msg"
 	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 func (ws *WsServer) msgParse(conn *UserConn, binaryMsg []byte) {
@@ -63,12 +63,7 @@ func (ws *WsServer) sendMsgReq(conn *UserConn, m *Req) {
 		MsgData: data,
 	}
 
-	// TODO(qingw1230): 使用服务发现建立连接
-	rpcConn, err := grpc.NewClient("127.0.0.1:10300", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Error("NewClient failed", err.Error())
-		return
-	}
+	rpcConn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.OnlineMessageRelayName)
 	client := pbMsg.NewMsgClient(rpcConn)
 	reply, err := client.SendMsg(context.Background(), &pbData)
 	if err != nil {

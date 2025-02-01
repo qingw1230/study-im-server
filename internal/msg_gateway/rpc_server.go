@@ -10,6 +10,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/config"
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
+	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbReply "github.com/qingw1230/study-im-server/pkg/proto/reply"
 	"github.com/qingw1230/study-im-server/pkg/utils"
 	"google.golang.org/grpc"
@@ -57,15 +58,15 @@ type gatewayServer struct {
 	pbReply.UnimplementedOnlineMessageRelayServiceServer
 	rpcPort         int
 	rpcRegisterName string
-	zkSchema        string
-	zkAddr          []string
+	etcdSchema      string
+	etcdAddr        []string
 }
 
 func (s *gatewayServer) onInit(rpcPort int) {
 	s.rpcPort = rpcPort
 	s.rpcRegisterName = config.Config.RpcRegisterName.OnlineMessageRelayName
-	s.zkSchema = config.Config.Zookeeper.ZKSchema
-	s.zkAddr = config.Config.Zookeeper.ZKAddr
+	s.etcdSchema = config.Config.Etcd.EtcdSchema
+	s.etcdAddr = config.Config.Etcd.EtcdAddr
 }
 
 func (s *gatewayServer) run() {
@@ -82,7 +83,12 @@ func (s *gatewayServer) run() {
 	defer server.GracefulStop()
 
 	pbReply.RegisterOnlineMessageRelayServiceServer(server, s)
-	// TODO(qingw1230): 将 rpc 服务注册进 zk
+	err = etcdv3.RegisterEtcd(s.etcdSchema, s.etcdAddr, utils.ServerIP, s.rpcPort, s.rpcRegisterName, etcdv3.TIME_TO_LIVE)
+	if err != nil {
+		log.Error("msg_gateway RegisterEtcd failed", err.Error())
+		return
+	}
+	log.Info("rpc msg_gateway register success")
 	err = server.Serve(ln)
 	if err != nil {
 		log.Error("Server failed", err.Error())
