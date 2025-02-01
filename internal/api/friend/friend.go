@@ -16,9 +16,10 @@ import (
 )
 
 func AddFriend(c *gin.Context) {
+	log.Info("call api AddFriend")
 	params := base_info.AddFriendReq{}
 	if err := c.BindJSON(&params); err != nil {
-		log.Error("BindJSON failed ", err.Error())
+		log.Error("BindJSON failed", err.Error())
 		c.JSON(http.StatusOK, constant.NewBindJSONErrorRespWithInfo(err.Error()))
 		return
 	}
@@ -26,7 +27,7 @@ func AddFriend(c *gin.Context) {
 
 	ok, opUserId := token_verify.GetUserIdFromToken(c.Request.Header.Get(constant.STR_TOKEN))
 	if !ok {
-		log.Error("GetUserIdFromToken failed ", c.Request.Header.Get(constant.STR_TOKEN))
+		log.Error("GetUserIdFromToken failed", c.Request.Header.Get(constant.STR_TOKEN))
 		c.JSON(http.StatusOK, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
 		return
 	}
@@ -34,7 +35,7 @@ func AddFriend(c *gin.Context) {
 	copier.Copy(req.CommonId, &params)
 	req.ReqMsg = params.ReqMsg
 	req.CommonId.OpUserId = opUserId
-	log.Info("AddFriend args: ", req.String())
+	log.Info("AddFriend args:", req.String())
 
 	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.FriendName)
 	client := pbFriend.NewFriendClient(conn)
@@ -47,12 +48,14 @@ func AddFriend(c *gin.Context) {
 	resp := base_info.AddFriendResp{CommonResp: base_info.CommonResp{}}
 	copier.Copy(&resp.CommonResp, reply.CommonResp)
 	c.JSON(http.StatusOK, resp)
+	log.Info("api AddFriend return")
 }
 
 func AddFriendResponse(c *gin.Context) {
+	log.Info("call api AddFriendResponse")
 	params := base_info.AddFriendResponseReq{}
 	if err := c.BindJSON(&params); err != nil {
-		log.Error("BindJSON failed ", err.Error())
+		log.Error("BindJSON failed", err.Error())
 		c.JSON(http.StatusOK, constant.NewBindJSONErrorRespWithInfo(err.Error()))
 		return
 	}
@@ -60,14 +63,14 @@ func AddFriendResponse(c *gin.Context) {
 
 	ok, opUserId := token_verify.GetUserIdFromToken(c.Request.Header.Get(constant.STR_TOKEN))
 	if !ok {
-		log.Error("GetUserIdFromToken failed ", c.Request.Header.Get(constant.STR_TOKEN))
+		log.Error("GetUserIdFromToken failed", c.Request.Header.Get(constant.STR_TOKEN))
 		c.JSON(http.StatusOK, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
 		return
 	}
 	req := &pbFriend.AddFriendResponseReq{}
 	copier.Copy(req, &params)
 	req.CommonId.OpUserId = opUserId
-	log.Info("AddFriendResponse args: ", req.String())
+	log.Info("AddFriendResponse args:", req.String())
 
 	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.FriendName)
 	client := pbFriend.NewFriendClient(conn)
@@ -80,6 +83,7 @@ func AddFriendResponse(c *gin.Context) {
 	resp := base_info.AddFriendResponseResp{CommonResp: base_info.CommonResp{}}
 	copier.Copy(&resp.CommonResp, reply.CommonResp)
 	c.JSON(http.StatusOK, resp)
+	log.Info("api AddFriendResponse return")
 }
 
 func DeleteFriend(c *gin.Context) {

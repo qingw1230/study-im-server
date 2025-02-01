@@ -23,14 +23,12 @@ import (
 )
 
 func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) (*pbFriend.AddFriendResp, error) {
-	log.Info("call AddFriend args: ", req.String())
-	// 确保有权限
+	log.Info("call rpc AddFriend args:", req.String())
 	if !token_verify.CheckAccess(req.CommonId.OpUserId, req.CommonId.FromUserId) {
-		log.Error("CheckAccess false ", req.CommonId.OpUserId, req.CommonId.FromUserId)
+		log.Error("CheckAccess failed", req.CommonId.OpUserId, req.CommonId.FromUserId)
 		return &pbFriend.AddFriendResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
 	}
 
-	// 保证要添加的好友存在
 	if _, err := controller.GetUserById(req.CommonId.ToUserId); err != nil {
 		return &pbFriend.AddFriendResp{
 			CommonResp: &pbPublic.CommonResp{
@@ -50,13 +48,13 @@ func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) 
 		return &pbFriend.AddFriendResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
 	}
 
+	log.Info("rpc AddFriend return")
 	// TODO(qingw1230): 给被添加方发送通知
 	return &pbFriend.AddFriendResp{CommonResp: &constant.PBCommonSuccessResp}, nil
 }
 
 func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFriendResponseReq) (*pbFriend.AddFriendResponseResp, error) {
-	log.Info("call AddFriendResponse args: ", req.String())
-	// 确保有权限
+	log.Info("call rpc AddFriendResponse args:", req.String())
 	if !token_verify.CheckAccess(req.CommonId.OpUserId, req.CommonId.ToUserId) {
 		log.Error("CheckAccess false ", req.CommonId.OpUserId, req.CommonId.ToUserId)
 		return &pbFriend.AddFriendResponseResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
@@ -77,58 +75,74 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 	friendRequest.HandleTime = time.Now()
 	friendRequest.HandleUserId = req.CommonId.OpUserId
 	friendRequest.HandleMsg = req.HandleMsg
+	resp := &pbFriend.AddFriendResponseResp{CommonResp: &constant.PBMySQLCommonFailResp}
 	err = controller.UpdateFriendApplication(friendRequest)
 	if err != nil {
-		resp := &pbFriend.AddFriendResponseResp{CommonResp: &pbPublic.CommonResp{}}
-		copier.Copy(resp.CommonResp, constant.MySQLCommonFailResp)
 		return resp, nil
 	}
 	log.Info("UpdateFriendApplication success ", friendRequest)
 
+	// 同意好友请求，向好友表和会话表插入记录
 	if friendRequest.HandleResult == constant.FriendResponseAgree {
 		// 插入两条单向好友关系
-		_, err := controller.GetFriendRelationFromFriend(req.CommonId.FromUserId, req.CommonId.ToUserId)
-		if err == nil {
-			log.Warn("GetFriendRelationFromFriend exist ", req.CommonId.FromUserId, req.CommonId.ToUserId)
-		} else if err == gorm.ErrRecordNotFound {
+		_, err1 := controller.GetFriendRelationFromFriend(req.CommonId.FromUserId, req.CommonId.ToUserId)
+		if err1 == nil {
+			log.Warn("GetFriendRelationFromFriend exist", req.CommonId.FromUserId, req.CommonId.ToUserId)
+		} else if err1 == gorm.ErrRecordNotFound {
 			toInsertFollow := db.Friend{OwnerUserId: req.CommonId.FromUserId, FriendUserId: req.CommonId.ToUserId, OpUserId: req.CommonId.OpUserId}
-			err = controller.InsertIntoFriend(&toInsertFollow)
+			err := controller.InsertIntoFriend(&toInsertFollow)
 			if err != nil {
-				log.Error("InsertToFriend failed ", err.Error(), toInsertFollow)
-				resp := &pbFriend.AddFriendResponseResp{CommonResp: &pbPublic.CommonResp{}}
-				copier.Copy(resp.CommonResp, constant.MySQLCommonFailResp)
+				log.Error("InsertIntoFriend failed", err.Error(), toInsertFollow)
 				return resp, nil
 			}
 		} else {
-			log.Error("GetFriendRelationFromFriend failed ", err.Error())
-			resp := &pbFriend.AddFriendResponseResp{CommonResp: &pbPublic.CommonResp{}}
-			copier.Copy(resp.CommonResp, constant.MySQLCommonFailResp)
+			log.Error("GetFriendRelationFromFriend failed", err1.Error())
 			return resp, nil
 		}
 
-		_, err = controller.GetFriendRelationFromFriend(req.CommonId.ToUserId, req.CommonId.FromUserId)
-		if err == nil {
-			log.Warn("GetFriendRelationFromFriend exist ", req.CommonId.ToUserId, req.CommonId.FromUserId)
-		} else if err == gorm.ErrRecordNotFound {
+		_, err2 := controller.GetFriendRelationFromFriend(req.CommonId.ToUserId, req.CommonId.FromUserId)
+		if err2 == nil {
+			log.Warn("GetFriendRelationFromFriend exist", req.CommonId.ToUserId, req.CommonId.FromUserId)
+		} else if err2 == gorm.ErrRecordNotFound {
 			toInsertFollow := db.Friend{OwnerUserId: req.CommonId.ToUserId, FriendUserId: req.CommonId.FromUserId, OpUserId: req.CommonId.OpUserId}
-			err = controller.InsertIntoFriend(&toInsertFollow)
+			err := controller.InsertIntoFriend(&toInsertFollow)
 			if err != nil {
-				log.Error("InsertToFriend failed ", err.Error(), toInsertFollow)
-				resp := &pbFriend.AddFriendResponseResp{CommonResp: &pbPublic.CommonResp{}}
-				copier.Copy(resp.CommonResp, constant.MySQLCommonFailResp)
+				log.Error("InsertIntoFriend failed", err.Error(), toInsertFollow)
 				return resp, nil
 			}
 			// TODO(qingw1230): 通知另一方
 		} else {
-			log.Error("GetFriendRelationFromFriend failed ", err.Error())
-			resp := &pbFriend.AddFriendResponseResp{CommonResp: &pbPublic.CommonResp{}}
-			copier.Copy(resp.CommonResp, constant.MySQLCommonFailResp)
+			log.Error("GetFriendRelationFromFriend failed", err2.Error())
 			return resp, nil
+		}
+
+		if err1 == gorm.ErrRecordNotFound && err2 == gorm.ErrRecordNotFound {
+			user1, _ := controller.GetUserById(req.CommonId.ToUserId)
+			conversationRecord1 := &db.Conversation{
+				OwnerUserId:      req.CommonId.FromUserId,
+				ConversationId:   req.CommonId.FromUserId + req.CommonId.ToUserId,
+				ConversationType: constant.SingleChatType,
+				ConversationName: user1.NickName,
+				UserId:           req.CommonId.ToUserId,
+			}
+			controller.InsertIntoConversation(conversationRecord1)
+
+			user2, _ := controller.GetUserById(req.CommonId.FromUserId)
+			conversationRecord2 := &db.Conversation{
+				OwnerUserId:      req.CommonId.ToUserId,
+				ConversationId:   req.CommonId.ToUserId + req.CommonId.FromUserId,
+				ConversationType: constant.SingleChatType,
+				ConversationName: user2.NickName,
+				UserId:           req.CommonId.FromUserId,
+			}
+			controller.InsertIntoConversation(conversationRecord2)
+			// TODO(qingw1230): 向会话添加 ReqMsg
 		}
 	}
 
 	// TODO(qingw1230): 通知或拒绝的通知
-	return &pbFriend.AddFriendResponseResp{CommonResp: &constant.PBCommonSuccessResp}, nil
+	copier.Copy(resp.CommonResp, &constant.PBCommonSuccessResp)
+	return resp, nil
 }
 
 func (s *friendServer) DeleteFriend(_ context.Context, req *pbFriend.DeleteFriendReq) (*pbFriend.DeleteFriendResp, error) {

@@ -9,7 +9,7 @@ type CommonId struct {
 
 type AddFriendReq struct {
 	CommonId
-	ReqMsg string `json:"reqMsg"`
+	ReqMsg string `json:"reqMsg" binding:"required"`
 }
 
 type AddFriendResp struct {
