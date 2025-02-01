@@ -19,13 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Conversation_CreateConversation_FullMethodName = "/pbConversation.Conversation/CreateConversation"
+	Conversation_GetConversationList_FullMethodName = "/pbConversation.Conversation/GetConversationList"
+	Conversation_CreateConversation_FullMethodName  = "/pbConversation.Conversation/CreateConversation"
 )
 
 // ConversationClient is the client API for Conversation service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ConversationClient interface {
+	GetConversationList(ctx context.Context, in *GetConversationListReq, opts ...grpc.CallOption) (*GetConversationListResp, error)
 	CreateConversation(ctx context.Context, in *CreateConversationReq, opts ...grpc.CallOption) (*CreateConversationResp, error)
 }
 
@@ -35,6 +37,16 @@ type conversationClient struct {
 
 func NewConversationClient(cc grpc.ClientConnInterface) ConversationClient {
 	return &conversationClient{cc}
+}
+
+func (c *conversationClient) GetConversationList(ctx context.Context, in *GetConversationListReq, opts ...grpc.CallOption) (*GetConversationListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetConversationListResp)
+	err := c.cc.Invoke(ctx, Conversation_GetConversationList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *conversationClient) CreateConversation(ctx context.Context, in *CreateConversationReq, opts ...grpc.CallOption) (*CreateConversationResp, error) {
@@ -51,6 +63,7 @@ func (c *conversationClient) CreateConversation(ctx context.Context, in *CreateC
 // All implementations must embed UnimplementedConversationServer
 // for forward compatibility.
 type ConversationServer interface {
+	GetConversationList(context.Context, *GetConversationListReq) (*GetConversationListResp, error)
 	CreateConversation(context.Context, *CreateConversationReq) (*CreateConversationResp, error)
 	mustEmbedUnimplementedConversationServer()
 }
@@ -62,6 +75,9 @@ type ConversationServer interface {
 // pointer dereference when methods are called.
 type UnimplementedConversationServer struct{}
 
+func (UnimplementedConversationServer) GetConversationList(context.Context, *GetConversationListReq) (*GetConversationListResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetConversationList not implemented")
+}
 func (UnimplementedConversationServer) CreateConversation(context.Context, *CreateConversationReq) (*CreateConversationResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateConversation not implemented")
 }
@@ -84,6 +100,24 @@ func RegisterConversationServer(s grpc.ServiceRegistrar, srv ConversationServer)
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&Conversation_ServiceDesc, srv)
+}
+
+func _Conversation_GetConversationList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetConversationListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConversationServer).GetConversationList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Conversation_GetConversationList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConversationServer).GetConversationList(ctx, req.(*GetConversationListReq))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Conversation_CreateConversation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -111,6 +145,10 @@ var Conversation_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "pbConversation.Conversation",
 	HandlerType: (*ConversationServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetConversationList",
+			Handler:    _Conversation_GetConversationList_Handler,
+		},
 		{
 			MethodName: "CreateConversation",
 			Handler:    _Conversation_CreateConversation_Handler,

@@ -26,6 +26,7 @@ type config struct {
 		OnlineMessageRelayPort []int `yaml:"onlineMessageRelayPort"`
 		GroupPort              []int `yaml:"groupPort"`
 		PushPort               []int `yaml:"pushPort"`
+		ConversationPort       []int `yaml:"conversationPort"`
 	} `yaml:"rpcport"`
 
 	RpcRegisterName struct {
@@ -35,6 +36,7 @@ type config struct {
 		OnlineMessageRelayName string `yaml:"onlineMessageRelayName"`
 		GroupName              string `yaml:"groupName"`
 		PushName               string `yaml:"pushName"`
+		ConversationName       string `yaml:"conversationName"`
 	} `yaml:"rpcregistername"`
 
 	Admin struct {

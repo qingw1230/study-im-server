@@ -11,6 +11,7 @@ rpcport:
   onlineMessageRelayPort: [ 10400 ]
   groupPort: [ 10500 ]
   pushPort: [ 10700 ]
+  conversationPort: [ 11100 ]
 
 rpcregistername:
   accountName: Account
@@ -19,6 +20,7 @@ rpcregistername:
   onlineMessageRelayName: OnlineMessageRelay
   groupName: Group
   pushName: Push
+  conversationName: Conversation
 
 admin:
   userIds : [ ]

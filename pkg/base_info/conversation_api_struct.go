@@ -1,5 +1,16 @@
 package base_info
 
+import "github.com/qingw1230/study-im-server/pkg/proto/public"
+
+type GetConversationListReq struct {
+	FromUserId string `json:"fromUserId" binding:"required"`
+}
+
+type GetConversationListResp struct {
+	CommonResp
+	ConversationList []*public.ConversationInfo `json:"-"`
+}
+
 type CreateConversationReq struct {
 	OwnerUserId      string `json:"ownerUserId" binding:"required"`
 	ConversationId   string `json:"conversationId"`

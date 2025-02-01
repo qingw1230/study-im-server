@@ -10,6 +10,7 @@ service_filename=(
     account
     friend
     group
+    conversation
 )
 
 service_port_name=(
@@ -18,6 +19,7 @@ service_port_name=(
     accountPort
     friendPort
     groupPort
+    conversationPort
 )
 
 for ((i = 0; i < ${#service_filename[*]}; i++)); do

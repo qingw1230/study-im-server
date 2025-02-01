@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/qingw1230/study-im-server/internal/api/account"
+	"github.com/qingw1230/study-im-server/internal/api/conversation"
 	"github.com/qingw1230/study-im-server/internal/api/friend"
 	"github.com/qingw1230/study-im-server/internal/api/group"
 	"github.com/qingw1230/study-im-server/internal/api/msg"
@@ -45,6 +46,11 @@ func Router() *gin.Engine {
 	msgGroup := r.Group("/api/msg")
 	{
 		msgGroup.POST("/send_msg", msg.SendMsg)
+	}
+
+	conversationGroup := r.Group("/api/conversation")
+	{
+		conversationGroup.POST("/get_conversation_list", conversation.GetConversationList)
 	}
 
 	return r
