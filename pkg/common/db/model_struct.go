@@ -157,3 +157,19 @@ type ChatLog struct {
 func (ChatLog) TableName() string {
 	return constant.DBTableChatLog
 }
+
+type Conversation struct {
+	OwnerUserId      string `gorm:"column:owner_user_id;type:varchar(12);not null;primary_key"`
+	ConversationId   string `gorm:"column:conversation_id;type:varchar(24);not null;primary_key"`
+	ConversationType int32  `gorm:"column:conversation_type;type:tinyint(1);not null"`
+	UserId           string `gorm:"column:user_id;type:varchar(12)"`
+	GroupId          string `gorm:"column:group_id;type:varchar(12)"`
+	RecvMsgOpt       int32  `gorm:"column:recv_msg_opt;type:tinyint(1)"`
+	UnreadCount      int32  `gorm:"column:unread_count;type:int(11)"`
+	IsPinned         bool   `gorm:"column:is_pinned;type:bool"`
+	Ex               string `gorm:"column:ex;type:varchar(1024)"`
+}
+
+func (Conversation) TableName() string {
+	return constant.DBTableConversation
+}
