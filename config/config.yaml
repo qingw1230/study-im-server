@@ -41,8 +41,12 @@ longconnsvr:
 
 #--------------- Infrastructure configuration ---------------#
 zookeeper:
-  zkSchema: studyIM
+  zkSchema: studyim
   zkAddr: [ 127.0.0.1:12181 ]
+
+etcd:
+  etcdSchema: studyIM
+  etcdAddr: [ 127.0.0.1:12379 ]
 
 mysql:
   dbMysqlAddress: [ 127.0.0.1:13306 ]

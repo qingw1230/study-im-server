@@ -65,6 +65,11 @@ type config struct {
 		ZKAddr   []string `yaml:"zkAddr"`
 	} `yaml:"zookeeper"`
 
+	Etcd struct {
+		EtcdSchema string   `yaml:"etcdSchema"`
+		EtcdAddr   []string `yaml:"etcdAddr"`
+	} `yaml:"etcd"`
+
 	Mysql struct {
 		DBAddress      []string `yaml:"dbMysqlAddress"`
 		DBUserName     string   `yaml:"dbMysqlUserName"`

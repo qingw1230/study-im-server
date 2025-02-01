@@ -54,3 +54,13 @@ services:
     network_mode: "host"
     depends_on:
       - zookeeper
+
+  etcd:
+    image: bitnami/etcd:3.5
+    container_name: etcd
+    ports:
+      - "12379:2379"
+    privileged: true
+    environment:
+      - ALLOW_NONE_AUTHENTICATION=yes
+    restart: always

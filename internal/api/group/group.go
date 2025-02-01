@@ -7,9 +7,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
 	"github.com/qingw1230/study-im-server/pkg/base_info"
+	"github.com/qingw1230/study-im-server/pkg/common/config"
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	"github.com/qingw1230/study-im-server/pkg/common/token_verify"
+	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbGroup "github.com/qingw1230/study-im-server/pkg/proto/group"
 	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
 	"google.golang.org/grpc"
@@ -17,6 +19,7 @@ import (
 )
 
 func CreateGroup(c *gin.Context) {
+	log.Info("call api CreateGroup")
 	params := base_info.CreateGroupReq{}
 	if err := c.BindJSON(&params); err != nil {
 		log.Error("BindJSON failed", err.Error())
@@ -39,15 +42,11 @@ func CreateGroup(c *gin.Context) {
 	log.Info("CreateGroup args:", req.String())
 
 	// TODO(qingw1230): 使用服务发现建立连接
-	conn, err := grpc.NewClient("127.0.0.1:10500", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Error("NewClient failed", err.Error())
-		c.JSON(http.StatusOK, constant.CommonFailResp)
-		return
-	}
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.GroupName)
 	client := pbGroup.NewGroupClient(conn)
 	reply, err := client.CreateGroup(context.Background(), req)
 	if err != nil {
+		log.Error("call rpc CreateGroup failed", err.Error())
 		c.JSON(http.StatusOK, constant.CommonFailResp)
 		return
 	}
@@ -55,6 +54,7 @@ func CreateGroup(c *gin.Context) {
 	resp := base_info.CreateGroupResp{CommonResp: base_info.CommonResp{}}
 	copier.Copy(&resp.CommonResp, reply.CommonResp)
 	c.JSON(http.StatusOK, resp)
+	log.Info("api CreateGroup return")
 }
 
 func DeleteGroup(c *gin.Context) {

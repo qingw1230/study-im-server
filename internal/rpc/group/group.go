@@ -13,6 +13,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	"github.com/qingw1230/study-im-server/pkg/common/token_verify"
 	cp "github.com/qingw1230/study-im-server/pkg/common/utils"
+	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbGroup "github.com/qingw1230/study-im-server/pkg/proto/group"
 	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
 	"github.com/qingw1230/study-im-server/pkg/utils"
@@ -212,8 +213,8 @@ type groupServer struct {
 	pbGroup.UnimplementedGroupServer
 	rpcPort         int
 	rpcRegisterName string
-	zkSchema        string
-	zkAddr          []string
+	etcdSchema      string
+	etcdAddr        []string
 }
 
 func NewGroupServer(port int) *groupServer {
@@ -221,13 +222,13 @@ func NewGroupServer(port int) *groupServer {
 	return &groupServer{
 		rpcPort:         port,
 		rpcRegisterName: config.Config.RpcRegisterName.GroupName,
-		zkSchema:        config.Config.Zookeeper.ZKSchema,
-		zkAddr:          config.Config.Zookeeper.ZKAddr,
+		etcdSchema:      config.Config.Etcd.EtcdSchema,
+		etcdAddr:        config.Config.Etcd.EtcdAddr,
 	}
 }
 
 func (s *groupServer) Run() {
-	log.Info("rpc friend start...")
+	log.Info("rpc group start...")
 	address := utils.ServerIP + ":" + strconv.Itoa(s.rpcPort)
 	ln, err := net.Listen("tcp", address)
 	if err != nil {
@@ -240,7 +241,12 @@ func (s *groupServer) Run() {
 	defer server.GracefulStop()
 
 	pbGroup.RegisterGroupServer(server, s)
-	// TODO(qingw1230): 将 rpc 服务注册进 zk
+	err = etcdv3.RegisterEtcd(s.etcdSchema, s.etcdAddr, utils.ServerIP, s.rpcPort, s.rpcRegisterName, etcdv3.TIME_TO_LIVE)
+	if err != nil {
+		log.Error("group RegisterEtcd failed", err.Error())
+		return
+	}
+	log.Info("rpc group register success")
 	err = server.Serve(ln)
 	if err != nil {
 		log.Error("Server failed ", err.Error())
