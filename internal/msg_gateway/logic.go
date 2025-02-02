@@ -63,7 +63,7 @@ func (ws *WsServer) sendMsgReq(conn *UserConn, m *Req) {
 		MsgData: data,
 	}
 
-	rpcConn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.OnlineMessageRelayName)
+	rpcConn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.OfflineMessageName)
 	client := pbMsg.NewMsgClient(rpcConn)
 	reply, err := client.SendMsg(context.Background(), &pbData)
 	if err != nil {

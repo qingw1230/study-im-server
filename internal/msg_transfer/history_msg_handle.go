@@ -8,10 +8,9 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/kafka"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
+	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbMsg "github.com/qingw1230/study-im-server/pkg/proto/msg"
 	pbPush "github.com/qingw1230/study-im-server/pkg/proto/push"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -66,13 +65,9 @@ func sendMessageToPush(message *pbMsg.MsgDataToMq, pushToUserId string) {
 		PushToUserId: pushToUserId,
 	}
 
-	conn, err := grpc.NewClient("127.0.0.1:10700", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Error("NewClient failed", err.Error())
-		return
-	}
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.PushName)
 	client := pbPush.NewPushMsgServiceClient(conn)
-	_, err = client.PushMsg(context.Background(), &rpcPushMsg)
+	_, err := client.PushMsg(context.Background(), &rpcPushMsg)
 	if err != nil {
 		log.Error("push rpc PushMsg failed", err.Error())
 		return
