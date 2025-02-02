@@ -49,13 +49,14 @@ const (
 	GroupChatType  = 2
 
 	// Websocket Protocol
-	WSHeartBeat        = 1000
-	WSGetNewestSeq     = 1001
-	WSPullMsgBySeqList = 1002
-	WSSendMsg          = 1003
-	WSPushMsg          = 2001
-	WSKickOnlineMsg    = 2002
-	WSDataError        = 3001
+	WSHeartBeat            = 1000
+	WSGetNewestSeq         = 1001
+	WSPullMsgBySeqList     = 1002
+	WSSendMsg              = 1003
+	WSPullConversationList = 1004
+	WSPushMsg              = 2001
+	WSKickOnlineMsg        = 2002
+	WSDataError            = 3001
 
 	WSNoError    = 0
 	WSNoUserConn = -1

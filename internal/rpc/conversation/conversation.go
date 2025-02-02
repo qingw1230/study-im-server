@@ -35,7 +35,7 @@ func (s *conversationServer) GetConversationList(_ context.Context, req *pbConve
 	for _, c := range conversationList {
 		tmp := &pbPublic.ConversationInfo{}
 		copier.Copy(tmp, &c)
-		resp.ConversationInfo = append(resp.ConversationInfo, tmp)
+		resp.ConversationList = append(resp.ConversationList, tmp)
 	}
 	return resp, nil
 }

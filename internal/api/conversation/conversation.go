@@ -47,7 +47,7 @@ func GetConversationList(c *gin.Context) {
 
 	resp := base_info.GetConversationListResp{CommonResp: base_info.CommonResp{}}
 	copier.Copy(&resp.CommonResp, reply.CommonResp)
-	resp.CommonResp.Data = reply.ConversationInfo
+	resp.CommonResp.Data = reply.ConversationList
 	c.JSON(http.StatusOK, resp)
 	log.Info("api GetConversationList return")
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
+	pbConversation "github.com/qingw1230/study-im-server/pkg/proto/conversation"
 	pbMsg "github.com/qingw1230/study-im-server/pkg/proto/msg"
 	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
 )
@@ -39,6 +40,17 @@ func (ws *WsServer) argsValidate(m *Req, r int32) (isPass bool, code int32, info
 		return true, constant.NoError, constant.SuccessInfo, &data
 	case constant.WSSendMsg:
 		data := pbPublic.MsgData{}
+		if err := json.Unmarshal(m.Data, &data); err != nil {
+			log.Error("Unmarshal failed", err.Error(), "reqIdentifier", r)
+			return false, constant.WSUnmarshalError, constant.WSUnmarshalErrorInfo, nil
+		}
+		if err := validate.Struct(&data); err != nil {
+			log.Error("validate failed", err.Error(), "reqIdentifier", r)
+			return false, constant.WSValidateError, constant.WSValidateErrorInfo, nil
+		}
+		return true, constant.NoError, constant.SuccessInfo, &data
+	case constant.WSPullConversationList:
+		data := pbConversation.GetConversationListReq{}
 		if err := json.Unmarshal(m.Data, &data); err != nil {
 			log.Error("Unmarshal failed", err.Error(), "reqIdentifier", r)
 			return false, constant.WSUnmarshalError, constant.WSUnmarshalErrorInfo, nil

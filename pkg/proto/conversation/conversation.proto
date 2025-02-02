@@ -10,7 +10,7 @@ message GetConversationListReq {
 
 message GetConversationListResp {
   server_api_params.CommonResp CommonResp = 1;
-  repeated server_api_params.ConversationInfo ConversationInfo = 2;
+  repeated server_api_params.ConversationInfo ConversationList = 2;
 }
 
 message CreateConversationReq {

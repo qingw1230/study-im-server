@@ -10,6 +10,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	"github.com/qingw1230/study-im-server/pkg/etcdv3"
+	pbConversation "github.com/qingw1230/study-im-server/pkg/proto/conversation"
 	pbMsg "github.com/qingw1230/study-im-server/pkg/proto/msg"
 	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
 )
@@ -30,6 +31,8 @@ func (ws *WsServer) msgParse(conn *UserConn, binaryMsg []byte) {
 		ws.pullMsgBySeqListReq(conn, &m)
 	case constant.WSSendMsg:
 		ws.sendMsgReq(conn, &m)
+	case constant.WSPullConversationList:
+		ws.pullConversationListReq(conn, &m)
 	}
 }
 
@@ -126,6 +129,45 @@ func (ws *WsServer) sendMsgResp(conn *UserConn, m *Req, pb *pbMsg.SendMsgResp) {
 		SendTime:    pb.GetSendTime(),
 	}
 	b, _ := json.Marshal(&mReplyData)
+	mReply := Resp{
+		ReqIdentifier: m.ReqIdentifier,
+		Code:          pb.CommonResp.Code,
+		Info:          pb.CommonResp.Info,
+		Data:          b,
+	}
+	ws.sendMsg(conn, mReply)
+}
+
+func (ws *WsServer) pullConversationListReq(conn *UserConn, m *Req) {
+	log.Info("ws call pullConversationListReq")
+	nReply := pbConversation.GetConversationListResp{CommonResp: &pbPublic.CommonResp{}}
+	isPass, code, info, pData := ws.argsValidate(m, constant.WSPullConversationList)
+	if !isPass {
+		nReply.CommonResp.Status = constant.Fail
+		nReply.CommonResp.Code = code
+		nReply.CommonResp.Info = info
+		ws.pullConversationListResp(conn, m, &nReply)
+		return
+	}
+
+	pbData := pData.(*pbConversation.GetConversationListReq)
+	pbData.OpUserId = pbData.FromUserId
+
+	rpcConn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.ConversationName)
+	client := pbConversation.NewConversationClient(rpcConn)
+	reply, err := client.GetConversationList(context.Background(), pbData)
+	if err != nil {
+		log.Error("ws call GetConversationList failed", err.Error())
+		copier.Copy(nReply.CommonResp, reply.CommonResp)
+		ws.pullConversationListResp(conn, m, &nReply)
+		return
+	}
+
+	ws.pullConversationListResp(conn, m, reply)
+}
+
+func (ws *WsServer) pullConversationListResp(conn *UserConn, m *Req, pb *pbConversation.GetConversationListResp) {
+	b, _ := json.Marshal(pb)
 	mReply := Resp{
 		ReqIdentifier: m.ReqIdentifier,
 		Code:          pb.CommonResp.Code,
