@@ -2,12 +2,15 @@ package db
 
 import (
 	"context"
-	"encoding/json"
 	"strconv"
 	"time"
 
 	"github.com/qingw1230/study-im-server/pkg/common/config"
+	"github.com/qingw1230/study-im-server/pkg/common/log"
 	pbMsg "github.com/qingw1230/study-im-server/pkg/proto/msg"
+	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
+	"github.com/qingw1230/study-im-server/pkg/utils"
+	"google.golang.org/protobuf/proto"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -17,34 +20,77 @@ const (
 	singleGocMsgNum = 5000
 )
 
-type MsgInfo struct {
+type UserChat struct {
+	Uid      string
+	Seq      uint32
 	SendTime int64
-	Msg      []byte
+	Msg      []byte // 使用 proto 序列化后的 *pbPublic.MsgData
 }
 
-type UserChat struct {
-	UserId string
-	Msg    []MsgInfo
+func (d *DataBases) GetMsgBySeqList(userId string, seqList []uint32) (seqMsg []*pbPublic.MsgData, err error) {
+	ctx, _ := context.WithTimeout(context.Background(), time.Duration(config.Config.Mongo.DBTimeout)*time.Second)
+	c := d.mongoClient.Database(config.Config.Mongo.DBDatabase).Collection(singleChat)
+
+	table := func(userId string, seqList []uint32) map[string][]uint32 {
+		m := make(map[string][]uint32)
+		for _, seq := range seqList {
+			seqUid := getSeqUid(userId, seq)
+			m[seqUid] = append(m[seqUid], seq)
+		}
+		return m
+	}(userId, seqList)
+
+	var hasSeqList []uint32
+	userChat := UserChat{}
+	for seqUid, groupSeqList := range table {
+		for _, seq := range groupSeqList {
+			if err = c.FindOne(ctx, bson.M{"uid": seqUid, "seq": seq}).Decode(&userChat); err != nil {
+				log.Error("not find seqUid", seqUid, err.Error())
+				continue
+			}
+
+			msg := &pbPublic.MsgData{}
+			if err = proto.Unmarshal(userChat.Msg, msg); err != nil {
+				log.Error("mongo get Unmarshal failed", err.Error(), seqUid, seq)
+				return
+			}
+			seqMsg = append(seqMsg, msg)
+			hasSeqList = append(hasSeqList, seq)
+		}
+
+	}
+
+	if len(hasSeqList) != len(seqList) {
+		diff := utils.Difference(hasSeqList, seqList)
+		exceptionMSg := genExceptionMessageBySeqList(diff)
+		seqMsg = append(seqMsg, exceptionMSg...)
+	}
+	return seqMsg, nil
+}
+
+func genExceptionMessageBySeqList(seqList []uint32) (exceptionMsg []*pbPublic.MsgData) {
+	for _, seq := range seqList {
+		msg := &pbPublic.MsgData{}
+		msg.Seq = seq
+		exceptionMsg = append(exceptionMsg, msg)
+	}
+	return exceptionMsg
 }
 
 func (d *DataBases) SaveUserChat(userId string, sendTime int64, m *pbMsg.MsgDataToDb) (err error) {
 	ctx, _ := context.WithTimeout(context.Background(), time.Duration(config.Config.Mongo.DBTimeout)*time.Second)
 	c := d.mongoClient.Database(config.Config.Mongo.DBDatabase).Collection(singleChat)
+
 	seqUid := getSeqUid(userId, m.MsgData.Seq)
-	filter := bson.M{"uid": seqUid}
-	singleMsg := MsgInfo{}
-	singleMsg.SendTime = sendTime
-	if singleMsg.Msg, err = json.Marshal(m.MsgData); err != nil {
+	singleChatLog := UserChat{
+		Uid:      seqUid,
+		Seq:      m.MsgData.Seq,
+		SendTime: sendTime,
+	}
+	if singleChatLog.Msg, err = proto.Marshal(m.MsgData); err != nil {
 		return err
 	}
-	err = c.FindOneAndUpdate(ctx, filter, bson.M{"$push": bson.M{"msg": singleMsg}}).Err()
-	if err != nil {
-		singleChat := UserChat{}
-		singleChat.UserId = seqUid
-		singleChat.Msg = append(singleChat.Msg, singleMsg)
-		if _, err = c.InsertOne(ctx, &singleChat); err != nil {
-			return err
-		}
+	if _, err = c.InsertOne(ctx, &singleChatLog); err != nil {
 		return err
 	}
 	return nil

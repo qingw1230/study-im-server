@@ -19,10 +19,10 @@ const (
 	RequestTokenAccessError = 10004
 
 	// MySQL 数据库相关的
-	RecordMySQLCommonError  = 11000
-	RecordAlreadyExists     = 11001
-	RecordNotExists         = 11002
-	RecordAccountORPwdError = 11003
+	MySQLCommonError         = 11000
+	MySQLRecordAlreadyExists = 11001
+	MySQLRecordNotExists     = 11002
+	MySQLAccountORPwdError   = 11003
 
 	// msg 相关的
 	MsgCommonError    = 12000
@@ -33,4 +33,7 @@ const (
 	WSCommonError    = 13000
 	WSUnmarshalError = 13003
 	WSValidateError  = 13004
+
+	// Mongo 数据库相关的
+	MongoCommonError = 14000
 )

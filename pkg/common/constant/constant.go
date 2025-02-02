@@ -48,11 +48,6 @@ const (
 	SingleChatType = 1
 	GroupChatType  = 2
 
-	// MsgReceiveOpt
-	ReceiveMessage          = 1
-	NotReceiveMessage       = 2
-	ReceiveNotNotifyMessage = 3
-
 	// Websocket Protocol
 	WSHeartBeat        = 1000
 	WSGetNewestSeq     = 1001

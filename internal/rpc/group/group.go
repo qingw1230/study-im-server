@@ -179,7 +179,7 @@ func (s *groupServer) SetGroupInfo(_ context.Context, req *pbGroup.SetGroupInfoR
 
 // hasOwnerAccess 检查是否是群拥有者
 func hasOwnerAccess(groupId, opUserId string) bool {
-	if utils.IsContain(opUserId, config.Config.Admin.UserIds) {
+	if utils.IsContainString(opUserId, config.Config.Admin.UserIds) {
 		return true
 	}
 	groupUserInfo, err := controller.GetGroupMemberInfoByGroupIdAndUserId(groupId, opUserId)
@@ -195,7 +195,7 @@ func hasOwnerAccess(groupId, opUserId string) bool {
 
 // hasOwnerOrAdminAccess 检查是否是群拥有者或管理员
 func hasOwnerOrAdminAccess(groupId, opUserId string) bool {
-	if utils.IsContain(opUserId, config.Config.Admin.UserIds) {
+	if utils.IsContainString(opUserId, config.Config.Admin.UserIds) {
 		return true
 	}
 	groupUserInfo, err := controller.GetGroupMemberInfoByGroupIdAndUserId(groupId, opUserId)

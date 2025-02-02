@@ -33,8 +33,8 @@ func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) 
 		return &pbFriend.AddFriendResp{
 			CommonResp: &pbPublic.CommonResp{
 				Status: constant.Fail,
-				Code:   constant.RecordNotExists,
-				Info:   constant.RecordAccountNotExistsInfo,
+				Code:   constant.MySQLRecordNotExists,
+				Info:   constant.MySQLAccountNotExistsInfo,
 			},
 		}, nil
 	}
@@ -66,8 +66,8 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 		return &pbFriend.AddFriendResponseResp{
 			CommonResp: &pbPublic.CommonResp{
 				Status: constant.Fail,
-				Code:   constant.RecordNotExists,
-				Info:   constant.RecordNotExistsInfo,
+				Code:   constant.MySQLRecordNotExists,
+				Info:   constant.MySQLRecordNotExistsInfo,
 			},
 		}, nil
 	}

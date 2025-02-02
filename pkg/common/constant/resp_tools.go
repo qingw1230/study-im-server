@@ -20,8 +20,14 @@ var (
 
 	MySQLCommonFailResp = base_info.CommonResp{
 		Status: Fail,
-		Code:   RecordMySQLCommonError,
-		Info:   RecordMySQLCommonErrorInfo,
+		Code:   MySQLCommonError,
+		Info:   MySQLCommonErrorInfo,
+	}
+
+	MongoCommonFailResp = base_info.CommonResp{
+		Status: Fail,
+		Code:   MongoCommonError,
+		Info:   MongoCommonErrorInfo,
 	}
 )
 
@@ -46,8 +52,14 @@ var (
 
 	PBMySQLCommonFailResp = pbPublic.CommonResp{
 		Status: Fail,
-		Code:   RecordMySQLCommonError,
-		Info:   RecordMySQLCommonErrorInfo,
+		Code:   MySQLCommonError,
+		Info:   MySQLCommonErrorInfo,
+	}
+
+	PBMongoCommonFailResp = pbPublic.CommonResp{
+		Status: Fail,
+		Code:   MongoCommonError,
+		Info:   MongoCommonErrorInfo,
 	}
 )
 

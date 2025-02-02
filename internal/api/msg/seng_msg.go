@@ -15,22 +15,7 @@ import (
 	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
 )
 
-type paramsUserSendMsg struct {
-	SendId         string `json:"sendId" binding:"required"`
-	SenderNickName string `json:"senderNickName"`
-	SenderFaceUrl  string `json:"senderFaceUrl"`
-	Data           struct {
-		RecvId      string `json:"recvId" `
-		GroupId     string `json:"groupId" `
-		SessionType int32  `json:"sessionType" binding:"required"`
-		MsgFrom     int32  `json:"msgFrom" binding:"required"`
-		ContentType int32  `json:"contentType" binding:"required"`
-		Content     string `json:"content" binding:"required"`
-		CreateTime  int64  `json:"createTime" binding:"required"`
-	}
-}
-
-func newUserSendMsgReq(token string, params *paramsUserSendMsg) *pbMsg.SendMsgReq {
+func newUserSendMsgReq(token string, params *base_info.UserSendMsgReq) *pbMsg.SendMsgReq {
 	pbData := pbMsg.SendMsgReq{
 		Token: token,
 		MsgData: &pbPublic.MsgData{
@@ -51,7 +36,7 @@ func newUserSendMsgReq(token string, params *paramsUserSendMsg) *pbMsg.SendMsgRe
 
 func SendMsg(c *gin.Context) {
 	log.Info("call api SendMsg")
-	params := paramsUserSendMsg{}
+	params := base_info.UserSendMsgReq{}
 	if err := c.BindJSON(&params); err != nil {
 		log.Error("BindJSON failed", err.Error())
 		c.JSON(http.StatusOK, constant.NewBindJSONErrorRespWithInfo(err.Error()))
@@ -62,6 +47,7 @@ func SendMsg(c *gin.Context) {
 	token := c.Request.Header.Get(constant.STR_TOKEN)
 	req := newUserSendMsgReq(token, &params)
 	log.Info("SendMsg args:", req.String())
+
 	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.OfflineMessageName)
 	client := pbMsg.NewMsgClient(conn)
 	reply, err := client.SendMsg(context.Background(), req)

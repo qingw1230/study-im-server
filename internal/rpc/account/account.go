@@ -30,8 +30,8 @@ func (s *accountServer) Register(_ context.Context, req *pbAccount.RegisterReq) 
 		resp := &pbAccount.RegisterResp{
 			CommonResp: &pbPublic.CommonResp{
 				Status: constant.Fail,
-				Code:   constant.RecordAlreadyExists,
-				Info:   constant.RecordEmailAlreadyRegisterErrorInfo,
+				Code:   constant.MySQLRecordAlreadyExists,
+				Info:   constant.MySQLEmailAlreadyRegisterErrorInfo,
 			},
 		}
 		return resp, nil
@@ -65,8 +65,8 @@ func (s *accountServer) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAc
 		resp := &pbAccount.LoginResp{
 			CommonResp: &pbPublic.CommonResp{
 				Status: constant.Fail,
-				Code:   constant.RecordNotExists,
-				Info:   constant.RecordAccountORPwdErrorInfo,
+				Code:   constant.MySQLRecordNotExists,
+				Info:   constant.MySQLAccountORPwdErrorInfo,
 			},
 		}
 		return resp, nil
@@ -80,8 +80,8 @@ func (s *accountServer) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAc
 		resp := &pbAccount.LoginResp{
 			CommonResp: &pbPublic.CommonResp{
 				Status: constant.Fail,
-				Code:   constant.RecordAccountORPwdError,
-				Info:   constant.RecordAccountORPwdErrorInfo,
+				Code:   constant.MySQLAccountORPwdError,
+				Info:   constant.MySQLAccountORPwdErrorInfo,
 			},
 		}
 		return resp, nil
@@ -107,7 +107,7 @@ func (s *accountServer) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAc
 	copier.Copy(resp.CommonResp, &constant.CommonSuccessResp)
 	copier.Copy(resp.UserInfo, user)
 	resp.UserInfo.Token = token
-	resp.UserInfo.Admin = utils.IsContain(user.UserId, config.Config.Admin.UserIds)
+	resp.UserInfo.Admin = utils.IsContainString(user.UserId, config.Config.Admin.UserIds)
 	return resp, nil
 }
 

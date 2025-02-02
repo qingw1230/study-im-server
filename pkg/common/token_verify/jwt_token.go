@@ -149,7 +149,7 @@ func GetUserIdFromToken(token string) (bool, string) {
 
 // CheckAccess 检查是否有访问权限
 func CheckAccess(opUserId, ownerUserId string) bool {
-	if utils.IsContain(opUserId, config.Config.Admin.UserIds) {
+	if utils.IsContainString(opUserId, config.Config.Admin.UserIds) {
 		return true
 	}
 	return opUserId == ownerUserId
