@@ -139,9 +139,9 @@ func (Black) TableName() string {
 
 type ChatLog struct {
 	ServerMsgId    string    `gorm:"column:server_msg_id;type:char(64);not null;primary_key"`
-	ClientMsgId    string    `gorm:"column:client_msg_id;type:char(64)"`
 	SendId         string    `gorm:"column:send_id;type:varchar(12)"`
 	RecvId         string    `gorm:"column:recv_id;type:varchar(12)"`
+	Seq            uint32    `gorm:"column:seq;type:int(11)"`
 	SenderNickName string    `gorm:"column:sender_nick_name;type:varchar(20)"`
 	SenderFaceUrl  string    `gorm:"column:sender_face_url;type:varchar(255)"`
 	SessionType    int32     `gorm:"column:session_type"`

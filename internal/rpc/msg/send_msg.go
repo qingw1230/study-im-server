@@ -6,9 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gomodule/redigo/redis"
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
-	"github.com/qingw1230/study-im-server/pkg/common/db"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	pbMsg "github.com/qingw1230/study-im-server/pkg/proto/msg"
 	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
@@ -72,24 +70,6 @@ func returnMsg(resp *pbMsg.SendMsgResp, req *pbMsg.SendMsgReq, status string, co
 	resp.CommonResp.Code = code
 	resp.CommonResp.Info = info
 	resp.ServerMsgId = serverMsgId
-	resp.ClientMsgId = req.MsgData.ClientMsgId
 	resp.SendTime = sendTime
 	return resp, nil
-}
-
-func modifyMessageByUserMessageReceiveOpt(userId, sourceId string, sessionType int, req *pbMsg.SendMsgReq) bool {
-	conversationId := utils.GetConversationIdBySessionType(sourceId, sessionType)
-	opt, err := db.DB.GetSingleConversationMsgOpt(userId, conversationId)
-	if err != nil && err != redis.ErrNil {
-		log.Error("GetSingleConversationMsgOpt from redis error", conversationId, req.String(), err.Error())
-		return true
-	}
-
-	switch opt {
-	case constant.ReceiveMessage:
-		return true
-	case constant.NotReceiveMessage:
-		return false
-	}
-	return true
 }

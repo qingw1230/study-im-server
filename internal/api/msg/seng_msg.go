@@ -20,17 +20,13 @@ type paramsUserSendMsg struct {
 	SenderNickName string `json:"senderNickName"`
 	SenderFaceUrl  string `json:"senderFaceUrl"`
 	Data           struct {
-		RecvId      string                    `json:"recvId" `
-		GroupId     string                    `json:"groupId" `
-		ClientMsgId string                    `json:"clientMsgId" binding:"required"`
-		SessionType int32                     `json:"sessionType" binding:"required"`
-		MsgFrom     int32                     `json:"msgFrom" binding:"required"`
-		ContentType int32                     `json:"contentType" binding:"required"`
-		Content     string                    `json:"content" binding:"required"`
-		ForceList   []string                  `json:"forceList"`
-		Options     map[string]bool           `json:"options" `
-		CreateTime  int64                     `json:"createTime" binding:"required"`
-		OfflineInfo *pbPublic.OfflinePushInfo `json:"offlineInfo"`
+		RecvId      string `json:"recvId" `
+		GroupId     string `json:"groupId" `
+		SessionType int32  `json:"sessionType" binding:"required"`
+		MsgFrom     int32  `json:"msgFrom" binding:"required"`
+		ContentType int32  `json:"contentType" binding:"required"`
+		Content     string `json:"content" binding:"required"`
+		CreateTime  int64  `json:"createTime" binding:"required"`
 	}
 }
 
@@ -38,19 +34,16 @@ func newUserSendMsgReq(token string, params *paramsUserSendMsg) *pbMsg.SendMsgRe
 	pbData := pbMsg.SendMsgReq{
 		Token: token,
 		MsgData: &pbPublic.MsgData{
-			SendId:          params.SendId,
-			RecvId:          params.Data.RecvId,
-			GroupId:         params.Data.GroupId,
-			ClientMsgId:     params.Data.ClientMsgId,
-			SenderNickName:  params.SenderNickName,
-			SenderFaceUrl:   params.SenderFaceUrl,
-			SessionType:     params.Data.SessionType,
-			MsgFrom:         params.Data.MsgFrom,
-			ContentType:     params.Data.ContentType,
-			Content:         params.Data.Content,
-			CreateTime:      params.Data.CreateTime,
-			Options:         params.Data.Options,
-			OfflinePushInfo: params.Data.OfflineInfo,
+			SendId:         params.SendId,
+			RecvId:         params.Data.RecvId,
+			GroupId:        params.Data.GroupId,
+			SenderNickName: params.SenderNickName,
+			SenderFaceUrl:  params.SenderFaceUrl,
+			SessionType:    params.Data.SessionType,
+			MsgFrom:        params.Data.MsgFrom,
+			ContentType:    params.Data.ContentType,
+			Content:        params.Data.Content,
+			CreateTime:     params.Data.CreateTime,
 		},
 	}
 	return &pbData

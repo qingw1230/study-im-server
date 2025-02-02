@@ -83,26 +83,17 @@ message MsgData {
   string sendId = 1;          // client 设置
   string recvId = 2;
   string groupId = 3;
-  string clientMsgId = 4;     // client 设置
+  uint32 seq = 4;             // transfer 设置
   string serverMsgId = 5;     // rpc 设置 timestamp + sendId + randNum
   string senderNickName = 6;
   string senderFaceUrl = 7;
   int32 sessionType = 8;      // client 设置 Single Group ...
   int32 msgFrom = 9;          // client 设置 User Sys
   int32 contentType = 10;     // client 设置 Text Picture Voice Video File ... 
-  string content = 11;         // client 设置
-  uint32 seq = 12;
-  int64 sendTime = 13;        // rpc 设置 timestamp
-  int64 createTime = 14;      // client 设置
-  int32 status = 15;
-  map<string, bool> options = 16;
-  OfflinePushInfo offlinePushInfo = 17;
-}
-
-message OfflinePushInfo {
-  string title = 1;
-  string desc = 2;
-  string ex = 3;
+  string content = 11;        // client 设置
+  int64 sendTime = 12;        // rpc 设置 timestamp
+  int64 createTime = 13;      // client 设置
+  int32 status = 14;
 }
 
 message ConversationInfo {
