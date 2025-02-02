@@ -5,6 +5,7 @@ import (
 
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
+	pbMsg "github.com/qingw1230/study-im-server/pkg/proto/msg"
 	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
 )
 
@@ -22,8 +23,20 @@ type Resp struct {
 	Data          []byte `json:"data"`
 }
 
+// argsValidate 解析 Req 的 Data 部分，解析成相应 rpc 请求结构
 func (ws *WsServer) argsValidate(m *Req, r int32) (isPass bool, code int32, info string, returnData interface{}) {
 	switch r {
+	case constant.WSPullMsgBySeqList:
+		data := pbMsg.PullMessageBySeqListReq{}
+		if err := json.Unmarshal(m.Data, &data); err != nil {
+			log.Error("Unmarshal failed", err.Error(), "reqIdentifier", r)
+			return false, constant.WSUnmarshalError, constant.WSUnmarshalErrorInfo, nil
+		}
+		if err := validate.Struct(&data); err != nil {
+			log.Error("validate failed", err.Error(), "reqIdentifier", r)
+			return false, constant.WSValidateError, constant.WSValidateErrorInfo, nil
+		}
+		return true, constant.NoError, constant.SuccessInfo, &data
 	case constant.WSSendMsg:
 		data := pbPublic.MsgData{}
 		if err := json.Unmarshal(m.Data, &data); err != nil {

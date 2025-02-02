@@ -26,6 +26,8 @@ func (ws *WsServer) msgParse(conn *UserConn, binaryMsg []byte) {
 	switch m.ReqIdentifier {
 	case constant.WSHeartBeat:
 		ws.handleHeartBeat(conn, &m)
+	case constant.WSPullMsgBySeqList:
+		ws.pullMsgBySeqListReq(conn, &m)
 	case constant.WSSendMsg:
 		ws.sendMsgReq(conn, &m)
 	}
@@ -42,6 +44,48 @@ func (ws *WsServer) handleHeartBeat(conn *UserConn, m *Req) {
 	reply, _ := json.Marshal(resp)
 	// TODO(qingw1230): 为每个用户维护定时器，心跳超时后断开 ws 连接
 	ws.writeMsg(conn, websocket.TextMessage, reply)
+}
+
+func (ws *WsServer) pullMsgBySeqListReq(conn *UserConn, m *Req) {
+	log.Info("ws call pullMsgBySeqListReq")
+	nReply := pbMsg.PullMessageBySeqListResp{CommonResp: &pbPublic.CommonResp{}}
+	isPass, code, info, pData := ws.argsValidate(m, constant.WSPullMsgBySeqList)
+	if !isPass {
+		nReply.CommonResp.Status = constant.Fail
+		nReply.CommonResp.Code = code
+		nReply.CommonResp.Info = info
+		ws.pullMsgBySeqListResp(conn, m, &nReply)
+		return
+	}
+
+	pbData := pbMsg.PullMessageBySeqListReq{
+		UserId:   m.SendId,
+		OpUserId: m.SendId,
+		SeqList:  pData.(*pbMsg.PullMessageBySeqListReq).SeqList,
+	}
+
+	rpcConn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.OfflineMessageName)
+	client := pbMsg.NewMsgClient(rpcConn)
+	reply, err := client.PullMessageBySeqList(context.Background(), &pbData)
+	if err != nil {
+		log.Error("ws call PullMessageBySeqList failed", err.Error())
+		copier.Copy(nReply.CommonResp, reply.CommonResp)
+		ws.pullMsgBySeqListResp(conn, m, &nReply)
+		return
+	}
+
+	ws.pullMsgBySeqListResp(conn, m, reply)
+}
+
+func (ws *WsServer) pullMsgBySeqListResp(conn *UserConn, m *Req, pb *pbMsg.PullMessageBySeqListResp) {
+	b, _ := json.Marshal(pb)
+	mReply := Resp{
+		ReqIdentifier: m.ReqIdentifier,
+		Code:          pb.CommonResp.Code,
+		Info:          pb.CommonResp.Info,
+		Data:          b,
+	}
+	ws.sendMsg(conn, mReply)
 }
 
 // sendMsgReq 处理 ws 收到的发送消息请求
@@ -67,10 +111,12 @@ func (ws *WsServer) sendMsgReq(conn *UserConn, m *Req) {
 	client := pbMsg.NewMsgClient(rpcConn)
 	reply, err := client.SendMsg(context.Background(), &pbData)
 	if err != nil {
-		log.Error("SendMsg failed", err.Error())
+		log.Error("ws call SendMsg failed", err.Error())
 		copier.Copy(nReply.CommonResp, reply.CommonResp)
 		ws.sendMsgResp(conn, m, &nReply)
+		return
 	}
+
 	ws.sendMsgResp(conn, m, reply)
 }
 
