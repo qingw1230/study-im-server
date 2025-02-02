@@ -3,6 +3,17 @@ import "public/public.proto";
 package pbMsg;
 option go_package = "github.com/qingw1230/study-im-server/pkg/proto/msg";
 
+message PullMessageBySeqListReq {
+  string userId = 1;
+  string opUserId = 2;
+  repeated uint32 seqList = 3;
+}
+
+message PullMessageBySeqListResp {
+  server_api_params.CommonResp CommonResp = 1;
+  repeated server_api_params.MsgData list = 2;
+}
+
 message MsgDataToMq {
   string token = 1;
   server_api_params.MsgData msgData = 2;
@@ -20,10 +31,10 @@ message SendMsgReq {
 message SendMsgResp {
   server_api_params.CommonResp CommonResp = 1;
   string serverMsgId = 2;
-  string clientMsgId = 3;
-  int64 sendTime = 4;
+  int64 sendTime = 3;
 }
 
 service Msg {
+  rpc PullMessageBySeqList(PullMessageBySeqListReq) returns (PullMessageBySeqListResp);
   rpc SendMsg(SendMsgReq) returns (SendMsgResp);
 }

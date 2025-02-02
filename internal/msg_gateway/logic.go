@@ -77,7 +77,6 @@ func (ws *WsServer) sendMsgReq(conn *UserConn, m *Req) {
 func (ws *WsServer) sendMsgResp(conn *UserConn, m *Req, pb *pbMsg.SendMsgResp) {
 	mReplyData := pbPublic.UserSendMsgResp{
 		ServerMsgId: pb.GetServerMsgId(),
-		ClientMsgId: pb.GetClientMsgId(),
 		SendTime:    pb.GetSendTime(),
 	}
 	b, _ := json.Marshal(&mReplyData)

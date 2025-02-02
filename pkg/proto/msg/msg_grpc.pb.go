@@ -19,13 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Msg_SendMsg_FullMethodName = "/pbMsg.Msg/SendMsg"
+	Msg_PullMessageBySeqList_FullMethodName = "/pbMsg.Msg/PullMessageBySeqList"
+	Msg_SendMsg_FullMethodName              = "/pbMsg.Msg/SendMsg"
 )
 
 // MsgClient is the client API for Msg service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MsgClient interface {
+	PullMessageBySeqList(ctx context.Context, in *PullMessageBySeqListReq, opts ...grpc.CallOption) (*PullMessageBySeqListResp, error)
 	SendMsg(ctx context.Context, in *SendMsgReq, opts ...grpc.CallOption) (*SendMsgResp, error)
 }
 
@@ -35,6 +37,16 @@ type msgClient struct {
 
 func NewMsgClient(cc grpc.ClientConnInterface) MsgClient {
 	return &msgClient{cc}
+}
+
+func (c *msgClient) PullMessageBySeqList(ctx context.Context, in *PullMessageBySeqListReq, opts ...grpc.CallOption) (*PullMessageBySeqListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PullMessageBySeqListResp)
+	err := c.cc.Invoke(ctx, Msg_PullMessageBySeqList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *msgClient) SendMsg(ctx context.Context, in *SendMsgReq, opts ...grpc.CallOption) (*SendMsgResp, error) {
@@ -51,6 +63,7 @@ func (c *msgClient) SendMsg(ctx context.Context, in *SendMsgReq, opts ...grpc.Ca
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility.
 type MsgServer interface {
+	PullMessageBySeqList(context.Context, *PullMessageBySeqListReq) (*PullMessageBySeqListResp, error)
 	SendMsg(context.Context, *SendMsgReq) (*SendMsgResp, error)
 	mustEmbedUnimplementedMsgServer()
 }
@@ -62,6 +75,9 @@ type MsgServer interface {
 // pointer dereference when methods are called.
 type UnimplementedMsgServer struct{}
 
+func (UnimplementedMsgServer) PullMessageBySeqList(context.Context, *PullMessageBySeqListReq) (*PullMessageBySeqListResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PullMessageBySeqList not implemented")
+}
 func (UnimplementedMsgServer) SendMsg(context.Context, *SendMsgReq) (*SendMsgResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendMsg not implemented")
 }
@@ -84,6 +100,24 @@ func RegisterMsgServer(s grpc.ServiceRegistrar, srv MsgServer) {
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&Msg_ServiceDesc, srv)
+}
+
+func _Msg_PullMessageBySeqList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PullMessageBySeqListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).PullMessageBySeqList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_PullMessageBySeqList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).PullMessageBySeqList(ctx, req.(*PullMessageBySeqListReq))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Msg_SendMsg_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -111,6 +145,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "pbMsg.Msg",
 	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "PullMessageBySeqList",
+			Handler:    _Msg_PullMessageBySeqList_Handler,
+		},
 		{
 			MethodName: "SendMsg",
 			Handler:    _Msg_SendMsg_Handler,

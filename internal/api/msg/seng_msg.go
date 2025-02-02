@@ -75,7 +75,6 @@ func SendMsg(c *gin.Context) {
 	copier.Copy(&resp, reply.CommonResp)
 	resp.Data = gin.H{
 		"serverMsgID": reply.ServerMsgId,
-		"clientMsgID": reply.ClientMsgId,
 		"sendTime":    reply.SendTime,
 	}
 	c.JSON(http.StatusOK, resp)
