@@ -11,7 +11,6 @@ const (
 	checkCode                     = "STUDYIM:CHECK_CODE:"
 	userIdTokenStatus             = "STUDYIM:USER_ID_TOKEN_STATUS:"
 	userIncrSeq                   = "STUDYIM:USER_INCR_SEQ:"
-	userMinSeq                    = "STUDYIM:USER_MIN_SEQ:"
 	conversationReceiveMessageOpt = "STUDYIM:CON_RECV_MSG_OPT:"
 )
 
@@ -54,17 +53,6 @@ func (d *DataBases) IncrUserSeq(userId string) (uint64, error) {
 
 func (d *DataBases) GetUserMaxSeq(userId string) (uint64, error) {
 	key := userIncrSeq + userId
-	return redis.Uint64(d.Exec("GET", key))
-}
-
-func (d *DataBases) SetUserMinSeq(userId string, minSeq uint32) (err error) {
-	key := userMinSeq + userId
-	_, err = d.Exec("SET", key, minSeq)
-	return err
-}
-
-func (d *DataBases) GetUserMinSeq(userId string) (uint64, error) {
-	key := userMinSeq + userId
 	return redis.Uint64(d.Exec("GET", key))
 }
 

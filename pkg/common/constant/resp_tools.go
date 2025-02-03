@@ -61,6 +61,12 @@ var (
 		Code:   MongoCommonError,
 		Info:   MongoCommonErrorInfo,
 	}
+
+	PBRedisCommonFailResp = pbPublic.CommonResp{
+		Status: Fail,
+		Code:   RedisCommonError,
+		Info:   RedisCommonErrorInfo,
+	}
 )
 
 func NewPBResp(status string, code int, info string) *pbPublic.CommonResp {

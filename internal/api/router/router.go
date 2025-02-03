@@ -45,6 +45,7 @@ func Router() *gin.Engine {
 
 	msgGroup := r.Group("/api/msg")
 	{
+		msgGroup.POST("/get_newest_seq", msg.GetNewestSeq)
 		msgGroup.POST("/send_msg", msg.SendMsg)
 		msgGroup.POST("/pull_msg_by_seq_list", msg.PullMsgBySeqList)
 	}

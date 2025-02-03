@@ -2,6 +2,29 @@ package base_info
 
 import "github.com/qingw1230/study-im-server/pkg/proto/public"
 
+type UserGetNewestSeqReq struct {
+	ReqIdentifier int    `json:"reqIdentifier" binding:"required"`
+	UserId        string `json:"userId" binding:"required"`
+}
+
+type UserGetNewestSeqResp struct {
+	CommonResp
+	ReqIdentifier int    `json:"reqIdentifier" binding:"required"`
+	NewestSeq     uint32 `json:"-"`
+}
+
+type UserPullMsgBySeqListReq struct {
+	ReqIdentifier int      `json:"reqIdentifier" binding:"required"`
+	UserId        string   `json:"userId" binding:"required"`
+	SeqList       []uint32 `json:"seqList"`
+}
+
+type UserPullMsgBySeqListResp struct {
+	CommonResp
+	ReqIdentifier int               `json:"reqIdentifier" binding:"required"`
+	MsgDataList   []*public.MsgData `json:"-"`
+}
+
 type UserSendMsgReq struct {
 	SendId         string `json:"sendId" binding:"required"`
 	SenderNickName string `json:"senderNickName"`
@@ -15,16 +38,4 @@ type UserSendMsgReq struct {
 		Content     string `json:"content" binding:"required"`
 		CreateTime  int64  `json:"createTime" binding:"required"`
 	}
-}
-
-type UserPullMsgBySeqListReq struct {
-	ReqIdentifier int      `json:"reqIdentifier" binding:"required"`
-	UserId        string   `json:"userId" binding:"required"`
-	SeqList       []uint32 `json:"seqList"`
-}
-
-type UserPullMsgBySeqListResp struct {
-	CommonResp
-	ReqIdentifier int               `json:"reqIdentifier" binding:"required"`
-	MsgDataList   []*public.MsgData `json:"-"`
 }

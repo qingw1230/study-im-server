@@ -36,4 +36,7 @@ const (
 
 	// Mongo 数据库相关的
 	MongoCommonError = 14000
+
+	// Redis 数据库相关的
+	RedisCommonError = 15000
 )

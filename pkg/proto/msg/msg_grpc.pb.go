@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	Msg_GetNewestSeq_FullMethodName         = "/pbMsg.Msg/GetNewestSeq"
 	Msg_PullMessageBySeqList_FullMethodName = "/pbMsg.Msg/PullMessageBySeqList"
 	Msg_SendMsg_FullMethodName              = "/pbMsg.Msg/SendMsg"
 )
@@ -27,6 +28,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MsgClient interface {
+	GetNewestSeq(ctx context.Context, in *GetNewestSeqReq, opts ...grpc.CallOption) (*GetNewestSeqResp, error)
 	PullMessageBySeqList(ctx context.Context, in *PullMessageBySeqListReq, opts ...grpc.CallOption) (*PullMessageBySeqListResp, error)
 	SendMsg(ctx context.Context, in *SendMsgReq, opts ...grpc.CallOption) (*SendMsgResp, error)
 }
@@ -37,6 +39,16 @@ type msgClient struct {
 
 func NewMsgClient(cc grpc.ClientConnInterface) MsgClient {
 	return &msgClient{cc}
+}
+
+func (c *msgClient) GetNewestSeq(ctx context.Context, in *GetNewestSeqReq, opts ...grpc.CallOption) (*GetNewestSeqResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetNewestSeqResp)
+	err := c.cc.Invoke(ctx, Msg_GetNewestSeq_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *msgClient) PullMessageBySeqList(ctx context.Context, in *PullMessageBySeqListReq, opts ...grpc.CallOption) (*PullMessageBySeqListResp, error) {
@@ -63,6 +75,7 @@ func (c *msgClient) SendMsg(ctx context.Context, in *SendMsgReq, opts ...grpc.Ca
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility.
 type MsgServer interface {
+	GetNewestSeq(context.Context, *GetNewestSeqReq) (*GetNewestSeqResp, error)
 	PullMessageBySeqList(context.Context, *PullMessageBySeqListReq) (*PullMessageBySeqListResp, error)
 	SendMsg(context.Context, *SendMsgReq) (*SendMsgResp, error)
 	mustEmbedUnimplementedMsgServer()
@@ -75,6 +88,9 @@ type MsgServer interface {
 // pointer dereference when methods are called.
 type UnimplementedMsgServer struct{}
 
+func (UnimplementedMsgServer) GetNewestSeq(context.Context, *GetNewestSeqReq) (*GetNewestSeqResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNewestSeq not implemented")
+}
 func (UnimplementedMsgServer) PullMessageBySeqList(context.Context, *PullMessageBySeqListReq) (*PullMessageBySeqListResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PullMessageBySeqList not implemented")
 }
@@ -100,6 +116,24 @@ func RegisterMsgServer(s grpc.ServiceRegistrar, srv MsgServer) {
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&Msg_ServiceDesc, srv)
+}
+
+func _Msg_GetNewestSeq_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetNewestSeqReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).GetNewestSeq(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_GetNewestSeq_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).GetNewestSeq(ctx, req.(*GetNewestSeqReq))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Msg_PullMessageBySeqList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -145,6 +179,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "pbMsg.Msg",
 	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetNewestSeq",
+			Handler:    _Msg_GetNewestSeq_Handler,
+		},
 		{
 			MethodName: "PullMessageBySeqList",
 			Handler:    _Msg_PullMessageBySeqList_Handler,

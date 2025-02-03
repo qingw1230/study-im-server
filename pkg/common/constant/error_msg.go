@@ -30,6 +30,8 @@ const (
 	WSValidateErrorInfo  = "字段验证失败"
 
 	MongoCommonErrorInfo = "Mongo 数据库通用错误"
+
+	RedisCommonErrorInfo = "Redis 数据库通用错误"
 )
 
 var (
