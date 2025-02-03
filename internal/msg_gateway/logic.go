@@ -27,6 +27,8 @@ func (ws *WsServer) msgParse(conn *UserConn, binaryMsg []byte) {
 	switch m.ReqIdentifier {
 	case constant.WSHeartBeat:
 		ws.handleHeartBeat(conn, &m)
+	case constant.WSGetNewestSeq:
+		ws.getNewestSeqReq(conn, &m)
 	case constant.WSPullMsgBySeqList:
 		ws.pullMsgBySeqListReq(conn, &m)
 	case constant.WSSendMsg:
@@ -47,6 +49,38 @@ func (ws *WsServer) handleHeartBeat(conn *UserConn, m *Req) {
 	reply, _ := json.Marshal(resp)
 	// TODO(qingw1230): 为每个用户维护定时器，心跳超时后断开 ws 连接
 	ws.writeMsg(conn, websocket.TextMessage, reply)
+}
+
+func (ws *WsServer) getNewestSeqReq(conn *UserConn, m *Req) {
+	log.Info("ws call getNewestSeqReq")
+	nReply := pbMsg.GetNewestSeqResp{CommonResp: &pbPublic.CommonResp{}}
+	pbData := pbMsg.GetNewestSeqReq{
+		UserId:   m.SendId,
+		OpUserId: m.SendId,
+	}
+
+	rpcConn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.OfflineMessageName)
+	client := pbMsg.NewMsgClient(rpcConn)
+	reply, err := client.GetNewestSeq(context.Background(), &pbData)
+	if err != nil {
+		log.Error("ws call GetNewestSeq failed", err.Error())
+		copier.Copy(nReply.CommonResp, reply.CommonResp)
+		ws.getNewestSeqResp(conn, m, &nReply)
+		return
+	}
+
+	ws.getNewestSeqResp(conn, m, reply)
+}
+
+func (ws *WsServer) getNewestSeqResp(conn *UserConn, m *Req, pb *pbMsg.GetNewestSeqResp) {
+	b, _ := json.Marshal(pb)
+	mReply := Resp{
+		ReqIdentifier: m.ReqIdentifier,
+		Code:          pb.CommonResp.Code,
+		Info:          pb.CommonResp.Info,
+		Data:          b,
+	}
+	ws.sendMsg(conn, mReply)
 }
 
 func (ws *WsServer) pullMsgBySeqListReq(conn *UserConn, m *Req) {
