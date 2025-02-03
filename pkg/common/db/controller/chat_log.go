@@ -5,7 +5,6 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/db"
 	pbMsg "github.com/qingw1230/study-im-server/pkg/proto/msg"
-	"github.com/qingw1230/study-im-server/pkg/utils"
 )
 
 func InsertMessageToChatLog(msg *pbMsg.MsgDataToMq) error {
@@ -21,7 +20,7 @@ func InsertMessageToChatLog(msg *pbMsg.MsgDataToMq) error {
 		chatLog.RecvId = msg.MsgData.RecvId
 	}
 	chatLog.Content = msg.MsgData.Content
-	chatLog.CreateTime = utils.UnixMillSecondToTime(msg.MsgData.CreateTime)
-	chatLog.SendTime = utils.UnixMillSecondToTime(msg.MsgData.SendTime)
+	chatLog.CreateTime = msg.MsgData.CreateTime
+	chatLog.SendTime = msg.MsgData.SendTime
 	return dbConn.Table(constant.DBTableChatLog).Create(chatLog).Error
 }

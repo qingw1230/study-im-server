@@ -138,19 +138,19 @@ func (Black) TableName() string {
 }
 
 type ChatLog struct {
-	ServerMsgId    string    `gorm:"column:server_msg_id;type:char(64);not null;primary_key"`
-	SendId         string    `gorm:"column:send_id;type:varchar(12)"`
-	RecvId         string    `gorm:"column:recv_id;type:varchar(12)"`
-	SenderNickName string    `gorm:"column:sender_nick_name;type:varchar(20)"`
-	SenderFaceUrl  string    `gorm:"column:sender_face_url;type:varchar(255)"`
-	SessionType    int32     `gorm:"column:session_type"`
-	MsgFrom        int32     `gorm:"column:msg_from"`
-	ContentType    int32     `gorm:"column:content_type"`
-	Content        string    `gorm:"column:content;type:varchar(3000)"`
-	Status         int32     `gorm:"column:status"`
-	SendTime       time.Time `gorm:"column:send_time"`
-	CreateTime     time.Time `gorm:"column:create_time"`
-	Ex             string    `gorm:"column:ex;type:varchar(1024)"`
+	ServerMsgId    string `gorm:"column:server_msg_id;type:char(64);not null;primary_key"`
+	SendId         string `gorm:"column:send_id;type:varchar(12)"`
+	RecvId         string `gorm:"column:recv_id;type:varchar(12)"`
+	SenderNickName string `gorm:"column:sender_nick_name;type:varchar(20)"`
+	SenderFaceUrl  string `gorm:"column:sender_face_url;type:varchar(255)"`
+	SessionType    int32  `gorm:"column:session_type"`
+	MsgFrom        int32  `gorm:"column:msg_from"`
+	ContentType    int32  `gorm:"column:content_type"`
+	Content        string `gorm:"column:content;type:varchar(3000)"`
+	Status         int32  `gorm:"column:status"`
+	SendTime       int64  `gorm:"column:send_time;type:bigint"`
+	CreateTime     int64  `gorm:"column:create_time;type:bigint"`
+	Ex             string `gorm:"column:ex;type:varchar(1024)"`
 }
 
 func (ChatLog) TableName() string {
@@ -158,17 +158,18 @@ func (ChatLog) TableName() string {
 }
 
 type Conversation struct {
-	OwnerUserId      string    `gorm:"column:owner_user_id;type:varchar(12);not null;primary_key"`
-	ConversationId   string    `gorm:"column:conversation_id;type:varchar(24);not null;primary_key"`
-	ConversationType int32     `gorm:"column:conversation_type;type:tinyint(1);not null"`
-	ConversationName string    `gorm:"column:conversation_name;type:varchar(50)"`
-	UserId           string    `gorm:"column:user_id;type:varchar(12)"`
-	GroupId          string    `gorm:"column:group_id;type:varchar(12)"`
-	MemberCount      int32     `gorm:"column:member_count;type:int(11)"`
-	NoReadCount      int32     `gorm:"column:no_read_count;type:int(11)"`
-	TopType          int32     `gorm:"column:toy_type;type:tinyint(1)"`
-	LastMessage      string    `gorm:"last_message;type:varchar(1024)"`
-	LastMessageTime  time.Time `gorm:"last_message_time;type:datetime"`
+	OwnerUserId      string `gorm:"column:owner_user_id;type:varchar(12);not null;primary_key"`
+	ConversationId   string `gorm:"column:conversation_id;type:varchar(24);not null;primary_key"`
+	ConversationType int32  `gorm:"column:conversation_type;type:tinyint(1);not null"`
+	ConversationName string `gorm:"column:conversation_name;type:varchar(50)"`
+	UserId           string `gorm:"column:user_id;type:varchar(12)"`
+	GroupId          string `gorm:"column:group_id;type:varchar(12)"`
+	MemberCount      int32  `gorm:"column:member_count;type:int(11)"`
+	NoReadCount      int32  `gorm:"column:no_read_count;type:int(11)"`
+	TopType          int32  `gorm:"column:toy_type;type:tinyint(1)"`
+	LastMessage      string `gorm:"column:last_message;type:varchar(1024)"`
+	LastMessageTime  int64  `gorm:"column:last_message_time;type:bigint"`
+	Status           int32  `gorm:"column:status;type:tinyint(1);default:1"`
 	// RecvMsgOpt       int32     `gorm:"column:recv_msg_opt;type:tinyint(1)"`
 }
 

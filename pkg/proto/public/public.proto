@@ -97,15 +97,16 @@ message MsgData {
 }
 
 message ConversationInfo {
-  string OwnerUserId = 1;
-  string ConversationId = 2;
-  int32 ConversationType = 3;
-  string ConversationName = 4;
-  string UserId = 5;
-  string GroupId = 6;
-  int32 MemberCount = 7;
-  int32 NoReadCount = 8;
-  int32 TopType = 9;
-  string LastMessage = 10;
-  int64 LastMessageTime = 11;
+  string ownerUserId = 1;
+  string conversationId = 2;
+  int32 conversationType = 3;
+  string conversationName = 4;
+  string userId = 5;
+  string groupId = 6;
+  int32 memberCount = 7;
+  int32 noReadCount = 8;
+  int32 topType = 9;
+  string lastMessage = 10;
+  int64 lastMessageTime = 11;
+  int32 status = 12;
 }

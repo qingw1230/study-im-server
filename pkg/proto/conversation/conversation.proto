@@ -9,16 +9,16 @@ message GetConversationListReq {
 }
 
 message GetConversationListResp {
-  server_api_params.CommonResp CommonResp = 1;
-  repeated server_api_params.ConversationInfo ConversationList = 2;
+  server_api_params.CommonResp commonResp = 1;
+  repeated server_api_params.ConversationInfo conversationList = 2;
 }
 
 message CreateConversationReq {
-  server_api_params.ConversationInfo ConversationInfo = 1;
+  server_api_params.ConversationInfo conversationInfo = 1;
 }
 
 message CreateConversationResp {
-  server_api_params.CommonResp CommonResp = 1;
+  server_api_params.CommonResp commonResp = 1;
 }
 
 service Conversation {

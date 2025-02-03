@@ -25,6 +25,6 @@ func InsertIntoConversation(toInsertRecord *db.Conversation) error {
 	if err != nil {
 		return err
 	}
-	toInsertRecord.LastMessageTime = time.Now()
+	toInsertRecord.LastMessageTime = time.Now().Unix()
 	return dbConn.Table(constant.DBTableConversation).Create(toInsertRecord).Error
 }
