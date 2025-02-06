@@ -47,10 +47,12 @@ services:
     container_name: im-mongo
     ports:
       - "37017:27017"
+    command: ["/bin/bash", "-c", "/docker-entrypoint-initdb.d/mongo-init.sh || true; docker-entrypoint.sh mongod --wiredTigerCacheSizeGB 1 --auth"]
     volumes:
       - "../components/mongodb/data/db:/data/db"
       - "../components/mongodb/data/logs:/data/logs"
       - "../components/mongodb/data/conf:/etc/mongo"
+      - "./script/mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro"
     environment:
       TZ: Asia/Shanghai
       wiredTigerCacheSizeGB: 1
@@ -85,7 +87,6 @@ services:
     ports:
       - "19094:9094"
     volumes:
-      - ./scripts/create-topic.sh:/opt/bitnami/kafka/create-topic.sh
       - "../components/kafka:/bitnami/kafka"
     command: >
       bash -c "/opt/bitnami/scripts/kafka/run.sh & sleep 5; /opt/bitnami/kafka/create-topic.sh; wait"

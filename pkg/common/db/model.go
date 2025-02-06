@@ -26,14 +26,14 @@ func key(dbAddress, dbName string) string {
 func init() {
 	initMySQLDB()
 
-	var mongoClient *mongo.Client
-	uri := fmt.Sprintf("mongodb://%s:%s@%s/%s/?maxPoolSize=%d",
-		config.Config.Mongo.DBUserName,
-		config.Config.Mongo.DBPassword,
-		config.Config.Mongo.DBAddress[0],
-		config.Config.Mongo.DBDatabase,
-		config.Config.Mongo.DBMaxPoolSize)
-	mongoClient, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+	uri := fmt.Sprintf("mongodb://%s/%s?maxPoolSize=%d", config.Config.Mongo.DBAddress[0], config.Config.Mongo.DBDatabase, config.Config.Mongo.DBMaxPoolSize)
+	clientOpts := options.Client().ApplyURI(uri)
+	clientOpts.Auth = &options.Credential{
+		Username:   config.Config.Mongo.DBUserName,
+		Password:   config.Config.Mongo.DBPassword,
+		AuthSource: "admin",
+	}
+	mongoClient, err := mongo.Connect(context.TODO(), clientOpts)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -43,9 +43,9 @@ func init() {
 		Dial: func() (redis.Conn, error) {
 			return redis.Dial(
 				"tcp",
-				"127.0.0.1:16379",
+				config.Config.Redis.DBAddress,
 				redis.DialDatabase(0),
-				redis.DialPassword("qin1002."),
+				redis.DialPassword(config.Config.Redis.DBPassword),
 			)
 		},
 	}
