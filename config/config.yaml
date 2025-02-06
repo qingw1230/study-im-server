@@ -42,10 +42,6 @@ longconnsvr:
   websocketTimeout: 1000
 
 #--------------- Infrastructure configuration ---------------#
-zookeeper:
-  zkSchema: studyim
-  zkAddr: [ 127.0.0.1:12181 ]
-
 etcd:
   etcdSchema: studyim
   etcdAddr: [ 127.0.0.1:12379 ]
@@ -58,6 +54,8 @@ mysql:
 
 mongo:
   dbAddress: [ 127.0.0.1:37017 ]
+  dbMongoUserName: root
+  dbMongoPassword: qin1002.
   dbDirect: false
   dbTimeout: 10
   dbDatabase: studyIM
@@ -71,11 +69,11 @@ redis:
 
 kafka:
   ws2mschat:
-    addr: [ 127.0.0.1:9092 ]
-    topic: "ws2ms_chat"
+    addr: [ 127.0.0.1:19094 ]
+    topic: "offlineMsgToMongoMysql"
   ms2pschat:
-    addr: [ 127.0.0.1:9092 ]
-    topic: "ms2ps_chat"
+    addr: [ 127.0.0.1:19094 ]
+    topic: "msgToPush"
   consumergroupid:
     msgToMongo: mongo
     msgToMySql: mysql

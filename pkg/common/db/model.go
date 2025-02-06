@@ -27,7 +27,12 @@ func init() {
 	initMySQLDB()
 
 	var mongoClient *mongo.Client
-	uri := fmt.Sprintf("mongodb://%s/%s/?maxPoolSize=%d", config.Config.Mongo.DBAddress[0], config.Config.Mongo.DBDatabase, config.Config.Mongo.DBMaxPoolSize)
+	uri := fmt.Sprintf("mongodb://%s:%s@%s/%s/?maxPoolSize=%d",
+		config.Config.Mongo.DBUserName,
+		config.Config.Mongo.DBPassword,
+		config.Config.Mongo.DBAddress[0],
+		config.Config.Mongo.DBDatabase,
+		config.Config.Mongo.DBMaxPoolSize)
 	mongoClient, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
 	if err != nil {
 		panic(err.Error())

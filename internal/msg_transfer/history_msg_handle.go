@@ -3,7 +3,7 @@ package msg_transfer
 import (
 	"context"
 
-	"github.com/Shopify/sarama"
+	"github.com/IBM/sarama"
 	"github.com/qingw1230/study-im-server/pkg/common/config"
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/kafka"
@@ -24,7 +24,7 @@ func (hc *HistoryConsumerHandler) Init() {
 	hc.msgHandle[config.Config.Kafka.Ws2mschat.Topic] = hc.handleChatWs2Mongo
 	hc.historyConsumerGroup = kafka.NewMyConsumerGroup(
 		&kafka.MyConsumerGroupConfig{
-			KafkaVersion:   sarama.V0_10_2_0,
+			KafkaVersion:   sarama.V3_5_1_0,
 			OffsetsInitial: sarama.OffsetNewest,
 			IsReturnErr:    false,
 		},

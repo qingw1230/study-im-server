@@ -62,11 +62,6 @@ type config struct {
 		WebsocketTimeout    int   `yaml:"websocketTimeout"`
 	} `yaml:"longconnsvr"`
 
-	Zookeeper struct {
-		ZKSchema string   `yaml:"zkSchema"`
-		ZKAddr   []string `yaml:"zkAddr"`
-	} `yaml:"zookeeper"`
-
 	Etcd struct {
 		EtcdSchema string   `yaml:"etcdSchema"`
 		EtcdAddr   []string `yaml:"etcdAddr"`
@@ -81,6 +76,8 @@ type config struct {
 
 	Mongo struct {
 		DBAddress           []string `yaml:"dbAddress"`
+		DBUserName          string   `yaml:"dbMongoUserName"`
+		DBPassword          string   `yaml:"dbMongoPassword"`
 		DBDirect            bool     `yaml:"dbDirect"`
 		DBTimeout           int      `yaml:"dbTimeout"`
 		DBDatabase          string   `yaml:"dbDatabase"`

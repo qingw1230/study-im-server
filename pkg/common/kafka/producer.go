@@ -1,7 +1,7 @@
 package kafka
 
 import (
-	"github.com/Shopify/sarama"
+	"github.com/IBM/sarama"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	"google.golang.org/protobuf/proto"
 )

@@ -1,7 +1,7 @@
 package msg_transfer
 
 import (
-	"github.com/Shopify/sarama"
+	"github.com/IBM/sarama"
 	"github.com/qingw1230/study-im-server/pkg/common/config"
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/db/controller"
@@ -23,7 +23,7 @@ func (pc *PersistentConsumerHandler) Init() {
 	pc.msgHandle[config.Config.Kafka.Ws2mschat.Topic] = pc.handleChatWs2Mysql
 	pc.persistentConsumerGroup = kafka.NewMyConsumerGroup(
 		&kafka.MyConsumerGroupConfig{
-			KafkaVersion:   sarama.V0_10_2_0,
+			KafkaVersion:   sarama.V3_5_1_0,
 			OffsetsInitial: sarama.OffsetNewest,
 			IsReturnErr:    false,
 		},

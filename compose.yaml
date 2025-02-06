@@ -1,66 +1,118 @@
+networks:
+  server:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.28.0.0/16"
+          gateway: "172.28.0.1"
+
 services:
   mysql:
     image: mysql:5.7
-    container_name: mysql
+    container_name: im-mysql
     ports:
-      - 13306:3306
+      - "13306:3306"
     volumes:
-      - "/etc/localtime:/etc/localtime"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "../components/mysql/data:/var/lib/mysql"
     environment:
+      TZ: Asia/Shanghai
       MYSQL_ROOT_PASSWORD: qin1002.
     restart: always
-
-  mongodb:
-    image: mongo:4.0
-    container_name: mongo
-    ports:
-      - "37017:27017"
-    restart: always
+    networks:
+      server: 
+        ipv4_address: "172.28.0.2"
 
   redis:
-    image: redis:5.0.7
-    container_name: redis
+    image: redis:7.0.0
+    container_name: im-redis
     ports:
       - "16379:6379"
+    volumes:
+      - "../components/redis/data:/data"
+      - "../components/redis/config/redis.conf:/usr/local/redis/config/redis.conf"
     environment:
       TZ: Asia/Shanghai
     restart: always
     sysctls:
       net.core.somaxconn: 1024
     command: redis-server --requirepass qin1002. --appendonly yes
+    networks:
+      server:
+        ipv4_address: "172.28.0.3"
+
+  mongodb:
+    image: mongo:6.0.2
+    container_name: im-mongo
+    ports:
+      - "37017:27017"
+    volumes:
+      - "../components/mongodb/data/db:/data/db"
+      - "../components/mongodb/data/logs:/data/logs"
+      - "../components/mongodb/data/conf:/etc/mongo"
+    environment:
+      TZ: Asia/Shanghai
+      wiredTigerCacheSizeGB: 1
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: qin1002.
+      MONGO_INITDB_DATABASE: studyIM
+    restart: always
+    networks:
+      server:
+        ipv4_address: "172.28.0.4"
 
   zookeeper:
-    image: wurstmeister/zookeeper
-    container_name: zookeeper
+    image: bitnami/zookeeper:3.8
+    container_name: im-zookeeper
     ports:
-      - "12181:2181"
+     - "12181:2181"
     volumes:
-      - "/etc/localtime:/etc/localtime"
+      - "/etc/localtime:/etc/localtime:ro"
     environment:
+      TZ: Asia/Shanghai
       ALLOW_ANONYMOUS_LOGIN: yes
-      TZ: Asia/Shanghai
     restart: always
-  
+    networks:
+      server:
+        ipv4_address: "172.28.0.6"
+
   kafka:
-    image: wurstmeister/kafka
-    container_name: kafka
-    environment:
-      TZ: Asia/Shanghai
-      KAFKA_BROKER_ID: 0
-      KAFKA_ZOOKEEPER_CONNECT: 127.0.0.1:12181/kafka
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://172.23.137.168:9092
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+    image: bitnami/kafka:3.5.1
+    container_name: im-kafka
     restart: always
-    network_mode: "host"
+    user: root
+    ports:
+      - "19094:9094"
+    volumes:
+      - ./scripts/create-topic.sh:/opt/bitnami/kafka/create-topic.sh
+      - "../components/kafka:/bitnami/kafka"
+    command: >
+      bash -c "/opt/bitnami/scripts/kafka/run.sh & sleep 5; /opt/bitnami/kafka/create-topic.sh; wait"
+    environment:
+       TZ: Asia/Shanghai
+       KAFKA_CFG_NODE_ID: 0
+       KAFKA_CFG_PROCESS_ROLES: controller,broker
+       KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@im-kafka:9093
+       KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+       KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://im-kafka:9092,EXTERNAL://127.0.0.1:19094
+       KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+       KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
     depends_on:
       - zookeeper
+    networks:
+      server:
+        ipv4_address: "172.28.0.5"
 
   etcd:
     image: bitnami/etcd:3.5
-    container_name: etcd
+    container_name: im-etcd
     ports:
       - "12379:2379"
     privileged: true
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
     restart: always
+    networks:
+      server:
+        ipv4_address: "172.28.0.7"
