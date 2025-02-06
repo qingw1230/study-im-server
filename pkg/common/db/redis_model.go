@@ -8,10 +8,9 @@ const (
 	redisTimeOneMintue = 60
 	redisTimeOneDay    = 60 * 60 * 24
 
-	checkCode                     = "STUDYIM:CHECK_CODE:"
-	userIdTokenStatus             = "STUDYIM:USER_ID_TOKEN_STATUS:"
-	userIncrSeq                   = "STUDYIM:USER_INCR_SEQ:"
-	conversationReceiveMessageOpt = "STUDYIM:CON_RECV_MSG_OPT:"
+	checkCode         = "STUDYIM:CHECK_CODE:"
+	userIdTokenStatus = "STUDYIM:USER_ID_TOKEN_STATUS:"
+	userIncrSeq       = "STUDYIM:USER_INCR_SEQ:"
 )
 
 func (d *DataBases) Exec(cmd string, key interface{}, args ...interface{}) (interface{}, error) {
@@ -56,6 +55,12 @@ func (d *DataBases) GetUserMaxSeq(userId string) (uint64, error) {
 	return redis.Uint64(d.Exec("GET", key))
 }
 
+func (d *DataBases) SetUserSeq(userId string, seq uint64) error {
+	key := userIncrSeq + userId
+	_, err := d.Exec("SET", key, seq)
+	return err
+}
+
 // AddTokenFlag 添加用户 token
 func (d *DataBases) AddTokenFlag(userId string, token string, flag int) error {
 	key := userIdTokenStatus + userId
@@ -73,15 +78,4 @@ func (d *DataBases) DeleteTokenByUid(userId string, fields []string) error {
 	key := userIdTokenStatus + userId
 	_, err := d.Exec("HDEL", key, redis.Args{}.Add().AddFlat(fields)...)
 	return err
-}
-
-func (d *DataBases) SetSingleConversationMsgOpt(userId, conversationId string, opt int) error {
-	key := conversationReceiveMessageOpt + userId
-	_, err := d.Exec("HSET", key, conversationId, opt)
-	return err
-}
-
-func (d *DataBases) GetSingleConversationMsgOpt(userId, conversationId string) (int, error) {
-	key := conversationReceiveMessageOpt + userId
-	return redis.Int(d.Exec("HGET", key, conversationId))
 }
