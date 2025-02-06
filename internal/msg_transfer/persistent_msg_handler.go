@@ -20,15 +20,15 @@ type PersistentConsumerHandler struct {
 
 func (pc *PersistentConsumerHandler) Init() {
 	pc.msgHandle = make(map[string]fcb)
-	pc.msgHandle[config.Config.Kafka.Ws2mschat.Topic] = pc.handleChatWs2Mysql
+	pc.msgHandle[config.Config.Kafka.OfflineMsgToMongoMysql.Topic] = pc.handleChatWs2Mysql
 	pc.persistentConsumerGroup = kafka.NewMyConsumerGroup(
 		&kafka.MyConsumerGroupConfig{
 			KafkaVersion:   sarama.V3_5_1_0,
 			OffsetsInitial: sarama.OffsetNewest,
 			IsReturnErr:    false,
 		},
-		[]string{config.Config.Kafka.Ws2mschat.Topic},
-		config.Config.Kafka.Ws2mschat.Addr,
+		[]string{config.Config.Kafka.OfflineMsgToMongoMysql.Topic},
+		config.Config.Kafka.OfflineMsgToMongoMysql.Addr,
 		config.Config.Kafka.ConsumerGroupId.MsgToMySql,
 	)
 }

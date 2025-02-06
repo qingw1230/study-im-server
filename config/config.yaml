@@ -68,10 +68,10 @@ redis:
   dbPassword: qin1002. 
 
 kafka:
-  ws2mschat:
+  offlineMsgToMongoMysql:
     addr: [ 127.0.0.1:19094 ]
     topic: "offlineMsgToMongoMysql"
-  ms2pschat:
+  msgToPush:
     addr: [ 127.0.0.1:19094 ]
     topic: "msgToPush"
   consumergroupid:

@@ -7,8 +7,10 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/proto/public"
 )
 
+const topic = "test-kafka"
+
 func TestSendMessage(t *testing.T) {
-	p := NewKafkaProducer(config.Config.Kafka.Ws2mschat.Addr, config.Config.Kafka.Ws2mschat.Topic)
+	p := NewKafkaProducer(config.Config.Kafka.OfflineMsgToMongoMysql.Addr, topic)
 	msg := &public.CommonResp{
 		Status: "success",
 		Info:   "成功",

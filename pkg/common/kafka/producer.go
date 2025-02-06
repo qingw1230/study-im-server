@@ -14,7 +14,6 @@ type Producer struct {
 }
 
 func NewKafkaProducer(addr []string, topic string) *Producer {
-	log.Debug("call NewKafkaProducer")
 	p := &Producer{
 		topic: topic,
 		addr:  addr,
@@ -31,7 +30,6 @@ func NewKafkaProducer(addr []string, topic string) *Producer {
 		panic(err.Error())
 	}
 	p.producer = producer
-	log.Debug("NewKafkaProducer return")
 	return p
 }
 

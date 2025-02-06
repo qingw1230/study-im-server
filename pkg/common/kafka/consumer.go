@@ -1,14 +1,11 @@
 package kafka
 
 import (
-	"sync"
-
 	"github.com/IBM/sarama"
 )
 
 type Consumer struct {
 	addr          []string
-	WG            sync.WaitGroup
 	Topic         string
 	PartitionList []int32
 	Consumer      sarama.Consumer

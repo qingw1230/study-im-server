@@ -31,7 +31,7 @@ func NewMsgServer(port int) *msgServer {
 		etcdSchema:      config.Config.Etcd.EtcdSchema,
 		etcdAddr:        config.Config.Etcd.EtcdAddr,
 	}
-	rpc.producer = kafka.NewKafkaProducer(config.Config.Kafka.Ws2mschat.Addr, config.Config.Kafka.Ws2mschat.Topic)
+	rpc.producer = kafka.NewKafkaProducer(config.Config.Kafka.OfflineMsgToMongoMysql.Addr, config.Config.Kafka.OfflineMsgToMongoMysql.Topic)
 	return rpc
 }
 

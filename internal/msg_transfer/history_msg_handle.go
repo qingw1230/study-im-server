@@ -21,15 +21,15 @@ type HistoryConsumerHandler struct {
 
 func (hc *HistoryConsumerHandler) Init() {
 	hc.msgHandle = make(map[string]fcb)
-	hc.msgHandle[config.Config.Kafka.Ws2mschat.Topic] = hc.handleChatWs2Mongo
+	hc.msgHandle[config.Config.Kafka.OfflineMsgToMongoMysql.Topic] = hc.handleChatWs2Mongo
 	hc.historyConsumerGroup = kafka.NewMyConsumerGroup(
 		&kafka.MyConsumerGroupConfig{
 			KafkaVersion:   sarama.V3_5_1_0,
 			OffsetsInitial: sarama.OffsetNewest,
 			IsReturnErr:    false,
 		},
-		[]string{config.Config.Kafka.Ws2mschat.Topic},
-		config.Config.Kafka.Ws2mschat.Addr,
+		[]string{config.Config.Kafka.OfflineMsgToMongoMysql.Topic},
+		config.Config.Kafka.OfflineMsgToMongoMysql.Addr,
 		config.Config.Kafka.ConsumerGroupId.MsgToMongo,
 	)
 }

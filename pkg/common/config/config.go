@@ -92,14 +92,14 @@ type config struct {
 	} `yaml:"redis"`
 
 	Kafka struct {
-		Ws2mschat struct {
+		OfflineMsgToMongoMysql struct {
 			Addr  []string `yaml:"addr"`
 			Topic string   `yaml:"topic"`
-		} `yaml:"ws2mschat"`
-		Ms2pschat struct {
+		} `yaml:"offlineMsgToMongoMysql"`
+		MsgToPush struct {
 			Addr  []string `yaml:"addr"`
 			Topic string   `yaml:"topic"`
-		} `yaml:"ms2pschat"`
+		} `yaml:"msgToPush"`
 		ConsumerGroupId struct {
 			MsgToMongo string `yaml:"msgToMongo"`
 			MsgToMySql string `yaml:"msgToMySql"`
