@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
+	"github.com/qingw1230/study-im-server/pkg/common/db"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	pbMsg "github.com/qingw1230/study-im-server/pkg/proto/msg"
 	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
@@ -29,24 +30,35 @@ func (s *msgServer) SendMsg(_ context.Context, req *pbMsg.SendMsgReq) (*pbMsg.Se
 	switch req.MsgData.SessionType {
 	case constant.SingleChatType:
 		msgToMq.MsgData = req.MsgData
+		seq, err := db.DB.IncrUserSeq(msgToMq.MsgData.RecvId)
+		if err != nil {
+			log.Error("redis IncrUserSeq failed", err.Error(), msgToMq.MsgData.RecvId)
+			return returnMsg(resp, req, constant.Fail, constant.MsgUnknownError, constant.MsgUnknownErrorInfo, msgToMq.MsgData.ServerMsgId, 0, msgToMq.MsgData.SendTime)
+		}
+		msgToMq.MsgData.Seq = uint32(seq)
 		err1 := s.sendMsgToKafka(&msgToMq, msgToMq.MsgData.RecvId)
 		if err1 != nil {
 			log.Error("sendMsgToKafka error", msgToMq.MsgData.RecvId, msgToMq.String())
-			return returnMsg(resp, req, constant.Fail, constant.MsgKafkaSendError, constant.MsgKafkaSendErrorInfo, "", 0)
+			return returnMsg(resp, req, constant.Fail, constant.MsgKafkaSendError, constant.MsgKafkaSendErrorInfo, "", 0, 0)
 		}
 
 		// 给自己发消息，kafka 中只需要存一份
 		if msgToMq.MsgData.SendId != msgToMq.MsgData.RecvId {
+			seq, err = db.DB.IncrUserSeq(msgToMq.MsgData.SendId)
+			if err != nil {
+				log.Error("redis IncrUserSeq failed", err.Error(), msgToMq.MsgData.SendId)
+				return returnMsg(resp, req, constant.Fail, constant.MsgUnknownError, constant.MsgUnknownErrorInfo, msgToMq.MsgData.ServerMsgId, 0, msgToMq.MsgData.SendTime)
+			}
 			err2 := s.sendMsgToKafka(&msgToMq, msgToMq.MsgData.SendId)
 			if err2 != nil {
 				log.Error("sendMsgToKafka error", msgToMq.MsgData.SendId, msgToMq.String())
-				return returnMsg(resp, req, constant.Fail, constant.MsgKafkaSendError, constant.MsgKafkaSendErrorInfo, "", 0)
+				return returnMsg(resp, req, constant.Fail, constant.MsgKafkaSendError, constant.MsgKafkaSendErrorInfo, "", 0, 0)
 			}
 		}
 		log.Info("rpc SendMsg success")
-		return returnMsg(resp, req, constant.Success, constant.NoError, constant.SuccessInfo, msgToMq.MsgData.ServerMsgId, msgToMq.MsgData.SendTime)
+		return returnMsg(resp, req, constant.Success, constant.NoError, constant.SuccessInfo, msgToMq.MsgData.ServerMsgId, uint32(seq), msgToMq.MsgData.SendTime)
 	default:
-		return returnMsg(resp, req, constant.Fail, constant.MsgUnknownError, constant.MsgUnknownErrorInfo, msgToMq.MsgData.ServerMsgId, msgToMq.MsgData.SendTime)
+		return returnMsg(resp, req, constant.Fail, constant.MsgUnknownError, constant.MsgUnknownErrorInfo, msgToMq.MsgData.ServerMsgId, 0, msgToMq.MsgData.SendTime)
 	}
 }
 
@@ -65,10 +77,11 @@ func GetMsgId(sendId string) string {
 	return t + "-" + sendId + "-" + strconv.Itoa(rand.Int())
 }
 
-func returnMsg(resp *pbMsg.SendMsgResp, req *pbMsg.SendMsgReq, status string, code int32, info, serverMsgId string, sendTime int64) (*pbMsg.SendMsgResp, error) {
+func returnMsg(resp *pbMsg.SendMsgResp, req *pbMsg.SendMsgReq, status string, code int32, info, serverMsgId string, seq uint32, sendTime int64) (*pbMsg.SendMsgResp, error) {
 	resp.CommonResp.Status = status
 	resp.CommonResp.Code = code
 	resp.CommonResp.Info = info
+	resp.Seq = seq
 	resp.ServerMsgId = serverMsgId
 	resp.SendTime = sendTime
 	return resp, nil

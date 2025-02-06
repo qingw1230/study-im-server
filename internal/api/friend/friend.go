@@ -120,6 +120,7 @@ func DeleteFriend(c *gin.Context) {
 }
 
 func GetFriendList(c *gin.Context) {
+	log.Info("call api GetFriendList")
 	params := base_info.GetFriendListReq{}
 	if err := c.BindJSON(&params); err != nil {
 		log.Error("BindJSON failed ", err.Error())
@@ -151,6 +152,7 @@ func GetFriendList(c *gin.Context) {
 	copier.Copy(&resp.CommonResp, reply.CommonResp)
 	resp.CommonResp.Data = reply.FriendInfoList
 	c.JSON(http.StatusOK, resp)
+	log.Info("api GetFriendList return")
 }
 
 func GetFriendApplyList(c *gin.Context) {

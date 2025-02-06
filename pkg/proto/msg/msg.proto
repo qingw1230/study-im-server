@@ -40,8 +40,9 @@ message SendMsgReq {
 
 message SendMsgResp {
   server_api_params.CommonResp commonResp = 1;
-  string serverMsgId = 2;
-  int64 sendTime = 3;
+  uint32 seq = 2;
+  string serverMsgId = 3;
+  int64 sendTime = 4;
 }
 
 service Msg {

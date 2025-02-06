@@ -91,6 +91,7 @@ func GetConn(schema string, endpoints []string, serviceName string) *grpc.Client
 	resolverMutex.Lock()
 	resolvers[schema+serviceName] = r
 	resolverMutex.Unlock()
+	log.Info("call GetConn return")
 	return r.grpcClientConn
 }
 

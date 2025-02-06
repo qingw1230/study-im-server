@@ -163,8 +163,7 @@ func (s *friendServer) DeleteFriend(_ context.Context, req *pbFriend.DeleteFrien
 }
 
 func (s *friendServer) GetFriendList(_ context.Context, req *pbFriend.GetFriendListReq) (*pbFriend.GetFriendListResp, error) {
-	log.Info("call GetFriendList args: ", req.String())
-	// 确保有权限
+	log.Info("call rpc GetFriendList args: ", req.String())
 	if !token_verify.CheckAccess(req.CommonId.OpUserId, req.CommonId.FromUserId) {
 		log.Error("CheckAccess false ", req.CommonId.OpUserId, req.CommonId.FromUserId)
 		return &pbFriend.GetFriendListResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
@@ -182,6 +181,7 @@ func (s *friendServer) GetFriendList(_ context.Context, req *pbFriend.GetFriendL
 		cp.FriendDBCopyIM(friendUserInfo, &user)
 		userInfoList = append(userInfoList, friendUserInfo)
 	}
+	log.Info("rpc GetFriendList return")
 	return &pbFriend.GetFriendListResp{
 		CommonResp:     &constant.PBCommonSuccessResp,
 		FriendInfoList: userInfoList,

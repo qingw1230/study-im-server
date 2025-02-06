@@ -60,7 +60,8 @@ func SendMsg(c *gin.Context) {
 	resp := base_info.CommonResp{}
 	copier.Copy(&resp, reply.CommonResp)
 	resp.Data = gin.H{
-		"serverMsgID": reply.ServerMsgId,
+		"seq":         reply.Seq,
+		"serverMsgId": reply.ServerMsgId,
 		"sendTime":    reply.SendTime,
 	}
 	c.JSON(http.StatusOK, resp)
