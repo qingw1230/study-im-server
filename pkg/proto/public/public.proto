@@ -55,24 +55,6 @@ message GroupInfo {
   int32 groupType = 12;
 }
 
-message FriendRequest {
-  string fromUserId = 1;
-  string fromNickName = 2;
-  string fromFaceURL = 3;
-  int32 fromSex = 4;
-  string toUserId = 5;
-  string toNickName = 6;
-  string toFaceURL = 7;
-  int32 toSex = 8;
-  int32 handleResult = 9;
-  string reqMsg = 10;
-  uint32 createTime = 11;
-  string handlerUserId = 12;
-  string handleMsg = 13;
-  uint32 handleTime = 14;
-  string ex = 15;
-}
-
 message UserSendMsgResp {
   string serverMsgId = 1;
   string clientMsgId = 2;
@@ -87,8 +69,8 @@ message MsgData {
   string serverMsgId = 5;     // rpc 设置 timestamp + sendId + randNum
   string senderNickName = 6;
   string senderFaceUrl = 7;
-  int32 sessionType = 8;      // client 设置 Single Group ...
-  int32 msgFrom = 9;          // client 设置 User Sys
+  int32 msgFrom = 8;          // client 设置 User Sys
+  int32 sessionType = 9;      // client 设置 Single Group ...
   int32 contentType = 10;     // client 设置 Text Picture Voice Video File ... 
   string content = 11;        // client 设置
   int64 sendTime = 12;        // rpc 设置 timestamp

@@ -58,6 +58,10 @@ const (
 	WSKickOnlineMsg        = 2002
 	WSDataError            = 3001
 
+	FriendRequestNotification         = 1201 // add_friend
+	FriendRequestApprovedNotification = 1202 // add_friend_response
+	FriendRequestRejectedNotification = 1203 // add_friend_response
+
 	WSNoError    = 0
 	WSNoUserConn = -1
 	WSWriteError = -2

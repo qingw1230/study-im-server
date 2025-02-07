@@ -1,6 +1,9 @@
 package base_info
 
-import "github.com/qingw1230/study-im-server/pkg/proto/public"
+import (
+	"github.com/qingw1230/study-im-server/pkg/proto/friend"
+	"github.com/qingw1230/study-im-server/pkg/proto/public"
+)
 
 type CommonId struct {
 	FromUserId string `json:"fromUserId" binding:"required"`
@@ -49,7 +52,7 @@ type GetFriendApplyListReq struct {
 
 type GetFriendApplyListResp struct {
 	CommonResp
-	FriendRequestList []*public.FriendRequest `json:"-"`
+	FriendRequestList []*friend.FriendRequest `json:"-"`
 }
 
 type AddBlacklistReq struct {

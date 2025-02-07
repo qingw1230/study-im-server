@@ -6,9 +6,11 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/qingw1230/study-im-server/pkg/common/config"
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/db"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
+	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbMsg "github.com/qingw1230/study-im-server/pkg/proto/msg"
 	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
 	"github.com/qingw1230/study-im-server/pkg/utils"
@@ -85,4 +87,38 @@ func returnMsg(resp *pbMsg.SendMsgResp, req *pbMsg.SendMsgReq, status string, co
 	resp.ServerMsgId = serverMsgId
 	resp.SendTime = sendTime
 	return resp, nil
+}
+
+type NotificationMsg struct {
+	SendId      string
+	RecvId      string
+	MsgFrom     int32
+	SessionType int32
+	ContentType int32
+	Content     []byte
+}
+
+func Notification(n *NotificationMsg) {
+	msg := &pbPublic.MsgData{
+		SendId:      n.SendId,
+		RecvId:      n.RecvId,
+		MsgFrom:     n.MsgFrom,
+		SessionType: n.SessionType,
+		ContentType: n.ContentType,
+		Content:     string(n.Content),
+		CreateTime:  time.Now().UnixMilli(),
+	}
+	switch n.SessionType {
+	case constant.GroupChatType:
+		msg.RecvId = ""
+		msg.GroupId = n.RecvId
+	}
+
+	req := &pbMsg.SendMsgReq{MsgData: msg}
+	rpcConn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.OfflineMessageName)
+	client := pbMsg.NewMsgClient(rpcConn)
+	reply, err := client.SendMsg(context.Background(), req)
+	if err != nil || reply.CommonResp.Code != constant.NoError {
+		log.Error("rpc SendMsg failed", err.Error())
+	}
 }

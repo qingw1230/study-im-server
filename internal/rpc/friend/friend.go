@@ -8,6 +8,7 @@ import (
 
 	"github.com/jinzhu/copier"
 	"github.com/jinzhu/gorm"
+	"github.com/qingw1230/study-im-server/internal/rpc/msg"
 	"github.com/qingw1230/study-im-server/pkg/common/config"
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/db"
@@ -37,7 +38,7 @@ func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) 
 	// TODO(qingw1230): 检查是否已是好友
 	// TODO(qingw1230): 检查对方有没有添加自己的记录
 
-	friendRequest := db.FriendRequest{
+	friendRequest := &db.FriendRequest{
 		FromUserId:   req.CommonId.FromUserId,
 		ToUserId:     req.CommonId.ToUserId,
 		ReqMsg:       req.ReqMsg,
@@ -46,17 +47,17 @@ func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) 
 	}
 	_, err := controller.GetFriendRequestByBothUserId(friendRequest.FromUserId, friendRequest.ToUserId)
 	if err == nil {
-		err = controller.UpdateFriendRequest(&friendRequest)
+		err = controller.UpdateFriendRequest(friendRequest)
 	} else {
-		err = controller.InsertFriendRequest(&friendRequest)
+		err = controller.InsertFriendRequest(friendRequest)
 	}
 	if err != nil {
 		log.Error("InsertFriendRequest failed", err.Error(), friendRequest)
 		return &pbFriend.AddFriendResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
 	}
 
+	msg.FriendRequestNotification(req, friendRequest)
 	log.Info("rpc AddFriend return")
-	// TODO(qingw1230): 给被添加方发送通知
 	return &pbFriend.AddFriendResp{CommonResp: &constant.PBCommonSuccessResp}, nil
 }
 
@@ -206,9 +207,9 @@ func (s friendServer) GetFriendApplyList(_ context.Context, req *pbFriend.GetFri
 		return &pbFriend.GetFriendApplyListResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
 	}
 
-	var applyUserList []*pbPublic.FriendRequest
+	var applyUserList []*pbFriend.FriendRequest
 	for _, fr := range friendRequests {
-		var pbFr pbPublic.FriendRequest
+		var pbFr pbFriend.FriendRequest
 		cp.FriendRequestDBCopyIM(&pbFr, &fr)
 		applyUserList = append(applyUserList, &pbFr)
 	}

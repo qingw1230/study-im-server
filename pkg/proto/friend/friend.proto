@@ -49,17 +49,38 @@ message AddBlacklistReq {
   CommonId CommonId = 1;
 }
 
+message FriendRequest {
+  string fromUserId = 1;
+  string fromNickName = 2;
+  string fromFaceURL = 3;
+  string toUserId = 4;
+  string toNickName = 5;
+  string toFaceURL = 6;
+  string reqMsg = 7;
+  int32 handleResult = 8;
+  uint32 createTime = 9;
+  uint32 handleTime = 10;
+}
+
 message GetFriendApplyListReq {
   CommonId CommonId = 1;
 }
 
 message GetFriendApplyListResp {
   server_api_params.CommonResp CommonResp = 1;
-  repeated server_api_params.FriendRequest FriendRequestList = 2;
+  repeated FriendRequest FriendRequestList = 2;
 }
 
 message AddBlacklistResp {
   server_api_params.CommonResp CommonResp = 1;
+}
+
+message FriendRequestTips {
+  string fromUserId = 1;
+  string fromNickName = 2;
+  string fromFaceURL = 3;
+  string toUserId = 4;
+  string reqMsg = 5;
 }
 
 service Friend {
