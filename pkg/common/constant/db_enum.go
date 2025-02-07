@@ -6,6 +6,7 @@ const (
 )
 
 const (
+	FriendRequestDefault = 0
 	FriendResponseAgree  = 1
 	FriendResponseRefuse = -1
 

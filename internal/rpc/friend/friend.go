@@ -30,21 +30,28 @@ func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) 
 	}
 
 	if _, err := controller.GetUserById(req.CommonId.ToUserId); err != nil {
-		return &pbFriend.AddFriendResp{
-			CommonResp: &pbPublic.CommonResp{
-				Status: constant.Fail,
-				Code:   constant.MySQLRecordNotExists,
-				Info:   constant.MySQLAccountNotExistsInfo,
-			},
-		}, nil
+		log.Error("GetUserById failed", err.Error())
+		return &pbFriend.AddFriendResp{CommonResp: &pbPublic.CommonResp{Status: constant.Fail, Code: constant.MySQLRecordNotExists, Info: constant.MySQLAccountNotExistsInfo}}, nil
 	}
 
-	friendRequest := db.FriendRequest{HandleResult: 0}
-	copier.Copy(&friendRequest, req.CommonId)
-	friendRequest.ReqMsg = req.ReqMsg
-	err := controller.InsertFriendApplication(&friendRequest)
+	// TODO(qingw1230): 检查是否已是好友
+	// TODO(qingw1230): 检查对方有没有添加自己的记录
+
+	friendRequest := db.FriendRequest{
+		FromUserId:   req.CommonId.FromUserId,
+		ToUserId:     req.CommonId.ToUserId,
+		ReqMsg:       req.ReqMsg,
+		HandleResult: constant.FriendRequestDefault,
+		CreateTime:   time.Now().UnixMilli(),
+	}
+	_, err := controller.GetFriendRequestByBothUserId(friendRequest.FromUserId, friendRequest.ToUserId)
+	if err == nil {
+		err = controller.UpdateFriendRequest(&friendRequest)
+	} else {
+		err = controller.InsertFriendRequest(&friendRequest)
+	}
 	if err != nil {
-		log.Error("InsertFriendApplication failed ", err.Error(), friendRequest)
+		log.Error("InsertFriendRequest failed", err.Error(), friendRequest)
 		return &pbFriend.AddFriendResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
 	}
 
@@ -61,7 +68,7 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 	}
 
 	// 在同意或拒绝好友申请之前，先检查记录是否存在
-	friendRequest, err := controller.GetFriendApplicationByBothUserId(req.CommonId.FromUserId, req.CommonId.ToUserId)
+	friendRequest, err := controller.GetFriendRequestByBothUserId(req.CommonId.FromUserId, req.CommonId.ToUserId)
 	if err != nil {
 		return &pbFriend.AddFriendResponseResp{
 			CommonResp: &pbPublic.CommonResp{
@@ -74,7 +81,7 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 	friendRequest.HandleResult = req.HandleResult
 	friendRequest.HandleTime = time.Now().UnixMilli()
 	resp := &pbFriend.AddFriendResponseResp{CommonResp: &constant.PBMySQLCommonFailResp}
-	err = controller.UpdateFriendApplication(friendRequest)
+	err = controller.UpdateFriendRequest(friendRequest)
 	if err != nil {
 		return resp, nil
 	}

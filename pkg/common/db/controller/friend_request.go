@@ -21,28 +21,28 @@ func GetReceivedFriendApplicationListByUserId(toUserId string) ([]db.FriendReque
 	return friendRequests, nil
 }
 
-// InsertFriendApplication 插入一条好友申请记录
-func InsertFriendApplication(friendRequest *db.FriendRequest) error {
+// InsertFriendRequest 插入一条好友申请记录
+func InsertFriendRequest(friendRequest *db.FriendRequest) error {
 	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
 	if err != nil {
 		return err
 	}
-	friendRequest.CreateTime = time.Now().UnixMilli()
 	return dbConn.Table(constant.DBTableFriendRequest).Create(friendRequest).Error
 }
 
-func UpdateFriendApplication(friendRequest *db.FriendRequest) error {
+func UpdateFriendRequest(friendRequest *db.FriendRequest) error {
 	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
 	if err != nil {
 		return err
 	}
 	friendRequest.CreateTime = time.Now().UnixMilli()
-	return dbConn.Table(constant.DBTableFriendRequest).Where("from_user_id = ? AND to_user_id = ?", friendRequest.FromUserId, friendRequest.ToUserId).Update(friendRequest).Error
+	return dbConn.Table(constant.DBTableFriendRequest).Where("from_user_id = ? AND to_user_id = ?",
+		friendRequest.FromUserId, friendRequest.ToUserId).Update(friendRequest).Error
 }
 
-// GetFriendApplicationByBothUserId 根据添加方和被添加方的 UserId 获取申请记录
+// GetFriendRequestByBothUserId 根据添加方和被添加方的 UserId 获取申请记录
 // 若找到了返回相应的记录，否则返回错误
-func GetFriendApplicationByBothUserId(fromUserId, toUserId string) (*db.FriendRequest, error) {
+func GetFriendRequestByBothUserId(fromUserId, toUserId string) (*db.FriendRequest, error) {
 	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
 	if err != nil {
 		return nil, err

@@ -31,20 +31,20 @@ func AddFriend(c *gin.Context) {
 		c.JSON(http.StatusOK, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
 		return
 	}
-	req := &pbFriend.AddFriendReq{CommonId: &pbFriend.CommonId{}}
-	copier.Copy(req.CommonId, &params)
+	req := &pbFriend.AddFriendReq{CommonId: &pbFriend.CommonId{
+		OpUserId:   opUserId,
+		FromUserId: params.FromUserId,
+		ToUserId:   params.ToUserId,
+	}}
 	req.ReqMsg = params.ReqMsg
-	req.CommonId.OpUserId = opUserId
 	log.Info("AddFriend args:", req.String())
 
 	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.FriendName)
 	client := pbFriend.NewFriendClient(conn)
 	reply, err := client.AddFriend(context.Background(), req)
 	if err != nil {
-		c.JSON(http.StatusOK, constant.CommonFailResp)
-		return
+		log.Error("call rpc AddFriend failed", err.Error())
 	}
-
 	resp := base_info.AddFriendResp{CommonResp: base_info.CommonResp{}}
 	copier.Copy(&resp.CommonResp, reply.CommonResp)
 	c.JSON(http.StatusOK, resp)
