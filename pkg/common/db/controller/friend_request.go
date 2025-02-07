@@ -5,7 +5,6 @@ import (
 
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/db"
-	"github.com/qingw1230/study-im-server/pkg/utils"
 )
 
 // GetReceivedFriendApplicationListByUserId 查找想要添加我的好友请求
@@ -28,8 +27,7 @@ func InsertFriendApplication(friendRequest *db.FriendRequest) error {
 	if err != nil {
 		return err
 	}
-	friendRequest.CreateTime = time.Now()
-	friendRequest.HandleTime = utils.UnixSecondToTime(0)
+	friendRequest.CreateTime = time.Now().UnixMilli()
 	return dbConn.Table(constant.DBTableFriendRequest).Create(friendRequest).Error
 }
 
@@ -38,7 +36,7 @@ func UpdateFriendApplication(friendRequest *db.FriendRequest) error {
 	if err != nil {
 		return err
 	}
-	friendRequest.CreateTime = time.Now()
+	friendRequest.CreateTime = time.Now().UnixMilli()
 	return dbConn.Table(constant.DBTableFriendRequest).Where("from_user_id = ? AND to_user_id = ?", friendRequest.FromUserId, friendRequest.ToUserId).Update(friendRequest).Error
 }
 

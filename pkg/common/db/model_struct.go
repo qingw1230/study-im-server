@@ -29,18 +29,18 @@ func (User) TableName() string {
 	return constant.DBTableUser
 }
 
-// UserLuckyNumber 靓号表
-type UserLuckyNumber struct {
-	Id     int    `gorm:"column:id;type:int(11) auto_increment;not null;primary_key"`
-	Email  string `gorm:"column:email;type:varchar(50);not null;unique_index:idx_key_email"`
-	UserId string `gorm:"column:user_id;type:varchar(12);not null;unique_index:idx_key_user_id"`
-	Status int    `gorm:"column:status;type:tinyint(1)"`
-	Ex     string `gorm:"column:ex;type:varchar(1024)"`
-}
+// // UserLuckyNumber 靓号表
+// type UserLuckyNumber struct {
+// 	Id     int    `gorm:"column:id;type:int(11) auto_increment;not null;primary_key"`
+// 	Email  string `gorm:"column:email;type:varchar(50);not null;unique_index:idx_key_email"`
+// 	UserId string `gorm:"column:user_id;type:varchar(12);not null;unique_index:idx_key_user_id"`
+// 	Status int    `gorm:"column:status;type:tinyint(1)"`
+// 	Ex     string `gorm:"column:ex;type:varchar(1024)"`
+// }
 
-func (UserLuckyNumber) TableName() string {
-	return constant.DBTableUserLuckyNumber
-}
+// func (UserLuckyNumber) TableName() string {
+// 	return constant.DBTableUserLuckyNumber
+// }
 
 type Friend struct {
 	Id           int       `gorm:"column:id;type:int(11) auto_increment;not null;primary_key"`
@@ -59,16 +59,13 @@ func (Friend) TableName() string {
 
 // FriendRequest 好友申请表
 type FriendRequest struct {
-	RequestId    int       `gorm:"column:request_id;type:int(11) auto_increment;not null;primary_key"`
-	FromUserId   string    `gorm:"column:from_user_id;type:varchar(12);not null;unique_index:idx_key"`
-	ToUserId     string    `gorm:"column:to_user_id;type:varchar(12);not null;unique_index:idx_key"`
-	HandleResult int32     `gorm:"column:handle_result;type:tinyint(1)"`
-	ReqMsg       string    `gorm:"column:req_msg;type:varchar(255)"`
-	CreateTime   time.Time `gorm:"column:create_time;type:datetime"`
-	HandleUserId string    `gorm:"column:handle_user_id;type:varchar(12)"`
-	HandleMsg    string    `gorm:"column:handle_msg;type:varchar(255)"`
-	HandleTime   time.Time `gorm:"column:handle_time;typd:datetime"`
-	Ex           string    `gorm:"column:ex;type:varchar(1024)"`
+	Id           int    `gorm:"column:id;type:int(11) auto_increment;not null;primary_key"`
+	FromUserId   string `gorm:"column:from_user_id;type:varchar(12);not null;unique_index:idx_unique_request;index:idx_from"`
+	ToUserId     string `gorm:"column:to_user_id;type:varchar(12);not null;unique_index:idx_unique_request;index:idx_to"`
+	ReqMsg       string `gorm:"column:req_msg;type:varchar(255)"`
+	HandleResult int32  `gorm:"column:handle_result;type:tinyint(1)"`
+	CreateTime   int64  `gorm:"column:create_time;type:bigint"`
+	HandleTime   int64  `gorm:"column:handle_time;type:bigint"`
 }
 
 func (FriendRequest) TableName() string {
@@ -107,22 +104,22 @@ func (GroupMember) TableName() string {
 	return constant.DBTableGroupMember
 }
 
-type GroupRequest struct {
-	RequestId    int       `gorm:"column:request_id;type:int(11) auto_increment;not null;primary_key"`
-	UserId       string    `gorm:"column:user_id;type:varchar(12);not null;unique_index:idx_key"`
-	GroupId      string    `gorm:"column:group_id;type:varchar(12);not null;unique_index:idx_key"`
-	HandleResult int32     `gorm:"column:handle_result;type:tinyint(1)"`
-	ReqMsg       string    `gorm:"column:req_msg;type:varchar(255)"`
-	CreateTime   time.Time `gorm:"column:create_time;type:datetime"`
-	HandleUserId string    `gorm:"column:handle_user_id;type:varchar(12)"`
-	HandleMsg    string    `gorm:"column:handle_msg;type:varchar(255)"`
-	HandleTime   time.Time `gorm:"column:handle_time;typd:datetime"`
-	Ex           string    `gorm:"column:ex;type:varchar(1024)"`
-}
+// type GroupRequest struct {
+// 	RequestId    int       `gorm:"column:request_id;type:int(11) auto_increment;not null;primary_key"`
+// 	UserId       string    `gorm:"column:user_id;type:varchar(12);not null;unique_index:idx_key"`
+// 	GroupId      string    `gorm:"column:group_id;type:varchar(12);not null;unique_index:idx_key"`
+// 	HandleResult int32     `gorm:"column:handle_result;type:tinyint(1)"`
+// 	ReqMsg       string    `gorm:"column:req_msg;type:varchar(255)"`
+// 	CreateTime   time.Time `gorm:"column:create_time;type:datetime"`
+// 	HandleUserId string    `gorm:"column:handle_user_id;type:varchar(12)"`
+// 	HandleMsg    string    `gorm:"column:handle_msg;type:varchar(255)"`
+// 	HandleTime   time.Time `gorm:"column:handle_time;typd:datetime"`
+// 	Ex           string    `gorm:"column:ex;type:varchar(1024)"`
+// }
 
-func (GroupRequest) TableName() string {
-	return constant.DBTableGroupRequest
-}
+// func (GroupRequest) TableName() string {
+// 	return constant.DBTableGroupRequest
+// }
 
 type Black struct {
 	OwnerUserId string    `gorm:"column:owner_user_id;type:varchar(12);not null;primary_key"`

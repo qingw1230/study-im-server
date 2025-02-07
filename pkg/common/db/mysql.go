@@ -45,12 +45,10 @@ func initMySQLDB() {
 
 	db.AutoMigrate(
 		&User{},
-		&UserLuckyNumber{},
 		&Friend{},
 		&FriendRequest{},
 		&Group{},
 		&GroupMember{},
-		&GroupRequest{},
 		&Black{},
 		&ChatLog{},
 		&Conversation{},

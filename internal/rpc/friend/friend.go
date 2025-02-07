@@ -72,9 +72,7 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 		}, nil
 	}
 	friendRequest.HandleResult = req.HandleResult
-	friendRequest.HandleTime = time.Now()
-	friendRequest.HandleUserId = req.CommonId.OpUserId
-	friendRequest.HandleMsg = req.HandleMsg
+	friendRequest.HandleTime = time.Now().UnixMilli()
 	resp := &pbFriend.AddFriendResponseResp{CommonResp: &constant.PBMySQLCommonFailResp}
 	err = controller.UpdateFriendApplication(friendRequest)
 	if err != nil {
