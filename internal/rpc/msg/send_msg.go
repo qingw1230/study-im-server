@@ -52,6 +52,7 @@ func (s *msgServer) SendMsg(_ context.Context, req *pbMsg.SendMsgReq) (*pbMsg.Se
 				log.Error("redis IncrUserSeq failed", err.Error(), msgToMq.MsgData.SendId)
 				return returnMsg(resp, req, constant.Fail, constant.MsgUnknownError, constant.MsgUnknownErrorInfo, msgToMq.MsgData.ServerMsgId, 0, msgToMq.MsgData.SendTime)
 			}
+			msgToMq.MsgData.Seq = uint32(seq)
 			err2 := s.sendMsgToKafka(&msgToMq, msgToMq.MsgData.SendId)
 			if err2 != nil {
 				log.Error("sendMsgToKafka error", msgToMq.MsgData.SendId, msgToMq.String())
