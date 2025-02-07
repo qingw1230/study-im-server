@@ -1,8 +1,6 @@
 package msg
 
 import (
-	"encoding/json"
-
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	pbFriend "github.com/qingw1230/study-im-server/pkg/proto/friend"
@@ -13,14 +11,9 @@ func friendNotification(commonId *pbFriend.CommonId, contentType int32, m proto.
 	log.Info("call friendNotification args:", commonId, contentType)
 
 	var content []byte
-	var err error
 	switch contentType {
 	case constant.FriendRequestNotification:
-		content, err = json.Marshal(m)
-		if err != nil {
-			log.Error("json.Marshal failed")
-			return
-		}
+		content = []byte(m.(*pbFriend.FriendRequestTips).ReqMsg)
 	default:
 		log.Error("contentType failed", contentType)
 		return
