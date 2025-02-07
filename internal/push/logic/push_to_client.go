@@ -11,7 +11,7 @@ import (
 )
 
 func MsgToUser(req *pbPush.PushMsgReq) {
-	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.OfflineMessageName)
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.OnlineMessageRelayName)
 	client := pbReply.NewOnlineMessageRelayServiceClient(conn)
 	_, err := client.OnlinePushMsg(context.Background(), &pbReply.OnlinePushMsgReq{MsgData: req.MsgData, PushToUserId: req.PushToUserId})
 	if err != nil {
