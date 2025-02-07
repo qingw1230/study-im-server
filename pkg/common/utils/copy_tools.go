@@ -46,7 +46,7 @@ func FriendRequestDBCopyIM(dst *pbFriend.FriendRequest, src *db.FriendRequest) e
 	user, err = controller.GetUserById(src.ToUserId)
 	dst.ToNickName = user.NickName
 	dst.ToFaceURL = user.FaceUrl
-	dst.CreateTime = uint32(src.CreateTime)
-	dst.HandleTime = uint32(src.HandleTime)
+	dst.CreateTime = src.CreateTime
+	dst.HandleTime = src.HandleTime
 	return nil
 }

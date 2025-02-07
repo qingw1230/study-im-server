@@ -47,12 +47,14 @@ type GetFriendListResp struct {
 }
 
 type GetFriendApplyListReq struct {
-	FromUserID string `json:"fromUserId" binding:"required"`
+	UserId     string `json:"userId" binding:"required"`
+	Pagination `json:"pagination"`
 }
 
 type GetFriendApplyListResp struct {
-	CommonResp
+	CommonResp        `json:"commonResp"`
 	FriendRequestList []*friend.FriendRequest `json:"-"`
+	Total             int                     `json:"total"`
 }
 
 type AddBlacklistReq struct {

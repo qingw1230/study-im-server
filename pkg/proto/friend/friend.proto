@@ -58,17 +58,20 @@ message FriendRequest {
   string toFaceURL = 6;
   string reqMsg = 7;
   int32 handleResult = 8;
-  uint32 createTime = 9;
-  uint32 handleTime = 10;
+  int64 createTime = 9;
+  int64 handleTime = 10;
 }
 
 message GetFriendApplyListReq {
-  CommonId CommonId = 1;
+  CommonId commonId = 1;
+  int32 pageNumber = 2;
+  int32 showNumber = 3;
 }
 
 message GetFriendApplyListResp {
-  server_api_params.CommonResp CommonResp = 1;
-  repeated FriendRequest FriendRequestList = 2;
+  server_api_params.CommonResp commonResp = 1;
+  repeated FriendRequest friendRequestList = 2;
+  int64 total = 3;
 }
 
 message AddBlacklistResp {

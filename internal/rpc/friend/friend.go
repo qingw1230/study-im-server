@@ -201,7 +201,8 @@ func (s friendServer) GetFriendApplyList(_ context.Context, req *pbFriend.GetFri
 		return &pbFriend.GetFriendApplyListResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
 	}
 
-	friendRequests, err := controller.GetReceivedFriendApplicationListByUserId(req.CommonId.FromUserId)
+	offset := (req.PageNumber - 1) * req.ShowNumber
+	friendRequests, total, err := controller.GetReceivedFriendRequestList(req.CommonId.FromUserId, int(offset), int(req.ShowNumber))
 	if err != nil {
 		log.Error("GetReceivedFriendApplicationListByUserId failed", err.Error(), req.CommonId.FromUserId)
 		return &pbFriend.GetFriendApplyListResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
@@ -218,6 +219,7 @@ func (s friendServer) GetFriendApplyList(_ context.Context, req *pbFriend.GetFri
 	return &pbFriend.GetFriendApplyListResp{
 		CommonResp:        &constant.PBCommonSuccessResp,
 		FriendRequestList: applyUserList,
+		Total:             int64(total),
 	}, nil
 }
 

@@ -172,9 +172,11 @@ func GetFriendApplyList(c *gin.Context) {
 		return
 	}
 	req := &pbFriend.GetFriendApplyListReq{CommonId: &pbFriend.CommonId{
-		FromUserId: params.FromUserID,
+		FromUserId: params.UserId,
 		OpUserId:   opUserId,
 	}}
+	req.PageNumber = params.PageNumber
+	req.ShowNumber = params.ShowNumber
 	log.Info("GetFriendApplyList args:", req.String())
 
 	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.FriendName)
@@ -189,6 +191,7 @@ func GetFriendApplyList(c *gin.Context) {
 	resp := &base_info.GetFriendApplyListResp{CommonResp: base_info.CommonResp{}}
 	copier.Copy(&resp.CommonResp, reply.CommonResp)
 	resp.CommonResp.Data = reply.FriendRequestList
+	resp.Total = int(reply.Total)
 	c.JSON(http.StatusOK, resp)
 	log.Info("api GetFriendApplyList return")
 }

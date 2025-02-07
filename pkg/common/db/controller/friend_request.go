@@ -7,18 +7,35 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/db"
 )
 
-// GetReceivedFriendApplicationListByUserId 查找想要添加我的好友请求
-func GetReceivedFriendApplicationListByUserId(toUserId string) ([]db.FriendRequest, error) {
+// GetReceivedFriendRequestList 获取想要添加我的好友请求
+func GetReceivedFriendRequestList(toUserId string, offset, limit int) ([]db.FriendRequest, int, error) {
 	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
+
 	var friendRequests []db.FriendRequest
-	err = dbConn.Table(constant.DBTableFriendRequest).Where("to_user_id = ?", toUserId).Find(&friendRequests).Error
+
+	// 查询总记录数
+	var total int
+	err = dbConn.Table(constant.DBTableFriendRequest).
+		Where("to_user_id = ?", toUserId).
+		Count(&total).Error
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return friendRequests, nil
+
+	// 分页查询
+	err = dbConn.Table(constant.DBTableFriendRequest).
+		Where("to_user_id = ?", toUserId).
+		Offset(offset).
+		Limit(limit).
+		Find(&friendRequests).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return friendRequests, total, nil
 }
 
 // InsertFriendRequest 插入一条好友申请记录
