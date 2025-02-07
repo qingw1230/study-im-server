@@ -79,11 +79,7 @@ message AddBlacklistResp {
 }
 
 message FriendRequestTips {
-  string fromUserId = 1;
-  string fromNickName = 2;
-  string fromFaceURL = 3;
-  string toUserId = 4;
-  string reqMsg = 5;
+  string reqMsg = 1;
 }
 
 service Friend {

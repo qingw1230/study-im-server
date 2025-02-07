@@ -9,6 +9,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/config"
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/db"
+	"github.com/qingw1230/study-im-server/pkg/common/db/controller"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbMsg "github.com/qingw1230/study-im-server/pkg/proto/msg"
@@ -112,6 +113,14 @@ func Notification(n *NotificationMsg) {
 	case constant.GroupChatType:
 		msg.RecvId = ""
 		msg.GroupId = n.RecvId
+	}
+	sender, err := controller.GetUserById(msg.SendId)
+	if err != nil {
+		log.Error("GetUserById failed", err.Error(), msg.SendId)
+	}
+	if sender != nil {
+		msg.SenderNickName = sender.NickName
+		msg.SenderFaceUrl = sender.FaceUrl
 	}
 
 	req := &pbMsg.SendMsgReq{MsgData: msg}

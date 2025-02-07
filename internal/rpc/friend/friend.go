@@ -56,7 +56,7 @@ func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) 
 		return &pbFriend.AddFriendResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
 	}
 
-	msg.FriendRequestNotification(req, friendRequest)
+	msg.FriendRequestNotification(req, friendRequest.ReqMsg)
 	log.Info("rpc AddFriend return")
 	return &pbFriend.AddFriendResp{CommonResp: &constant.PBCommonSuccessResp}, nil
 }
