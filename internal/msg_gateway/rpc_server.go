@@ -21,6 +21,8 @@ func (s *gatewayServer) OnlinePushMsg(_ context.Context, req *pbReply.OnlinePush
 	msgBytes, _ := json.Marshal(req.MsgData)
 	mReply := Resp{
 		ReqIdentifier: constant.WSPushMsg,
+		Code:          constant.NoError,
+		Info:          constant.SuccessInfo,
 		Data:          msgBytes,
 	}
 	replyBytes, err := json.Marshal(mReply)
