@@ -8,7 +8,7 @@ import (
 
 	"github.com/jinzhu/copier"
 	"github.com/jinzhu/gorm"
-	"github.com/qingw1230/study-im-server/internal/rpc/msg"
+	rpcMsg "github.com/qingw1230/study-im-server/internal/rpc/msg"
 	"github.com/qingw1230/study-im-server/pkg/common/config"
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/db"
@@ -56,7 +56,7 @@ func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) 
 		return &pbFriend.AddFriendResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
 	}
 
-	msg.FriendRequestNotification(req, friendRequest.ReqMsg)
+	rpcMsg.FriendRequestNotification(req, friendRequest.ReqMsg)
 	log.Info("rpc AddFriend return")
 	return &pbFriend.AddFriendResp{CommonResp: &constant.PBCommonSuccessResp}, nil
 }
@@ -71,13 +71,10 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 	// 在同意或拒绝好友申请之前，先检查记录是否存在
 	friendRequest, err := controller.GetFriendRequestByBothUserId(req.CommonId.FromUserId, req.CommonId.ToUserId)
 	if err != nil {
-		return &pbFriend.AddFriendResponseResp{
-			CommonResp: &pbPublic.CommonResp{
-				Status: constant.Fail,
-				Code:   constant.MySQLRecordNotExists,
-				Info:   constant.MySQLRecordNotExistsInfo,
-			},
-		}, nil
+		log.Error("GetFriendRequestByBothUserId failed", err.Error(), req.CommonId.FromUserId, req.CommonId.ToUserId)
+		return &pbFriend.AddFriendResponseResp{CommonResp: &pbPublic.CommonResp{Status: constant.Fail, Code: constant.MySQLRecordNotExists, Info: constant.MySQLRecordNotExistsInfo}}, nil
+	} else if friendRequest.HandleResult != 0 {
+		return &pbFriend.AddFriendResponseResp{CommonResp: &pbPublic.CommonResp{Status: constant.Fail, Code: constant.MySQLDataAlreadyHandlerError, Info: constant.MySQLDataAlreadyHandlerErrorInfo}}, nil
 	}
 	friendRequest.HandleResult = req.HandleResult
 	friendRequest.HandleTime = time.Now().UnixMilli()
@@ -142,11 +139,12 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 				UserId:           req.CommonId.FromUserId,
 			}
 			controller.InsertIntoConversation(conversationRecord2)
-			// TODO(qingw1230): 向会话添加 ReqMsg
 		}
 	}
 
-	// TODO(qingw1230): 通知或拒绝的通知
+	if req.HandleResult == constant.FriendResponseAgree {
+		rpcMsg.FriendRequestApproveNotification(req, friendRequest)
+	}
 	copier.Copy(resp.CommonResp, &constant.PBCommonSuccessResp)
 	return resp, nil
 }

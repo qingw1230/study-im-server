@@ -25,10 +25,11 @@ const (
 
 // 字符串常量
 const (
-	STR_TOKEN   = "token"
-	STR_SEND_ID = "sendId"
-	STR_SINGLE_ = "single_"
-	STR_GROUP_  = "group_"
+	STR_TOKEN              = "token"
+	STR_SEND_ID            = "sendId"
+	STR_SINGLE_            = "single_"
+	STR_GROUP_             = "group_"
+	ADD_FRIEND_DEFAULT_MSG = "我们已成功添加为好友，现在可以开始聊天啦～"
 )
 
 // token
@@ -57,6 +58,10 @@ const (
 	WSPushMsg              = 2001
 	WSKickOnlineMsg        = 2002
 	WSDataError            = 3001
+
+	// ContentType
+	Text    = 101
+	Picture = 102
 
 	FriendRequestNotification         = 1201 // add_friend
 	FriendRequestApprovedNotification = 1202 // add_friend_response

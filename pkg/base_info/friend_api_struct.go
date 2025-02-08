@@ -21,8 +21,7 @@ type AddFriendResp struct {
 
 type AddFriendResponseReq struct {
 	CommonId
-	HandleResult int32  `json:"handleResult" binding:"required,oneof=-1 0 1"`
-	HandleMsg    string `json:"handleMsg"`
+	HandleResult int32 `json:"handleResult" binding:"required,oneof=-1 0 1"`
 }
 
 type AddFriendResponseResp struct {

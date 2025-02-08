@@ -19,10 +19,11 @@ const (
 	RequestTokenAccessError = 10004
 
 	// MySQL 数据库相关的
-	MySQLCommonError         = 11000
-	MySQLRecordAlreadyExists = 11001
-	MySQLRecordNotExists     = 11002
-	MySQLAccountORPwdError   = 11003
+	MySQLCommonError             = 11000
+	MySQLRecordAlreadyExists     = 11001
+	MySQLRecordNotExists         = 11002
+	MySQLAccountORPwdError       = 11003
+	MySQLDataAlreadyHandlerError = 11004
 
 	// msg 相关的
 	MsgCommonError    = 12000

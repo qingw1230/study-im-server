@@ -20,6 +20,7 @@ const (
 	MySQLEmailAlreadyRegisterErrorInfo = "邮箱已注册"
 	MySQLAccountORPwdErrorInfo         = "账号或密码错误"
 	MySQLAccountNotExistsInfo          = "账号不存在"
+	MySQLDataAlreadyHandlerErrorInfo   = "相应数据已经处理过了"
 
 	MsgCommonErrorInfo    = "msg 通用错误"
 	MsgUnknownErrorInfo   = "未知的 sessionTye"

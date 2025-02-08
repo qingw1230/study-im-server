@@ -21,7 +21,6 @@ message AddFriendResp {
 message AddFriendResponseReq {
   CommonId CommonId = 1;
   int32 HandleResult = 2;
-  string HandleMsg = 3;
 }
 
 message AddFriendResponseResp {
@@ -80,6 +79,10 @@ message AddBlacklistResp {
 
 message FriendRequestTips {
   string reqMsg = 1;
+}
+
+message FriendRequestApprovedTips {
+  string msg = 1;
 }
 
 service Friend {
