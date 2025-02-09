@@ -15,11 +15,14 @@ type SendMsgReq struct {
 	CreateTime     int64  `json:"createTime" binding:"required"`
 }
 
-type SendMsgResp struct {
-	CommonResp
+type SendMsgRespData struct {
 	Seq         uint64 `json:"seq" binding:"required"`
 	ServerMsgId string `json:"serverMsgId" binding:"required"`
 	SendTime    int64  `json:"sendTime" binding:"required"`
+}
+
+type SendMsgResp struct {
+	CommonResp
 }
 
 type UserGetNewestSeqReq struct {
