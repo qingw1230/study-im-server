@@ -29,18 +29,32 @@ func DeleteSingleFriendRelation(ownerUserId, friendUserId string) error {
 		Delete(&db.Friend{}).Error
 }
 
-// GetFriendListByUserId 根据 UserId 获取好友列表
-func GetFriendListByUserId(ownerUserId string) ([]db.Friend, error) {
+// GetFriendList 获取好友列表
+func GetFriendList(ownerUserId string, offset, limit int) ([]db.Friend, int, error) {
 	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
+
 	var friends []db.Friend
-	err = dbConn.Table(constant.DBTableFriend).Where("owner_user_id = ?", ownerUserId).Find(&friends).Error
+
+	var total int
+	err = dbConn.Table(constant.DBTableFriend).
+		Where("owner_user_id = ?", ownerUserId).
+		Count(&total).Error
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return friends, nil
+
+	err = dbConn.Table(constant.DBTableFriend).
+		Where("owner_user_id = ?", ownerUserId).
+		Offset(offset).
+		Limit(limit).
+		Find(&friends).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	return friends, total, nil
 }
 
 // GetFriendRelationFromFriend 从 Friend 表中获取好友关系

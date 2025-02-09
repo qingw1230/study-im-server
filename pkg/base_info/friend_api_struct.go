@@ -2,12 +2,33 @@ package base_info
 
 import (
 	"github.com/qingw1230/study-im-server/pkg/proto/friend"
-	"github.com/qingw1230/study-im-server/pkg/proto/public"
 )
 
 type CommonId struct {
 	FromUserId string `json:"fromUserId" binding:"required"`
 	ToUserId   string `json:"toUserId" binding:"required"`
+}
+
+type GetFriendListReq struct {
+	UserId     string `json:"userId" binding:"required"`
+	Pagination `json:"pagination"`
+}
+
+type GetFriendListResp struct {
+	CommonResp
+	FriendsInfo []*friend.FriendInfo `json:"-"`
+	Total       int                  `json:"total"`
+}
+
+type GetFriendApplyListReq struct {
+	UserId     string `json:"userId" binding:"required"`
+	Pagination `json:"pagination"`
+}
+
+type GetFriendApplyListResp struct {
+	CommonResp        `json:"commonResp"`
+	FriendRequestList []*friend.FriendRequest `json:"-"`
+	Total             int                     `json:"total"`
 }
 
 type AddFriendReq struct {
@@ -34,26 +55,6 @@ type DeleteFriendReq struct {
 
 type DeleteFriendResp struct {
 	CommonResp
-}
-
-type GetFriendListReq struct {
-	FromUserId string `json:"fromUserId" binding:"required"`
-}
-
-type GetFriendListResp struct {
-	CommonResp
-	FriendInfoList []*public.FriendInfo `json:"-"`
-}
-
-type GetFriendApplyListReq struct {
-	UserId     string `json:"userId" binding:"required"`
-	Pagination `json:"pagination"`
-}
-
-type GetFriendApplyListResp struct {
-	CommonResp        `json:"commonResp"`
-	FriendRequestList []*friend.FriendRequest `json:"-"`
-	Total             int                     `json:"total"`
 }
 
 type AddBlacklistReq struct {

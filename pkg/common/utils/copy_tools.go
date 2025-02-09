@@ -8,7 +8,7 @@ import (
 	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
 )
 
-func FriendDBCopyIM(dst *pbPublic.FriendInfo, src *db.Friend) error {
+func FriendDBCopyIM(dst *pbFriend.FriendInfo, src *db.Friend) error {
 	copier.Copy(dst, src)
 	user, err := controller.GetUserById(src.FriendUserId)
 	if err != nil {

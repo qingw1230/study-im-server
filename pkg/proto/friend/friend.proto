@@ -9,6 +9,39 @@ message CommonId {
   string ToUserId = 3;
 }
 
+message FriendInfo {
+  string ownerUserId = 1;
+  string remark = 2;
+  uint32 createTime = 3;
+  server_api_params.PublicUserInfo friendInfo = 4;
+  int32 addSource = 5;
+  string opUserId = 6;
+}
+
+message GetFriendListReq {
+  CommonId CommonId = 1;
+  int32 pageNumber = 2;
+  int32 showNumber = 3;
+}
+
+message GetFriendListResp {
+  server_api_params.CommonResp CommonResp = 1;
+  repeated FriendInfo FriendsInfo = 2;
+  int64 total = 3;
+}
+
+message GetFriendApplyListReq {
+  CommonId commonId = 1;
+  int32 pageNumber = 2;
+  int32 showNumber = 3;
+}
+
+message GetFriendApplyListResp {
+  server_api_params.CommonResp commonResp = 1;
+  repeated FriendRequest friendRequestList = 2;
+  int64 total = 3;
+}
+
 message AddFriendReq {
   CommonId CommonId = 1;
   string ReqMsg = 2;
@@ -35,15 +68,6 @@ message DeleteFriendResp {
   server_api_params.CommonResp CommonResp = 1;
 }
 
-message GetFriendListReq {
-  CommonId CommonId = 1;
-}
-
-message GetFriendListResp {
-  server_api_params.CommonResp CommonResp = 1;
-  repeated server_api_params.FriendInfo FriendInfoList = 2;
-}
-
 message AddBlacklistReq {
   CommonId CommonId = 1;
 }
@@ -59,18 +83,6 @@ message FriendRequest {
   int32 handleResult = 8;
   int64 createTime = 9;
   int64 handleTime = 10;
-}
-
-message GetFriendApplyListReq {
-  CommonId commonId = 1;
-  int32 pageNumber = 2;
-  int32 showNumber = 3;
-}
-
-message GetFriendApplyListResp {
-  server_api_params.CommonResp commonResp = 1;
-  repeated FriendRequest friendRequestList = 2;
-  int64 total = 3;
 }
 
 message AddBlacklistResp {

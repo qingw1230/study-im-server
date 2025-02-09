@@ -15,6 +15,88 @@ import (
 	pbFriend "github.com/qingw1230/study-im-server/pkg/proto/friend"
 )
 
+func GetFriendList(c *gin.Context) {
+	log.Info("call api GetFriendList")
+	params := base_info.GetFriendListReq{}
+	if err := c.BindJSON(&params); err != nil {
+		log.Error("BindJSON failed", err.Error())
+		c.JSON(http.StatusOK, constant.NewBindJSONErrorRespWithInfo(err.Error()))
+		return
+	}
+	log.Info("GetFriendList BindJSON success")
+
+	ok, opUserId := token_verify.GetUserIdFromToken(c.Request.Header.Get(constant.STR_TOKEN))
+	if !ok {
+		log.Error("GetUserIdFromToken failed", c.Request.Header.Get(constant.STR_TOKEN))
+		c.JSON(http.StatusOK, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
+		return
+	}
+	req := &pbFriend.GetFriendListReq{CommonId: &pbFriend.CommonId{
+		FromUserId: params.UserId,
+		OpUserId:   opUserId,
+	}}
+	req.PageNumber = params.PageNumber
+	req.ShowNumber = params.ShowNumber
+	log.Info("GetFriendList args:", req.String())
+
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.FriendName)
+	client := pbFriend.NewFriendClient(conn)
+	reply, err := client.GetFriendList(context.Background(), req)
+	if err != nil {
+		log.Error("GetFriendList failed", err.Error())
+		c.JSON(http.StatusOK, constant.CommonFailResp)
+		return
+	}
+
+	resp := base_info.GetFriendListResp{CommonResp: base_info.CommonResp{}}
+	copier.Copy(&resp.CommonResp, reply.CommonResp)
+	resp.CommonResp.Data = reply.FriendsInfo
+	resp.Total = int(reply.Total)
+	c.JSON(http.StatusOK, resp)
+	log.Info("api GetFriendList return")
+}
+
+func GetFriendApplyList(c *gin.Context) {
+	log.Info("call api GetFriendApplyList")
+	params := base_info.GetFriendApplyListReq{}
+	if err := c.BindJSON(&params); err != nil {
+		log.Error("BindJSON failed", err.Error())
+		c.JSON(http.StatusOK, constant.NewBindJSONErrorRespWithInfo(err.Error()))
+		return
+	}
+	log.Info("GetFriendApplyList BindJSON success")
+
+	ok, opUserId := token_verify.GetUserIdFromToken(c.Request.Header.Get(constant.STR_TOKEN))
+	if !ok {
+		log.Error("GetUserIdFromToken failed", c.Request.Header.Get(constant.STR_TOKEN))
+		c.JSON(http.StatusOK, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
+		return
+	}
+	req := &pbFriend.GetFriendApplyListReq{CommonId: &pbFriend.CommonId{
+		FromUserId: params.UserId,
+		OpUserId:   opUserId,
+	}}
+	req.PageNumber = params.PageNumber
+	req.ShowNumber = params.ShowNumber
+	log.Info("GetFriendApplyList args:", req.String())
+
+	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.FriendName)
+	client := pbFriend.NewFriendClient(conn)
+	reply, err := client.GetFriendApplyList(context.Background(), req)
+	if err != nil {
+		log.Error("GetFriendApplyList failed", err.Error())
+		c.JSON(http.StatusOK, constant.CommonFailResp)
+		return
+	}
+
+	resp := &base_info.GetFriendApplyListResp{CommonResp: base_info.CommonResp{}}
+	copier.Copy(&resp.CommonResp, reply.CommonResp)
+	resp.CommonResp.Data = reply.FriendRequestList
+	resp.Total = int(reply.Total)
+	c.JSON(http.StatusOK, resp)
+	log.Info("api GetFriendApplyList return")
+}
+
 func AddFriend(c *gin.Context) {
 	log.Info("call api AddFriend")
 	params := base_info.AddFriendReq{}
@@ -117,83 +199,6 @@ func DeleteFriend(c *gin.Context) {
 	resp := &base_info.DeleteFriendResp{CommonResp: base_info.CommonResp{}}
 	copier.Copy(resp, reply.CommonResp)
 	c.JSON(http.StatusOK, resp)
-}
-
-func GetFriendList(c *gin.Context) {
-	log.Info("call api GetFriendList")
-	params := base_info.GetFriendListReq{}
-	if err := c.BindJSON(&params); err != nil {
-		log.Error("BindJSON failed ", err.Error())
-		c.JSON(http.StatusOK, constant.NewBindJSONErrorRespWithInfo(err.Error()))
-		return
-	}
-	log.Info("GetFriendList BindJSON success")
-
-	ok, opUserId := token_verify.GetUserIdFromToken(c.Request.Header.Get(constant.STR_TOKEN))
-	if !ok {
-		log.Error("GetUserIdFromToken failed ", c.Request.Header.Get(constant.STR_TOKEN))
-		c.JSON(http.StatusOK, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
-		return
-	}
-	req := &pbFriend.GetFriendListReq{CommonId: &pbFriend.CommonId{}}
-	req.CommonId.FromUserId = params.FromUserId
-	req.CommonId.OpUserId = opUserId
-	log.Info("GetFriendList args: ", req.String())
-
-	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.FriendName)
-	client := pbFriend.NewFriendClient(conn)
-	reply, err := client.GetFriendList(context.Background(), req)
-	if err != nil {
-		c.JSON(http.StatusOK, constant.CommonFailResp)
-		return
-	}
-
-	resp := base_info.GetFriendListResp{CommonResp: base_info.CommonResp{}}
-	copier.Copy(&resp.CommonResp, reply.CommonResp)
-	resp.CommonResp.Data = reply.FriendInfoList
-	c.JSON(http.StatusOK, resp)
-	log.Info("api GetFriendList return")
-}
-
-func GetFriendApplyList(c *gin.Context) {
-	log.Info("call api GetFriendApplyList")
-	params := base_info.GetFriendApplyListReq{}
-	if err := c.BindJSON(&params); err != nil {
-		log.Error("BindJSON failed", err.Error())
-		c.JSON(http.StatusOK, constant.NewBindJSONErrorRespWithInfo(err.Error()))
-		return
-	}
-	log.Info("GetFriendApplyList BindJSON success")
-
-	ok, opUserId := token_verify.GetUserIdFromToken(c.Request.Header.Get(constant.STR_TOKEN))
-	if !ok {
-		log.Error("GetUserIdFromToken failed", c.Request.Header.Get(constant.STR_TOKEN))
-		c.JSON(http.StatusOK, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
-		return
-	}
-	req := &pbFriend.GetFriendApplyListReq{CommonId: &pbFriend.CommonId{
-		FromUserId: params.UserId,
-		OpUserId:   opUserId,
-	}}
-	req.PageNumber = params.PageNumber
-	req.ShowNumber = params.ShowNumber
-	log.Info("GetFriendApplyList args:", req.String())
-
-	conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.FriendName)
-	client := pbFriend.NewFriendClient(conn)
-	reply, err := client.GetFriendApplyList(context.Background(), req)
-	if err != nil {
-		log.Error("AddBlacklist failed", err.Error())
-		c.JSON(http.StatusOK, constant.CommonFailResp)
-		return
-	}
-
-	resp := &base_info.GetFriendApplyListResp{CommonResp: base_info.CommonResp{}}
-	copier.Copy(&resp.CommonResp, reply.CommonResp)
-	resp.CommonResp.Data = reply.FriendRequestList
-	resp.Total = int(reply.Total)
-	c.JSON(http.StatusOK, resp)
-	log.Info("api GetFriendApplyList return")
 }
 
 func AddBlacklist(c *gin.Context) {

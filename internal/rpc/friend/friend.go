@@ -23,6 +23,64 @@ import (
 	"google.golang.org/grpc"
 )
 
+func (s *friendServer) GetFriendList(_ context.Context, req *pbFriend.GetFriendListReq) (*pbFriend.GetFriendListResp, error) {
+	log.Info("call rpc GetFriendList args: ", req.String())
+	if !token_verify.CheckAccess(req.CommonId.OpUserId, req.CommonId.FromUserId) {
+		log.Error("CheckAccess failed", req.CommonId.OpUserId, req.CommonId.FromUserId)
+		return &pbFriend.GetFriendListResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
+	}
+
+	offset := (req.PageNumber - 1) * req.ShowNumber
+	friends, total, err := controller.GetFriendList(req.CommonId.FromUserId, int(offset), int(req.ShowNumber))
+	if err != nil {
+		log.Error("GetFriendList failed", err.Error(), req.CommonId.FromUserId)
+		return &pbFriend.GetFriendListResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
+	}
+
+	var userInfoList []*pbFriend.FriendInfo
+	for _, user := range friends {
+		friendUserInfo := &pbFriend.FriendInfo{FriendInfo: &pbPublic.PublicUserInfo{}}
+		cp.FriendDBCopyIM(friendUserInfo, &user)
+		userInfoList = append(userInfoList, friendUserInfo)
+	}
+
+	log.Info("rpc GetFriendList return")
+	return &pbFriend.GetFriendListResp{
+		CommonResp:  &constant.PBCommonSuccessResp,
+		FriendsInfo: userInfoList,
+		Total:       int64(total),
+	}, nil
+}
+
+func (s friendServer) GetFriendApplyList(_ context.Context, req *pbFriend.GetFriendApplyListReq) (*pbFriend.GetFriendApplyListResp, error) {
+	log.Info("call rpc GetFriendApplyList args:", req.String())
+	if !token_verify.CheckAccess(req.CommonId.OpUserId, req.CommonId.FromUserId) {
+		log.Error("CheckAccess failed", req.CommonId.OpUserId, req.CommonId.FromUserId)
+		return &pbFriend.GetFriendApplyListResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
+	}
+
+	offset := (req.PageNumber - 1) * req.ShowNumber
+	friendRequests, total, err := controller.GetReceivedFriendRequestList(req.CommonId.FromUserId, int(offset), int(req.ShowNumber))
+	if err != nil {
+		log.Error("GetReceivedFriendRequestList failed", err.Error(), req.CommonId.FromUserId)
+		return &pbFriend.GetFriendApplyListResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
+	}
+
+	var applyUserList []*pbFriend.FriendRequest
+	for _, fr := range friendRequests {
+		var pbFr pbFriend.FriendRequest
+		cp.FriendRequestDBCopyIM(&pbFr, &fr)
+		applyUserList = append(applyUserList, &pbFr)
+	}
+
+	log.Info("rpc GetFriendApplyList return")
+	return &pbFriend.GetFriendApplyListResp{
+		CommonResp:        &constant.PBCommonSuccessResp,
+		FriendRequestList: applyUserList,
+		Total:             int64(total),
+	}, nil
+}
+
 func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) (*pbFriend.AddFriendResp, error) {
 	log.Info("call rpc AddFriend args:", req.String())
 	if !token_verify.CheckAccess(req.CommonId.OpUserId, req.CommonId.FromUserId) {
@@ -164,61 +222,6 @@ func (s *friendServer) DeleteFriend(_ context.Context, req *pbFriend.DeleteFrien
 	}
 
 	return &pbFriend.DeleteFriendResp{CommonResp: &constant.PBCommonSuccessResp}, nil
-}
-
-func (s *friendServer) GetFriendList(_ context.Context, req *pbFriend.GetFriendListReq) (*pbFriend.GetFriendListResp, error) {
-	log.Info("call rpc GetFriendList args: ", req.String())
-	if !token_verify.CheckAccess(req.CommonId.OpUserId, req.CommonId.FromUserId) {
-		log.Error("CheckAccess false ", req.CommonId.OpUserId, req.CommonId.FromUserId)
-		return &pbFriend.GetFriendListResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
-	}
-
-	friends, err := controller.GetFriendListByUserId(req.CommonId.FromUserId)
-	if err != nil {
-		log.Error("GetFriendListByUserId failed ", err.Error(), req.CommonId.FromUserId)
-		return &pbFriend.GetFriendListResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
-	}
-
-	var userInfoList []*pbPublic.FriendInfo
-	for _, user := range friends {
-		friendUserInfo := &pbPublic.FriendInfo{FriendInfo: &pbPublic.PublicUserInfo{}}
-		cp.FriendDBCopyIM(friendUserInfo, &user)
-		userInfoList = append(userInfoList, friendUserInfo)
-	}
-	log.Info("rpc GetFriendList return")
-	return &pbFriend.GetFriendListResp{
-		CommonResp:     &constant.PBCommonSuccessResp,
-		FriendInfoList: userInfoList,
-	}, nil
-}
-
-func (s friendServer) GetFriendApplyList(_ context.Context, req *pbFriend.GetFriendApplyListReq) (*pbFriend.GetFriendApplyListResp, error) {
-	log.Info("call rpc GetFriendApplyList args:", req.String())
-	if !token_verify.CheckAccess(req.CommonId.OpUserId, req.CommonId.FromUserId) {
-		log.Error("CheckAccess failed", req.CommonId.OpUserId, req.CommonId.FromUserId)
-		return &pbFriend.GetFriendApplyListResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
-	}
-
-	offset := (req.PageNumber - 1) * req.ShowNumber
-	friendRequests, total, err := controller.GetReceivedFriendRequestList(req.CommonId.FromUserId, int(offset), int(req.ShowNumber))
-	if err != nil {
-		log.Error("GetReceivedFriendApplicationListByUserId failed", err.Error(), req.CommonId.FromUserId)
-		return &pbFriend.GetFriendApplyListResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
-	}
-
-	var applyUserList []*pbFriend.FriendRequest
-	for _, fr := range friendRequests {
-		var pbFr pbFriend.FriendRequest
-		cp.FriendRequestDBCopyIM(&pbFr, &fr)
-		applyUserList = append(applyUserList, &pbFr)
-	}
-
-	log.Info("rpc GetFriendApplyListResp return")
-	return &pbFriend.GetFriendApplyListResp{
-		CommonResp:        &constant.PBCommonSuccessResp,
-		FriendRequestList: applyUserList,
-		Total:             int64(total),
-	}, nil
 }
 
 func (s *friendServer) AddBlacklist(_ context.Context, req *pbFriend.AddBlacklistReq) (*pbFriend.AddBlacklistResp, error) {
