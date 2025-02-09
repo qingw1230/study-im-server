@@ -22,17 +22,17 @@ const (
 
 type UserChat struct {
 	Uid      string
-	Seq      uint32
+	Seq      uint64
 	SendTime int64
 	Msg      []byte // 使用 proto 序列化后的 *pbPublic.MsgData
 }
 
-func (d *DataBases) GetMsgBySeqList(userId string, seqList []uint32) (seqMsg []*pbPublic.MsgData, err error) {
+func (d *DataBases) GetMsgBySeqList(userId string, seqList []uint64) (seqMsg []*pbPublic.MsgData, err error) {
 	ctx, _ := context.WithTimeout(context.Background(), time.Duration(config.Config.Mongo.DBTimeout)*time.Second)
 	c := d.mongoClient.Database(config.Config.Mongo.DBDatabase).Collection(singleChat)
 
-	table := func(userId string, seqList []uint32) map[string][]uint32 {
-		m := make(map[string][]uint32)
+	table := func(userId string, seqList []uint64) map[string][]uint64 {
+		m := make(map[string][]uint64)
 		for _, seq := range seqList {
 			seqUid := getSeqUid(userId, seq)
 			m[seqUid] = append(m[seqUid], seq)
@@ -40,7 +40,7 @@ func (d *DataBases) GetMsgBySeqList(userId string, seqList []uint32) (seqMsg []*
 		return m
 	}(userId, seqList)
 
-	var hasSeqList []uint32
+	var hasSeqList []uint64
 	userChat := UserChat{}
 	for seqUid, groupSeqList := range table {
 		for _, seq := range groupSeqList {
@@ -68,7 +68,7 @@ func (d *DataBases) GetMsgBySeqList(userId string, seqList []uint32) (seqMsg []*
 	return seqMsg, nil
 }
 
-func genExceptionMessageBySeqList(seqList []uint32) (exceptionMsg []*pbPublic.MsgData) {
+func genExceptionMessageBySeqList(seqList []uint64) (exceptionMsg []*pbPublic.MsgData) {
 	for _, seq := range seqList {
 		msg := &pbPublic.MsgData{}
 		msg.Seq = seq
@@ -96,11 +96,11 @@ func (d *DataBases) SaveUserChat(userId string, sendTime int64, m *pbMsg.MsgData
 	return nil
 }
 
-func getSeqUid(userId string, seq uint32) string {
+func getSeqUid(userId string, seq uint64) string {
 	seqSuffix := seq / singleGocMsgNum
 	return indexGen(userId, seqSuffix)
 }
 
-func indexGen(userId string, seqSuffix uint32) string {
+func indexGen(userId string, seqSuffix uint64) string {
 	return userId + ":" + strconv.FormatInt(int64(seqSuffix), 10)
 }

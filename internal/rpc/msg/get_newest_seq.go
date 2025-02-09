@@ -22,6 +22,6 @@ func (s *msgServer) GetNewestSeq(_ context.Context, req *pbMsg.GetNewestSeqReq) 
 		return &pbMsg.GetNewestSeqResp{CommonResp: &constant.PBRedisCommonFailResp}, nil
 	}
 	resp := &pbMsg.GetNewestSeqResp{CommonResp: &constant.PBCommonSuccessResp}
-	resp.NewestSeq = uint32(newestSeq)
+	resp.NewestSeq = newestSeq
 	return resp, nil
 }

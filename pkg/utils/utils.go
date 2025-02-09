@@ -45,9 +45,9 @@ func GetConversationIdBySessionType(sourceId string, sessionType int) string {
 	return ""
 }
 
-func Intersect(slice1, slice2 []uint32) []uint32 {
-	m := make(map[uint32]bool)
-	n := make([]uint32, 0)
+func Intersect(slice1, slice2 []uint64) []uint64 {
+	m := make(map[uint64]bool)
+	n := make([]uint64, 0)
 	for _, v := range slice1 {
 		m[v] = true
 	}
@@ -60,9 +60,9 @@ func Intersect(slice1, slice2 []uint32) []uint32 {
 	return n
 }
 
-func Difference(slice1, slice2 []uint32) []uint32 {
-	m := make(map[uint32]bool)
-	n := make([]uint32, 0)
+func Difference(slice1, slice2 []uint64) []uint64 {
+	m := make(map[uint64]bool)
+	n := make([]uint64, 0)
 	inter := Intersect(slice1, slice2)
 	for _, v := range inter {
 		m[v] = true

@@ -55,18 +55,18 @@ message UserSendMsgResp {
 
 message MsgData {
   string sendId = 1;          // client 设置
-  string recvId = 2;
-  string groupId = 3;
-  uint32 seq = 4;             // transfer 设置
+  string recvId = 2;          // client 设置
+  string groupId = 3;         // client 设置
+  uint64 seq = 4;             // rpc 设置
   string serverMsgId = 5;     // rpc 设置 timestamp + sendId + randNum
-  string senderNickName = 6;
-  string senderFaceUrl = 7;
-  int32 msgFrom = 8;          // client 设置 User Sys
+  string senderNickName = 6;  // client 设置
+  string senderFaceUrl = 7;   // client 设置
   int32 sessionType = 9;      // client 设置 Single Group ...
   int32 contentType = 10;     // client 设置 Text Picture Voice Video File ... 
   string content = 11;        // client 设置
-  int64 sendTime = 12;        // rpc 设置 timestamp
+  int32 msgFrom = 8;          // client 设置 User Sys
   int64 createTime = 13;      // client 设置
+  int64 sendTime = 12;        // rpc 设置 timestamp
   int32 status = 14;
 }
 

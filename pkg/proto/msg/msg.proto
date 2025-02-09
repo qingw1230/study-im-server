@@ -3,27 +3,6 @@ import "public/public.proto";
 package pbMsg;
 option go_package = "github.com/qingw1230/study-im-server/pkg/proto/msg";
 
-message GetNewestSeqReq {
-  string userId = 1;
-  string opUserId = 2;
-}
-
-message GetNewestSeqResp {
-  server_api_params.CommonResp commonResp = 1;
-  uint32 newestSeq = 2;
-}
-
-message PullMessageBySeqListReq {
-  string userId = 1;
-  string opUserId = 2;
-  repeated uint32 seqList = 3;
-}
-
-message PullMessageBySeqListResp {
-  server_api_params.CommonResp commonResp = 1;
-  repeated server_api_params.MsgData list = 2;
-}
-
 message MsgDataToMq {
   string token = 1;
   server_api_params.MsgData msgData = 2;
@@ -40,9 +19,30 @@ message SendMsgReq {
 
 message SendMsgResp {
   server_api_params.CommonResp commonResp = 1;
-  uint32 seq = 2;
+  uint64 seq = 2;
   string serverMsgId = 3;
   int64 sendTime = 4;
+}
+
+message GetNewestSeqReq {
+  string userId = 1;
+  string opUserId = 2;
+}
+
+message GetNewestSeqResp {
+  server_api_params.CommonResp commonResp = 1;
+  uint64 newestSeq = 2;
+}
+
+message PullMessageBySeqListReq {
+  string userId = 1;
+  string opUserId = 2;
+  repeated uint64 seqList = 3;
+}
+
+message PullMessageBySeqListResp {
+  server_api_params.CommonResp commonResp = 1;
+  repeated server_api_params.MsgData list = 2;
 }
 
 service Msg {
