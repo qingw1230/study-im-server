@@ -75,6 +75,12 @@ func (s *groupServer) CreateGroup(_ context.Context, req *pbGroup.CreateGroupReq
 		return &pbGroup.CreateGroupResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
 	}
 
+	err = db.DB.SetSeq(groupId, 0)
+	if err != nil {
+		log.Error("SetSeq failed", err.Error())
+		return &pbGroup.CreateGroupResp{CommonResp: &constant.PBRedisCommonFailResp}, nil
+	}
+
 	var okUserIdList []string
 	for _, user := range req.InitMemberList {
 		us, err := controller.GetUserById(user.UserId)
@@ -215,6 +221,7 @@ func (s *groupServer) GetGroupAllMember(_ context.Context, req *pbGroup.GetGroup
 		resp.MemberList = append(resp.MemberList, &node)
 	}
 	log.Info("rpc GetGroupAllMember return")
+	resp.CommonResp = &constant.PBCommonSuccessResp
 	return &resp, nil
 }
 

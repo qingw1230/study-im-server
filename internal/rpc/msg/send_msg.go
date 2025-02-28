@@ -71,7 +71,7 @@ func (s *msgServer) SendMsg(_ context.Context, req *pbMsg.SendMsgReq) (*pbMsg.Se
 			return returnMsg(resp, req, constant.Fail, reply.CommonResp.Code, reply.CommonResp.Info, msgToMq.MsgData.ServerMsgId, 0, msgToMq.MsgData.SendTime)
 		}
 
-		seq, err := db.DB.IncrSeq(msgToMq.MsgData.GroupId)
+		seq, err := db.DB.IncrSeq(req.MsgData.GroupId)
 		if err != nil {
 			log.Error("redis IncrUserSeq failed", err.Error(), msgToMq.MsgData.SendId)
 			return returnMsg(resp, req, constant.Fail, constant.MsgUnknownError, constant.MsgUnknownErrorInfo, msgToMq.MsgData.ServerMsgId, 0, msgToMq.MsgData.SendTime)
