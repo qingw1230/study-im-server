@@ -7,8 +7,8 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/db"
 )
 
-// InsertIntoGroupMember 插入群成员
-func InsertIntoGroupMember(toInsertInfo *db.GroupMember) error {
+// AddGroupMember 插入群成员
+func AddGroupMember(toInsertInfo *db.GroupMember) error {
 	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
 	if err != nil {
 		return err

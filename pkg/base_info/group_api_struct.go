@@ -1,18 +1,18 @@
 package base_info
 
-import "github.com/qingw1230/study-im-server/pkg/proto/sdkws"
+import (
+	"github.com/qingw1230/study-im-server/pkg/proto/sdkws"
+)
 
 type CreateGroupReq struct {
-	OwnerUserId  string `json:"ownerUserId" binding:"required"`
-	GroupName    string `json:"groupName" binding:"required"`
-	GroupType    int32  `json:"groupType"`
-	FaceUrl      string `json:"faceUrl"`
-	Introduction string `json:"introduction"`
-	Notification string `json:"notification"`
+	MemberList  []GroupAddMemberInfo `json:"memberList"`
+	OwnerUserId string               `json:"ownerUserId" binding:"required"`
+	GroupInfo   sdkws.GroupInfo      `json:"groupInfo" binding:"required"`
 }
 
 type CreateGroupResp struct {
 	CommonResp
+	// GroupInfo sdkws.GroupInfo `json:"-"`
 }
 
 type DeleteGroupReq struct {

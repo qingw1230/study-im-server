@@ -35,16 +35,18 @@ message PublicUserInfo {
 message GroupInfo {
   string groupId = 1;
   string groupName = 2;
-  string faceUrl = 3;
+  string notification = 3;
   string introduction = 4;
-  string notifacation = 5;
+  string faceUrl = 5;
   string ownerUserId = 6;
-  uint32 createTime = 7;
+  int64 createTime = 7;
   uint32 memberCount = 8;
-  string ex = 9;
-  int32 status = 10;
-  string createUserId = 11;
-  int32 groupType = 12;
+  int32 status = 9;
+  string createUserId = 10;
+  int32 groupType = 11;
+  int32 needVerification = 12;
+  int64 notificationUpdateTime = 13;
+  string notificationUserId = 14;
 }
 
 message UserSendMsgResp {

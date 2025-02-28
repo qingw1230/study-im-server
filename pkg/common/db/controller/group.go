@@ -5,15 +5,17 @@ import (
 
 	"github.com/qingw1230/study-im-server/pkg/common/constant"
 	"github.com/qingw1230/study-im-server/pkg/common/db"
+	"github.com/qingw1230/study-im-server/pkg/utils"
 )
 
-// InsertIntoGroup 向 Group 表插入群信息
-func InsertIntoGroup(groupInfo *db.Group) error {
+// CreateGroup 向 Group 表插入群信息
+func CreateGroup(groupInfo *db.Group) error {
 	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
 	if err != nil {
 		return err
 	}
 	groupInfo.CreateTime = time.Now()
+	groupInfo.NotificationUpdateTime = utils.UnixSecondToTime(0)
 	return dbConn.Table(constant.DBTableGroup).Create(groupInfo).Error
 }
 

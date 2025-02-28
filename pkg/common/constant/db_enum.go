@@ -6,12 +6,13 @@ const (
 )
 
 const (
-	FriendRequestDefault = 0
-	FriendResponseAgree  = 1
-	FriendResponseRefuse = -1
+	FriendResponseDefault = 0
+	FriendResponseAgree   = 1
+	FriendResponseRefuse  = -1
 
-	GroupResponseAgree  = 1
-	GroupResponseRefuse = -1
+	GroupResponseDefault = 0
+	GroupResponseAgree   = 1
+	GroupResponseRefuse  = -1
 
 	GroupOrdinaryUser = 1
 	GroupOwner        = 2

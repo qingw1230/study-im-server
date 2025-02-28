@@ -1,6 +1,6 @@
 module github.com/qingw1230/study-im-server
 
-go 1.22.10
+go 1.22
 
 require (
 	github.com/IBM/sarama v1.45.0

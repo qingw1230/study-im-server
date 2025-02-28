@@ -30,7 +30,7 @@ func GroupDBCopyIM(dst *sdkws.GroupInfo, src *db.Group) error {
 	if err != nil {
 		return err
 	}
-	dst.CreateTime = uint32(src.CreateTime.Unix())
+	dst.CreateTime = src.CreateTime.UnixMilli()
 	return nil
 }
 

@@ -33,8 +33,10 @@ func CreateGroup(c *gin.Context) {
 		return
 	}
 	req := &pbGroup.CreateGroupReq{GroupInfo: &sdkws.GroupInfo{}}
-	copier.Copy(req.GroupInfo, &params)
-	req.GroupInfo.CreateUserId = opUserId
+	copier.Copy(req.GroupInfo, &params.GroupInfo)
+	for _, v := range params.MemberList {
+		req.InitMemberList = append(req.InitMemberList, &pbGroup.GroupAddMemberInfo{UserId: v.UserId, RoleLevel: v.RoleLevel})
+	}
 	req.OpUserId = opUserId
 	req.OwnerUserId = params.OwnerUserId
 	log.Info("CreateGroup args:", req.String())
@@ -50,6 +52,9 @@ func CreateGroup(c *gin.Context) {
 
 	resp := base_info.CreateGroupResp{CommonResp: base_info.CommonResp{}}
 	copier.Copy(&resp.CommonResp, reply.CommonResp)
+	if reply.CommonResp.Code == constant.NoError {
+		resp.CommonResp.Data = reply.GroupInfo
+	}
 	c.JSON(http.StatusOK, resp)
 	log.Info("api CreateGroup return")
 }

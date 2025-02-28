@@ -29,19 +29,6 @@ func (User) TableName() string {
 	return constant.DBTableUser
 }
 
-// // UserLuckyNumber 靓号表
-// type UserLuckyNumber struct {
-// 	Id     int    `gorm:"column:id;type:int(11) auto_increment;not null;primary_key"`
-// 	Email  string `gorm:"column:email;type:varchar(50);not null;unique_index:idx_key_email"`
-// 	UserId string `gorm:"column:user_id;type:varchar(12);not null;unique_index:idx_key_user_id"`
-// 	Status int    `gorm:"column:status;type:tinyint(1)"`
-// 	Ex     string `gorm:"column:ex;type:varchar(1024)"`
-// }
-
-// func (UserLuckyNumber) TableName() string {
-// 	return constant.DBTableUserLuckyNumber
-// }
-
 type Friend struct {
 	Id           int       `gorm:"column:id;type:int(11) auto_increment;not null;primary_key"`
 	OwnerUserId  string    `gorm:"column:owner_user_id;type:varchar(12);not null;unique_index:idx_key"`
@@ -92,14 +79,16 @@ func (Group) TableName() string {
 }
 
 type GroupMember struct {
-	GroupId    string    `gorm:"column:group_id;type:varchar(12);not null;primary_key"`
-	UserId     string    `gorm:"column:user_id;type:varchar(12);not null;primary_key"`
-	NickName   string    `gorm:"column:nick_name;type:varchar(20)"`
-	FaceUrl    string    `gorm:"column:face_url;type:varchar(255)"`
-	RoleLevel  int32     `gorm:"column:role_level;type:tinyint(1)"`
-	JoinTime   time.Time `gorm:"column:join_time;type:datetime"`
-	JoinSource int32     `gorm:"column:join_source;type:tinyint(1)"`
-	Ex         string    `gorm:"column:ex;type:varchar(1024)"`
+	GroupId        string    `gorm:"column:group_id;type:varchar(12);not null;primary_key"`
+	UserId         string    `gorm:"column:user_id;type:varchar(12);not null;primary_key"`
+	NickName       string    `gorm:"column:nick_name;type:varchar(20)"`
+	FaceUrl        string    `gorm:"column:face_url;type:varchar(255)"`
+	RoleLevel      int32     `gorm:"column:role_level;type:tinyint"`
+	JoinTime       time.Time `gorm:"column:join_time;type:datetime"`
+	JoinSource     int32     `gorm:"column:join_source;type:tinyint"`
+	InviterUserId  string    `gorm:"column:inviter_user_id;type:varchar(12)"`
+	OperatorUserId string    `gorm:"column:operator_user_id;type:varchar(12)"`
+	// MuteEndTime    time.Time
 }
 
 func (GroupMember) TableName() string {

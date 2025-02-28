@@ -100,7 +100,7 @@ func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) 
 		FromUserId:   req.CommonId.FromUserId,
 		ToUserId:     req.CommonId.ToUserId,
 		ReqMsg:       req.ReqMsg,
-		HandleResult: constant.FriendRequestDefault,
+		HandleResult: constant.FriendResponseDefault,
 		CreateTime:   time.Now().UnixMilli(),
 	}
 	_, err := controller.GetFriendRequestByBothUserId(friendRequest.FromUserId, friendRequest.ToUserId)

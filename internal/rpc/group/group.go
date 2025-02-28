@@ -21,16 +21,16 @@ import (
 )
 
 func (s *groupServer) CreateGroup(_ context.Context, req *pbGroup.CreateGroupReq) (*pbGroup.CreateGroupResp, error) {
-	log.Info("call CreateGroup args: ", req.String())
-	if !token_verify.CheckAccess(req.OpUserId, req.GroupInfo.CreateUserId) {
-		log.Error("CheckAccess failed", req.OpUserId, req.GroupInfo.CreateUserId)
+	log.Info("call CreateGroup args:", req.String())
+	if !token_verify.CheckAccess(req.OpUserId, req.OwnerUserId) {
+		log.Error("CheckAccess failed", req.OpUserId, req.OwnerUserId)
 		return &pbGroup.CreateGroupResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
 	}
 
 	// 确保群主存在
 	groupOwnerInfo, err := controller.GetUserById(req.OwnerUserId)
 	if err != nil {
-		log.Error("FindUserById failed ", err.Error(), req.OwnerUserId)
+		log.Error("GetUserById failed", err.Error(), req.OwnerUserId)
 		return &pbGroup.CreateGroupResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
 	}
 
@@ -38,27 +38,70 @@ func (s *groupServer) CreateGroup(_ context.Context, req *pbGroup.CreateGroupReq
 	groupId := utils.GenerateGroupId()
 	groupInfo := &db.Group{}
 	copier.Copy(groupInfo, req.GroupInfo)
+	groupInfo.CreateUserId = req.OpUserId
 	groupInfo.GroupId = groupId
 	// 创建群信息
-	err = controller.InsertIntoGroup(groupInfo)
+	err = controller.CreateGroup(groupInfo)
 	if err != nil {
-		log.Error("InsertToGroup failed ", err.Error(), groupInfo)
+		log.Error("InsertIntoGroup failed", err.Error(), groupInfo)
 		return &pbGroup.CreateGroupResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
 	}
 
+	// 添加群成员
 	groupMember := &db.GroupMember{
-		GroupId:   groupId,
-		RoleLevel: constant.GroupOwner,
+		GroupId:        groupId,
+		RoleLevel:      constant.GroupOwner,
+		InviterUserId:  req.OpUserId,
+		OperatorUserId: req.OpUserId,
 	}
 	copier.Copy(groupMember, groupOwnerInfo)
-	err = controller.InsertIntoGroupMember(groupMember)
+	err = controller.AddGroupMember(groupMember)
 	if err != nil {
-		log.Error("InsertIntoGroupMember failed ", err.Error(), groupInfo)
+		log.Error("AddGroupMember failed", err.Error(), groupInfo)
 		return &pbGroup.CreateGroupResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
 	}
 
-	log.Info("rpc CreateGroup return ", req.String())
-	return &pbGroup.CreateGroupResp{CommonResp: &constant.PBCommonSuccessResp}, nil
+	var okUserIdList []string
+	for _, user := range req.InitMemberList {
+		us, err := controller.GetUserById(user.UserId)
+		if err != nil {
+			log.Error("GetUserById failed", err.Error(), user.UserId)
+			continue
+		}
+		if user.RoleLevel == constant.GroupOwner {
+			log.Error("only one owner", user)
+			continue
+		}
+		groupMember.RoleLevel = user.RoleLevel
+		copier.Copy(groupMember, us)
+		err = controller.AddGroupMember(groupMember)
+		if err != nil {
+			log.Error("AddGroupMember failed", err.Error(), groupMember)
+			continue
+		}
+
+		okUserIdList = append(okUserIdList, user.UserId)
+	}
+
+	resp := &pbGroup.CreateGroupResp{CommonResp: &constant.PBCommonSuccessResp, GroupInfo: &sdkws.GroupInfo{}}
+	group, err := controller.GetGroupInfoByGroupId(groupId)
+	if err != nil {
+		log.Error("GetGroupInfoByGroupId failed", err.Error(), groupId)
+		resp.CommonResp = &constant.PBMySQLCommonFailResp
+		return resp, nil
+	}
+	copier.Copy(resp.GroupInfo, group)
+	resp.GroupInfo.MemberCount, err = controller.GetGroupMemberNumByGroupId(groupId)
+	if err != nil {
+		log.Error("GetGroupMemberNumByGroupId failed", err.Error(), groupId)
+		resp.CommonResp = &constant.PBMySQLCommonFailResp
+		return resp, nil
+	}
+	resp.GroupInfo.OwnerUserId = req.OwnerUserId
+
+	log.Info("rpc CreateGroup return", req.String())
+	// TODO(qingw1230): 通知进群的人
+	return resp, nil
 }
 
 func (s *groupServer) DeleteGroup(_ context.Context, req *pbGroup.DeleteGroupReq) (*pbGroup.DeleteGroupResp, error) {

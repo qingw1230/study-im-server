@@ -3,14 +3,21 @@ import "sdkws/sdkws.proto";
 package pbGroup;
 option go_package = "github.com/qingw1230/study-im-server/pkg/proto/group";
 
+message GroupAddMemberInfo {
+  string UserId = 1;
+  int32 RoleLevel = 2;
+}
+
 message CreateGroupReq {
-  server_api_params.GroupInfo GroupInfo = 1;
-  string OpUserId = 2;
-  string OwnerUserId = 3;
+  repeated GroupAddMemberInfo InitMemberList = 1;
+  server_api_params.GroupInfo GroupInfo = 2;
+  string OpUserId = 3;
+  string OwnerUserId = 4;
 }
 
 message CreateGroupResp {
   server_api_params.CommonResp CommonResp = 1;
+  server_api_params.GroupInfo GroupInfo = 2;
 }
 
 message DeleteGroupReq {
