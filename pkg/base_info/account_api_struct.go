@@ -1,6 +1,6 @@
 package base_info
 
-import "github.com/qingw1230/study-im-server/pkg/proto/public"
+import "github.com/qingw1230/study-im-server/pkg/proto/sdkws"
 
 type RegisterReq struct {
 	Email       string `json:"email" binding:"required,email"`
@@ -50,7 +50,7 @@ type GetUserInfoReq struct {
 }
 
 type GetUserInfoResp struct {
-	PublicUserInfo *public.PublicUserInfo
+	PublicUserInfo *sdkws.PublicUserInfo
 }
 
 type GetSelfUserInfoReq struct {
@@ -59,5 +59,5 @@ type GetSelfUserInfoReq struct {
 
 type GetSelfUserInfoResp struct {
 	CommonResp
-	UserInfo *public.UserInfo `json:"-"`
+	UserInfo *sdkws.UserInfo `json:"-"`
 }

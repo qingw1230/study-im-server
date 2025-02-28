@@ -13,7 +13,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/token_verify"
 	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbConversation "github.com/qingw1230/study-im-server/pkg/proto/conversation"
-	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
+	"github.com/qingw1230/study-im-server/pkg/proto/sdkws"
 	"github.com/qingw1230/study-im-server/pkg/utils"
 	"google.golang.org/grpc"
 )
@@ -33,7 +33,7 @@ func (s *conversationServer) GetConversationList(_ context.Context, req *pbConve
 
 	resp := &pbConversation.GetConversationListResp{CommonResp: &constant.PBCommonSuccessResp}
 	for _, c := range conversationList {
-		tmp := &pbPublic.ConversationInfo{}
+		tmp := &sdkws.ConversationInfo{}
 		copier.Copy(tmp, &c)
 		resp.ConversationList = append(resp.ConversationList, tmp)
 	}

@@ -1,5 +1,5 @@
 syntax = "proto3";
-import "public/public.proto";
+import "sdkws/sdkws.proto";
 package pbAccount;
 option go_package = "github.com/qingw1230/study-im-server/pkg/proto/account";
 

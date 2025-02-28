@@ -2,7 +2,7 @@ package constant
 
 import (
 	"github.com/qingw1230/study-im-server/pkg/base_info"
-	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
+	"github.com/qingw1230/study-im-server/pkg/proto/sdkws"
 )
 
 var (
@@ -32,45 +32,45 @@ var (
 )
 
 var (
-	PBCommonSuccessResp = pbPublic.CommonResp{
+	PBCommonSuccessResp = sdkws.CommonResp{
 		Status: Success,
 		Code:   NoError,
 		Info:   SuccessInfo,
 	}
 
-	PBCommonFailResp = pbPublic.CommonResp{
+	PBCommonFailResp = sdkws.CommonResp{
 		Status: Fail,
 		Code:   CommonError,
 		Info:   FailInfo,
 	}
 
-	PBTokenAccessErrorResp = pbPublic.CommonResp{
+	PBTokenAccessErrorResp = sdkws.CommonResp{
 		Status: Fail,
 		Code:   RequestTokenAccessError,
 		Info:   RequestTokenAccessErrorInfo,
 	}
 
-	PBMySQLCommonFailResp = pbPublic.CommonResp{
+	PBMySQLCommonFailResp = sdkws.CommonResp{
 		Status: Fail,
 		Code:   MySQLCommonError,
 		Info:   MySQLCommonErrorInfo,
 	}
 
-	PBMongoCommonFailResp = pbPublic.CommonResp{
+	PBMongoCommonFailResp = sdkws.CommonResp{
 		Status: Fail,
 		Code:   MongoCommonError,
 		Info:   MongoCommonErrorInfo,
 	}
 
-	PBRedisCommonFailResp = pbPublic.CommonResp{
+	PBRedisCommonFailResp = sdkws.CommonResp{
 		Status: Fail,
 		Code:   RedisCommonError,
 		Info:   RedisCommonErrorInfo,
 	}
 )
 
-func NewPBResp(status string, code int, info string) *pbPublic.CommonResp {
-	resp := &pbPublic.CommonResp{
+func NewPBResp(status string, code int, info string) *sdkws.CommonResp {
+	resp := &sdkws.CommonResp{
 		Status: status,
 		Code:   int32(code),
 		Info:   info,

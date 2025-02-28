@@ -18,7 +18,7 @@ import (
 	cp "github.com/qingw1230/study-im-server/pkg/common/utils"
 	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbFriend "github.com/qingw1230/study-im-server/pkg/proto/friend"
-	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
+	"github.com/qingw1230/study-im-server/pkg/proto/sdkws"
 	"github.com/qingw1230/study-im-server/pkg/utils"
 	"google.golang.org/grpc"
 )
@@ -39,7 +39,7 @@ func (s *friendServer) GetFriendList(_ context.Context, req *pbFriend.GetFriendL
 
 	var userInfoList []*pbFriend.FriendInfo
 	for _, user := range friends {
-		friendUserInfo := &pbFriend.FriendInfo{FriendInfo: &pbPublic.PublicUserInfo{}}
+		friendUserInfo := &pbFriend.FriendInfo{FriendInfo: &sdkws.PublicUserInfo{}}
 		cp.FriendDBCopyIM(friendUserInfo, &user)
 		userInfoList = append(userInfoList, friendUserInfo)
 	}
@@ -90,7 +90,7 @@ func (s *friendServer) AddFriend(_ context.Context, req *pbFriend.AddFriendReq) 
 
 	if _, err := controller.GetUserById(req.CommonId.ToUserId); err != nil {
 		log.Error("GetUserById failed", err.Error())
-		return &pbFriend.AddFriendResp{CommonResp: &pbPublic.CommonResp{Status: constant.Fail, Code: constant.MySQLRecordNotExists, Info: constant.MySQLAccountNotExistsInfo}}, nil
+		return &pbFriend.AddFriendResp{CommonResp: &sdkws.CommonResp{Status: constant.Fail, Code: constant.MySQLRecordNotExists, Info: constant.MySQLAccountNotExistsInfo}}, nil
 	}
 
 	// TODO(qingw1230): 检查是否已是好友
@@ -130,9 +130,9 @@ func (s *friendServer) AddFriendResponse(_ context.Context, req *pbFriend.AddFri
 	friendRequest, err := controller.GetFriendRequestByBothUserId(req.CommonId.FromUserId, req.CommonId.ToUserId)
 	if err != nil {
 		log.Error("GetFriendRequestByBothUserId failed", err.Error(), req.CommonId.FromUserId, req.CommonId.ToUserId)
-		return &pbFriend.AddFriendResponseResp{CommonResp: &pbPublic.CommonResp{Status: constant.Fail, Code: constant.MySQLRecordNotExists, Info: constant.MySQLRecordNotExistsInfo}}, nil
+		return &pbFriend.AddFriendResponseResp{CommonResp: &sdkws.CommonResp{Status: constant.Fail, Code: constant.MySQLRecordNotExists, Info: constant.MySQLRecordNotExistsInfo}}, nil
 	} else if friendRequest.HandleResult != 0 {
-		return &pbFriend.AddFriendResponseResp{CommonResp: &pbPublic.CommonResp{Status: constant.Fail, Code: constant.MySQLDataAlreadyHandlerError, Info: constant.MySQLDataAlreadyHandlerErrorInfo}}, nil
+		return &pbFriend.AddFriendResponseResp{CommonResp: &sdkws.CommonResp{Status: constant.Fail, Code: constant.MySQLDataAlreadyHandlerError, Info: constant.MySQLDataAlreadyHandlerErrorInfo}}, nil
 	}
 	friendRequest.HandleResult = req.HandleResult
 	friendRequest.HandleTime = time.Now().UnixMilli()

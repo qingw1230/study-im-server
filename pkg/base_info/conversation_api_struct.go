@@ -1,6 +1,6 @@
 package base_info
 
-import "github.com/qingw1230/study-im-server/pkg/proto/public"
+import "github.com/qingw1230/study-im-server/pkg/proto/sdkws"
 
 type GetConversationListReq struct {
 	FromUserId string `json:"fromUserId" binding:"required"`
@@ -8,7 +8,7 @@ type GetConversationListReq struct {
 
 type GetConversationListResp struct {
 	CommonResp
-	ConversationList []*public.ConversationInfo `json:"-"`
+	ConversationList []*sdkws.ConversationInfo `json:"-"`
 }
 
 type CreateConversationReq struct {

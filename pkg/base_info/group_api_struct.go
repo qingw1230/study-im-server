@@ -1,6 +1,6 @@
 package base_info
 
-import "github.com/qingw1230/study-im-server/pkg/proto/public"
+import "github.com/qingw1230/study-im-server/pkg/proto/sdkws"
 
 type CreateGroupReq struct {
 	OwnerUserId  string `json:"ownerUserId" binding:"required"`
@@ -50,7 +50,7 @@ type GetJoinedGroupListReq struct {
 
 type GetJoinedGroupListResp struct {
 	CommonResp
-	GroupInfoList []*public.GroupInfo `json:"-"`
+	GroupInfoList []*sdkws.GroupInfo `json:"-"`
 }
 
 type GetGroupInfoReq struct {
@@ -59,5 +59,5 @@ type GetGroupInfoReq struct {
 
 type GetGroupInfoResp struct {
 	CommonResp
-	GroupInfo *public.GroupInfo `json:"-"`
+	GroupInfo *sdkws.GroupInfo `json:"-"`
 }

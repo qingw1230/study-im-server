@@ -10,8 +10,6 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/config"
 )
 
-var Test mysqlDB
-
 type mysqlDB struct {
 	sync.RWMutex
 	dbMap map[string]*gorm.DB
@@ -29,7 +27,7 @@ func initMySQLDB() {
 		}
 	}
 
-	sql := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s default charset utf8 COLLATE utf8_general_ci;", "studyim")
+	sql := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s default charset utf8 COLLATE utf8_general_ci;", config.Config.Mysql.DBDatabaseName)
 	err = db.Exec(sql).Error
 	if err != nil {
 		panic(err.Error())

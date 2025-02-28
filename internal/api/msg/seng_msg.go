@@ -12,13 +12,13 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbMsg "github.com/qingw1230/study-im-server/pkg/proto/msg"
-	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
+	"github.com/qingw1230/study-im-server/pkg/proto/sdkws"
 )
 
 func newPbSendMsgReq(token string, params *base_info.SendMsgReq) *pbMsg.SendMsgReq {
 	pbData := pbMsg.SendMsgReq{
 		Token: token,
-		MsgData: &pbPublic.MsgData{
+		MsgData: &sdkws.MsgData{
 			SendId:         params.SendId,
 			RecvId:         params.RecvId,
 			GroupId:        params.GroupId,

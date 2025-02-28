@@ -1,6 +1,6 @@
 syntax = "proto3";
 package server_api_params;
-option go_package = "github.com/qingw1230/study-im-server/pkg/proto/public";
+option go_package = "github.com/qingw1230/study-im-server/pkg/proto/sdkws";
 
 message CommonResp {
   string status = 1;

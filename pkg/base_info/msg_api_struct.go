@@ -1,6 +1,6 @@
 package base_info
 
-import "github.com/qingw1230/study-im-server/pkg/proto/public"
+import "github.com/qingw1230/study-im-server/pkg/proto/sdkws"
 
 type SendMsgReq struct {
 	SendId         string `json:"sendId" binding:"required"`
@@ -44,6 +44,6 @@ type UserPullMsgBySeqListReq struct {
 
 type UserPullMsgBySeqListResp struct {
 	CommonResp
-	ReqIdentifier int               `json:"reqIdentifier" binding:"required"`
-	MsgDataList   []*public.MsgData `json:"-"`
+	ReqIdentifier int              `json:"reqIdentifier" binding:"required"`
+	MsgDataList   []*sdkws.MsgData `json:"-"`
 }

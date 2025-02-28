@@ -5,7 +5,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/db"
 	"github.com/qingw1230/study-im-server/pkg/common/db/controller"
 	pbFriend "github.com/qingw1230/study-im-server/pkg/proto/friend"
-	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
+	"github.com/qingw1230/study-im-server/pkg/proto/sdkws"
 )
 
 func FriendDBCopyIM(dst *pbFriend.FriendInfo, src *db.Friend) error {
@@ -19,7 +19,7 @@ func FriendDBCopyIM(dst *pbFriend.FriendInfo, src *db.Friend) error {
 	return nil
 }
 
-func GroupDBCopyIM(dst *pbPublic.GroupInfo, src *db.Group) error {
+func GroupDBCopyIM(dst *sdkws.GroupInfo, src *db.Group) error {
 	copier.Copy(dst, src)
 	user, err := controller.GetGroupOwnerInfoByGroupId(src.GroupId)
 	if err != nil {

@@ -16,7 +16,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/token_verify"
 	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbAccount "github.com/qingw1230/study-im-server/pkg/proto/account"
-	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
+	"github.com/qingw1230/study-im-server/pkg/proto/sdkws"
 	"github.com/qingw1230/study-im-server/pkg/utils"
 	"google.golang.org/grpc"
 )
@@ -28,7 +28,7 @@ func (s *accountServer) Register(_ context.Context, req *pbAccount.RegisterReq) 
 	if controller.IsUserExist(req.Email) {
 		log.Error("IsUserExist failed ", req.Email)
 		resp := &pbAccount.RegisterResp{
-			CommonResp: &pbPublic.CommonResp{
+			CommonResp: &sdkws.CommonResp{
 				Status: constant.Fail,
 				Code:   constant.MySQLRecordAlreadyExists,
 				Info:   constant.MySQLEmailAlreadyRegisterErrorInfo,
@@ -55,7 +55,7 @@ func (s *accountServer) Register(_ context.Context, req *pbAccount.RegisterReq) 
 	}
 
 	log.Info("call Register success")
-	resp := &pbAccount.RegisterResp{CommonResp: &pbPublic.CommonResp{}}
+	resp := &pbAccount.RegisterResp{CommonResp: &sdkws.CommonResp{}}
 	copier.Copy(resp.CommonResp, constant.CommonSuccessResp)
 	return resp, nil
 }
@@ -67,7 +67,7 @@ func (s *accountServer) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAc
 	user, err := controller.GetUserByEmail(req.Email)
 	if err == gorm.ErrRecordNotFound {
 		resp := &pbAccount.LoginResp{
-			CommonResp: &pbPublic.CommonResp{
+			CommonResp: &sdkws.CommonResp{
 				Status: constant.Fail,
 				Code:   constant.MySQLRecordNotExists,
 				Info:   constant.MySQLAccountORPwdErrorInfo,
@@ -82,7 +82,7 @@ func (s *accountServer) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAc
 
 	if !utils.ValidPassword(req.Password, user.Salt, user.Password) {
 		resp := &pbAccount.LoginResp{
-			CommonResp: &pbPublic.CommonResp{
+			CommonResp: &sdkws.CommonResp{
 				Status: constant.Fail,
 				Code:   constant.MySQLAccountORPwdError,
 				Info:   constant.MySQLAccountORPwdErrorInfo,
@@ -95,7 +95,7 @@ func (s *accountServer) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAc
 	token, _, err := token_verify.CreateToken(user.UserId)
 	if err != nil {
 		resp := &pbAccount.LoginResp{
-			CommonResp: &pbPublic.CommonResp{
+			CommonResp: &sdkws.CommonResp{
 				Status: constant.Fail,
 				Code:   constant.TokenError,
 				Info:   constant.CreateTokenMsg.Error(),
@@ -105,8 +105,8 @@ func (s *accountServer) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAc
 	}
 
 	resp := &pbAccount.LoginResp{
-		CommonResp: &pbPublic.CommonResp{},
-		UserInfo:   &pbPublic.UserInfo{},
+		CommonResp: &sdkws.CommonResp{},
+		UserInfo:   &sdkws.UserInfo{},
 	}
 	copier.Copy(resp.CommonResp, &constant.CommonSuccessResp)
 	copier.Copy(resp.UserInfo, user)
@@ -150,8 +150,8 @@ func (s *accountServer) GetUserInfo(_ context.Context, req *pbAccount.GetUserInf
 	}
 
 	resp := &pbAccount.GetUserInfoResp{
-		CommonResp:     &pbPublic.CommonResp{},
-		PublicUserInfo: &pbPublic.PublicUserInfo{},
+		CommonResp:     &sdkws.CommonResp{},
+		PublicUserInfo: &sdkws.PublicUserInfo{},
 	}
 	_, err = controller.GetFriendRelationFromFriend(req.OpUserId, req.UserId)
 	resp.PublicUserInfo.IsFriend = err == nil
@@ -163,7 +163,7 @@ func (s *accountServer) GetSelfUserInfo(_ context.Context, req *pbAccount.GetSel
 	log.Info("call rpc GetSelfUserInfo args:", req.String())
 	if !token_verify.CheckAccess(req.OpUserId, req.UserId) {
 		log.Error("CheckAccess failed", req.OpUserId, req.UserId)
-		return &pbAccount.GetSelfUserInfoResp{CommonResp: &constant.PBTokenAccessErrorResp, UserInfo: &pbPublic.UserInfo{}}, nil
+		return &pbAccount.GetSelfUserInfoResp{CommonResp: &constant.PBTokenAccessErrorResp, UserInfo: &sdkws.UserInfo{}}, nil
 	}
 
 	user, err := controller.GetUserById(req.UserId)
@@ -174,7 +174,7 @@ func (s *accountServer) GetSelfUserInfo(_ context.Context, req *pbAccount.GetSel
 
 	resp := &pbAccount.GetSelfUserInfoResp{
 		CommonResp: &constant.PBCommonSuccessResp,
-		UserInfo:   &pbPublic.UserInfo{},
+		UserInfo:   &sdkws.UserInfo{},
 	}
 	copier.Copy(resp.UserInfo, user)
 	log.Info("rpc GetSelfUserInfo return")

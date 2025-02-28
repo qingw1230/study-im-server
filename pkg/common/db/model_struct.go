@@ -73,16 +73,18 @@ func (FriendRequest) TableName() string {
 }
 
 type Group struct {
-	GroupId      string    `gorm:"column:group_id;type:varchar(12);not null;primary_key"`
-	GroupName    string    `gorm:"column:group_name;type:varchar(32)"`
-	FaceUrl      string    `gorm:"column:face_url;type:varchar(255)"`
-	Introduction string    `gorm:"column:introduction;type:varchar(255)"`
-	Notification string    `gorm:"column:notification;type:varchar(255)"`
-	CreateTime   time.Time `gorm:"column:create_time;type:datetime"`
-	Ex           string    `gorm:"column:ex;type:varchar(1024)"`
-	Status       int32     `gorm:"column:status;type:tinyint(1)"`
-	CreateUserId string    `gorm:"column:create_user_id;type:varchar(12)"`
-	GroupType    int32     `gorm:"column:group_type;type:tinyint(1)"`
+	GroupId                string    `gorm:"column:group_id;type:varchar(12);not null;primary_key"`
+	GroupName              string    `gorm:"column:group_name;type:varchar(32)"`
+	Notification           string    `gorm:"column:notification;type:varchar(255)"`
+	Introduction           string    `gorm:"column:introduction;type:varchar(255)"`
+	FaceUrl                string    `gorm:"column:face_url;type:varchar(255)"`
+	CreateTime             time.Time `gorm:"column:create_time;type:datetime"`
+	Status                 int32     `gorm:"column:status;type:tinyint"`
+	CreateUserId           string    `gorm:"column:create_user_id;type:varchar(12)"`
+	GroupType              int32     `gorm:"column:group_type;type:tinyint"`
+	NeedVerification       int32     `gorm:"column:need_verification;type:tinyint"`
+	NotificationUpdateTime time.Time `gorm:"column:notification_update_time;type:datetime"`
+	NotificationUserId     string    `gorm:"column:notification_user_id;type:varchar(12)"`
 }
 
 func (Group) TableName() string {

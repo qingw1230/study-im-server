@@ -15,7 +15,7 @@ import (
 	cp "github.com/qingw1230/study-im-server/pkg/common/utils"
 	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbGroup "github.com/qingw1230/study-im-server/pkg/proto/group"
-	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
+	"github.com/qingw1230/study-im-server/pkg/proto/sdkws"
 	"github.com/qingw1230/study-im-server/pkg/utils"
 	"google.golang.org/grpc"
 )
@@ -120,9 +120,9 @@ func (s *groupServer) GetJoinedGroupList(_ context.Context, req *pbGroup.GetJoin
 		return &pbGroup.GetJoinedGroupListResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
 	}
 
-	resp := &pbGroup.GetJoinedGroupListResp{CommonResp: &pbPublic.CommonResp{}}
+	resp := &pbGroup.GetJoinedGroupListResp{CommonResp: &sdkws.CommonResp{}}
 	for _, groupId := range joinedGroupIdList {
-		var groupInfo pbPublic.GroupInfo
+		var groupInfo sdkws.GroupInfo
 		num, _ := controller.GetGroupMemberNumByGroupId(groupId)
 		owner, err1 := controller.GetGroupOwnerInfoByGroupId(groupId)
 		group, err2 := controller.GetGroupInfoByGroupId(groupId)
@@ -149,7 +149,7 @@ func (s *groupServer) GetGroupInfo(_ context.Context, req *pbGroup.GetGroupInfoR
 		log.Error("GetGroupInfoByGroupId failed", req.GroupId)
 		return &pbGroup.GetGroupInfoResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
 	}
-	groupInfo := &pbPublic.GroupInfo{}
+	groupInfo := &sdkws.GroupInfo{}
 	cp.GroupDBCopyIM(groupInfo, group)
 	resp := &pbGroup.GetGroupInfoResp{
 		CommonResp: &constant.PBCommonSuccessResp,

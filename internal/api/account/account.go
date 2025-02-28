@@ -14,7 +14,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/token_verify"
 	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbAccount "github.com/qingw1230/study-im-server/pkg/proto/account"
-	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
+	"github.com/qingw1230/study-im-server/pkg/proto/sdkws"
 )
 
 func Register(c *gin.Context) {
@@ -143,7 +143,7 @@ func UpdateUserInfo(c *gin.Context) {
 		c.JSON(http.StatusOK, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
 		return
 	}
-	req := &pbAccount.UpdateUserInfoReq{UserInfo: &pbPublic.UserInfo{}}
+	req := &pbAccount.UpdateUserInfoReq{UserInfo: &sdkws.UserInfo{}}
 	copier.Copy(req.UserInfo, &params)
 	req.OpUserId = opUserId
 	log.Info("UpdateUserInfo args:", req.String())

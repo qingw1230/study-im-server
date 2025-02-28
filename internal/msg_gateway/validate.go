@@ -7,7 +7,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	pbConversation "github.com/qingw1230/study-im-server/pkg/proto/conversation"
 	pbMsg "github.com/qingw1230/study-im-server/pkg/proto/msg"
-	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
+	"github.com/qingw1230/study-im-server/pkg/proto/sdkws"
 )
 
 type Req struct {
@@ -39,7 +39,7 @@ func (ws *WsServer) argsValidate(m *Req, r int32) (isPass bool, code int32, info
 		}
 		return true, constant.NoError, constant.SuccessInfo, &data
 	case constant.WSSendMsg:
-		data := pbPublic.MsgData{}
+		data := sdkws.MsgData{}
 		if err := json.Unmarshal(m.Data, &data); err != nil {
 			log.Error("Unmarshal failed", err.Error(), "reqIdentifier", r)
 			return false, constant.WSUnmarshalError, constant.WSUnmarshalErrorInfo, nil

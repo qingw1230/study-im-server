@@ -8,7 +8,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/config"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	pbMsg "github.com/qingw1230/study-im-server/pkg/proto/msg"
-	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
+	"github.com/qingw1230/study-im-server/pkg/proto/sdkws"
 	"github.com/qingw1230/study-im-server/pkg/utils"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/mgo.v2/bson"
@@ -27,7 +27,7 @@ type UserChat struct {
 	Msg      []byte // 使用 proto 序列化后的 *pbPublic.MsgData
 }
 
-func (d *DataBases) GetMsgBySeqList(userId string, seqList []uint64) (seqMsg []*pbPublic.MsgData, err error) {
+func (d *DataBases) GetMsgBySeqList(userId string, seqList []uint64) (seqMsg []*sdkws.MsgData, err error) {
 	ctx, _ := context.WithTimeout(context.Background(), time.Duration(config.Config.Mongo.DBTimeout)*time.Second)
 	c := d.mongoClient.Database(config.Config.Mongo.DBDatabase).Collection(singleChat)
 
@@ -49,7 +49,7 @@ func (d *DataBases) GetMsgBySeqList(userId string, seqList []uint64) (seqMsg []*
 				continue
 			}
 
-			msg := &pbPublic.MsgData{}
+			msg := &sdkws.MsgData{}
 			if err = proto.Unmarshal(userChat.Msg, msg); err != nil {
 				log.Error("mongo get Unmarshal failed", err.Error(), seqUid, seq)
 				return
@@ -68,9 +68,9 @@ func (d *DataBases) GetMsgBySeqList(userId string, seqList []uint64) (seqMsg []*
 	return seqMsg, nil
 }
 
-func genExceptionMessageBySeqList(seqList []uint64) (exceptionMsg []*pbPublic.MsgData) {
+func genExceptionMessageBySeqList(seqList []uint64) (exceptionMsg []*sdkws.MsgData) {
 	for _, seq := range seqList {
-		msg := &pbPublic.MsgData{}
+		msg := &sdkws.MsgData{}
 		msg.Seq = seq
 		exceptionMsg = append(exceptionMsg, msg)
 	}

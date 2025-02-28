@@ -13,7 +13,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/token_verify"
 	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbGroup "github.com/qingw1230/study-im-server/pkg/proto/group"
-	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
+	"github.com/qingw1230/study-im-server/pkg/proto/sdkws"
 )
 
 func CreateGroup(c *gin.Context) {
@@ -32,7 +32,7 @@ func CreateGroup(c *gin.Context) {
 		c.JSON(http.StatusOK, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
 		return
 	}
-	req := &pbGroup.CreateGroupReq{GroupInfo: &pbPublic.GroupInfo{}}
+	req := &pbGroup.CreateGroupReq{GroupInfo: &sdkws.GroupInfo{}}
 	copier.Copy(req.GroupInfo, &params)
 	req.GroupInfo.CreateUserId = opUserId
 	req.OpUserId = opUserId
@@ -215,7 +215,7 @@ func SetGroupInfo(c *gin.Context) {
 		c.JSON(http.StatusOK, constant.NewRespNoData(constant.Fail, constant.TokenUnknown, constant.TokenUnknownMsg.Error()))
 		return
 	}
-	req := &pbGroup.SetGroupInfoReq{GroupInfo: &pbPublic.GroupInfo{}}
+	req := &pbGroup.SetGroupInfoReq{GroupInfo: &sdkws.GroupInfo{}}
 	copier.Copy(req.GroupInfo, &params)
 	req.OpUserId = opUserId
 	log.Info("SetGroupInfo args:", req.String())

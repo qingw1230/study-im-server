@@ -13,7 +13,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbMsg "github.com/qingw1230/study-im-server/pkg/proto/msg"
-	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
+	"github.com/qingw1230/study-im-server/pkg/proto/sdkws"
 	"github.com/qingw1230/study-im-server/pkg/utils"
 )
 
@@ -24,7 +24,7 @@ func (s *msgServer) SendMsg(_ context.Context, req *pbMsg.SendMsgReq) (*pbMsg.Se
 	msgToMq := pbMsg.MsgDataToMq{
 		Token: req.Token,
 	}
-	resp := &pbMsg.SendMsgResp{CommonResp: &pbPublic.CommonResp{}}
+	resp := &pbMsg.SendMsgResp{CommonResp: &sdkws.CommonResp{}}
 
 	switch req.MsgData.SessionType {
 	case constant.SingleChatType:
@@ -96,7 +96,7 @@ type NotificationMsg struct {
 }
 
 func Notification(n *NotificationMsg) {
-	msg := &pbPublic.MsgData{
+	msg := &sdkws.MsgData{
 		SendId:      n.SendId,
 		RecvId:      n.RecvId,
 		MsgFrom:     n.MsgFrom,

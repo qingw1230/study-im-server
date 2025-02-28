@@ -12,7 +12,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/etcdv3"
 	pbConversation "github.com/qingw1230/study-im-server/pkg/proto/conversation"
 	pbMsg "github.com/qingw1230/study-im-server/pkg/proto/msg"
-	pbPublic "github.com/qingw1230/study-im-server/pkg/proto/public"
+	"github.com/qingw1230/study-im-server/pkg/proto/sdkws"
 )
 
 func (ws *WsServer) msgParse(conn *UserConn, binaryMsg []byte) {
@@ -53,7 +53,7 @@ func (ws *WsServer) handleHeartBeat(conn *UserConn, m *Req) {
 
 func (ws *WsServer) getNewestSeqReq(conn *UserConn, m *Req) {
 	log.Info("ws call getNewestSeqReq")
-	nReply := pbMsg.GetNewestSeqResp{CommonResp: &pbPublic.CommonResp{}}
+	nReply := pbMsg.GetNewestSeqResp{CommonResp: &sdkws.CommonResp{}}
 	pbData := pbMsg.GetNewestSeqReq{
 		UserId:   m.SendId,
 		OpUserId: m.SendId,
@@ -85,7 +85,7 @@ func (ws *WsServer) getNewestSeqResp(conn *UserConn, m *Req, pb *pbMsg.GetNewest
 
 func (ws *WsServer) pullMsgBySeqListReq(conn *UserConn, m *Req) {
 	log.Info("ws call pullMsgBySeqListReq")
-	nReply := pbMsg.PullMessageBySeqListResp{CommonResp: &pbPublic.CommonResp{}}
+	nReply := pbMsg.PullMessageBySeqListResp{CommonResp: &sdkws.CommonResp{}}
 	isPass, code, info, pData := ws.argsValidate(m, constant.WSPullMsgBySeqList)
 	if !isPass {
 		nReply.CommonResp.Status = constant.Fail
@@ -128,7 +128,7 @@ func (ws *WsServer) pullMsgBySeqListResp(conn *UserConn, m *Req, pb *pbMsg.PullM
 // sendMsgReq 处理 ws 收到的发送消息请求
 func (ws *WsServer) sendMsgReq(conn *UserConn, m *Req) {
 	log.Info("ws call sendMsgReq")
-	nReply := pbMsg.SendMsgResp{CommonResp: &pbPublic.CommonResp{}}
+	nReply := pbMsg.SendMsgResp{CommonResp: &sdkws.CommonResp{}}
 	isPass, code, info, pData := ws.argsValidate(m, constant.WSSendMsg)
 	if !isPass {
 		nReply.CommonResp.Status = constant.Fail
@@ -138,7 +138,7 @@ func (ws *WsServer) sendMsgReq(conn *UserConn, m *Req) {
 		return
 	}
 
-	data := pData.(*pbPublic.MsgData)
+	data := pData.(*sdkws.MsgData)
 	pbData := pbMsg.SendMsgReq{
 		Token:   m.Token,
 		MsgData: data,
@@ -158,7 +158,7 @@ func (ws *WsServer) sendMsgReq(conn *UserConn, m *Req) {
 }
 
 func (ws *WsServer) sendMsgResp(conn *UserConn, m *Req, pb *pbMsg.SendMsgResp) {
-	mReplyData := pbPublic.UserSendMsgResp{
+	mReplyData := sdkws.UserSendMsgResp{
 		ServerMsgId: pb.GetServerMsgId(),
 		SendTime:    pb.GetSendTime(),
 	}
@@ -174,7 +174,7 @@ func (ws *WsServer) sendMsgResp(conn *UserConn, m *Req, pb *pbMsg.SendMsgResp) {
 
 func (ws *WsServer) pullConversationListReq(conn *UserConn, m *Req) {
 	log.Info("ws call pullConversationListReq")
-	nReply := pbConversation.GetConversationListResp{CommonResp: &pbPublic.CommonResp{}}
+	nReply := pbConversation.GetConversationListResp{CommonResp: &sdkws.CommonResp{}}
 	isPass, code, info, pData := ws.argsValidate(m, constant.WSPullConversationList)
 	if !isPass {
 		nReply.CommonResp.Status = constant.Fail
