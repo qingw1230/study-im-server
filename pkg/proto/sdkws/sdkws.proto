@@ -49,6 +49,18 @@ message GroupInfo {
   string notificationUserId = 14;
 }
 
+message GroupMemberInfo {
+  string groupId = 1;
+  string userId = 2;
+  string nickName = 3;
+  string faceUrl = 4;
+  int32 roleLevel = 5;
+  int64 joinTime = 6;
+  int32 joinSource = 7;
+  string inviterUserId = 8;
+  string operatorUserId = 9;
+}
+
 message UserSendMsgResp {
   string serverMsgId = 1;
   string clientMsgId = 2;

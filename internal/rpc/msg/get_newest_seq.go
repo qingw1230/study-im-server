@@ -17,7 +17,7 @@ func (s *msgServer) GetNewestSeq(_ context.Context, req *pbMsg.GetNewestSeqReq) 
 		return &pbMsg.GetNewestSeqResp{CommonResp: &constant.PBTokenAccessErrorResp}, nil
 	}
 
-	newestSeq, err := db.DB.GetUserMaxSeq(req.UserId)
+	newestSeq, err := db.DB.GetMaxSeq(req.UserId)
 	if err != nil {
 		return &pbMsg.GetNewestSeqResp{CommonResp: &constant.PBRedisCommonFailResp}, nil
 	}

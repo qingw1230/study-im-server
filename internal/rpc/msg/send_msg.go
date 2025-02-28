@@ -12,6 +12,7 @@ import (
 	"github.com/qingw1230/study-im-server/pkg/common/db/controller"
 	"github.com/qingw1230/study-im-server/pkg/common/log"
 	"github.com/qingw1230/study-im-server/pkg/etcdv3"
+	pbGroup "github.com/qingw1230/study-im-server/pkg/proto/group"
 	pbMsg "github.com/qingw1230/study-im-server/pkg/proto/msg"
 	"github.com/qingw1230/study-im-server/pkg/proto/sdkws"
 	"github.com/qingw1230/study-im-server/pkg/utils"
@@ -29,7 +30,7 @@ func (s *msgServer) SendMsg(_ context.Context, req *pbMsg.SendMsgReq) (*pbMsg.Se
 	switch req.MsgData.SessionType {
 	case constant.SingleChatType:
 		msgToMq.MsgData = req.MsgData
-		seq, err := db.DB.IncrUserSeq(msgToMq.MsgData.RecvId)
+		seq, err := db.DB.IncrSeq(msgToMq.MsgData.RecvId)
 		if err != nil {
 			log.Error("redis IncrUserSeq failed", err.Error(), msgToMq.MsgData.RecvId)
 			return returnMsg(resp, req, constant.Fail, constant.MsgUnknownError, constant.MsgUnknownErrorInfo, msgToMq.MsgData.ServerMsgId, 0, msgToMq.MsgData.SendTime)
@@ -43,7 +44,7 @@ func (s *msgServer) SendMsg(_ context.Context, req *pbMsg.SendMsgReq) (*pbMsg.Se
 
 		// 给自己发消息，kafka 中只需要存一份
 		if msgToMq.MsgData.SendId != msgToMq.MsgData.RecvId {
-			seq, err = db.DB.IncrUserSeq(msgToMq.MsgData.SendId)
+			seq, err = db.DB.IncrSeq(msgToMq.MsgData.SendId)
 			if err != nil {
 				log.Error("redis IncrUserSeq failed", err.Error(), msgToMq.MsgData.SendId)
 				return returnMsg(resp, req, constant.Fail, constant.MsgUnknownError, constant.MsgUnknownErrorInfo, msgToMq.MsgData.ServerMsgId, 0, msgToMq.MsgData.SendTime)
@@ -55,6 +56,36 @@ func (s *msgServer) SendMsg(_ context.Context, req *pbMsg.SendMsgReq) (*pbMsg.Se
 				return returnMsg(resp, req, constant.Fail, constant.MsgKafkaSendError, constant.MsgKafkaSendErrorInfo, "", 0, 0)
 			}
 		}
+		return returnMsg(resp, req, constant.Success, constant.NoError, constant.SuccessInfo, msgToMq.MsgData.ServerMsgId, seq, msgToMq.MsgData.SendTime)
+	case constant.GroupChatType:
+		conn := etcdv3.GetConn(config.Config.Etcd.EtcdSchema, config.Config.Etcd.EtcdAddr, config.Config.RpcRegisterName.GroupName)
+		client := pbGroup.NewGroupClient(conn)
+		inReq := &pbGroup.GetGroupAllMemberReq{GroupId: req.MsgData.GroupId}
+		reply, err := client.GetGroupAllMember(context.Background(), inReq)
+		if err != nil {
+			log.Error("rpc GetGroupAllMember failed", err.Error())
+			return returnMsg(resp, req, constant.Fail, constant.MsgUnknownError, constant.MsgUnknownErrorInfo, msgToMq.MsgData.ServerMsgId, 0, msgToMq.MsgData.SendTime)
+		}
+		if reply.CommonResp.Code != constant.NoError {
+			log.Error("rpc send_msg GetGroupAllMember failed", err.Error())
+			return returnMsg(resp, req, constant.Fail, reply.CommonResp.Code, reply.CommonResp.Info, msgToMq.MsgData.ServerMsgId, 0, msgToMq.MsgData.SendTime)
+		}
+
+		seq, err := db.DB.IncrSeq(msgToMq.MsgData.GroupId)
+		if err != nil {
+			log.Error("redis IncrUserSeq failed", err.Error(), msgToMq.MsgData.SendId)
+			return returnMsg(resp, req, constant.Fail, constant.MsgUnknownError, constant.MsgUnknownErrorInfo, msgToMq.MsgData.ServerMsgId, 0, msgToMq.MsgData.SendTime)
+		}
+		for _, v := range reply.MemberList {
+			req.MsgData.RecvId = v.UserId
+			msgToMq.MsgData = req.MsgData
+			err := s.sendMsgToKafka(&msgToMq, v.UserId)
+			if err != nil {
+				log.Error("sendMsgToKafka error", msgToMq.MsgData.SendId, msgToMq.String())
+				return returnMsg(resp, req, constant.Fail, constant.MsgKafkaSendError, constant.MsgKafkaSendErrorInfo, "", 0, 0)
+			}
+		}
+
 		return returnMsg(resp, req, constant.Success, constant.NoError, constant.SuccessInfo, msgToMq.MsgData.ServerMsgId, seq, msgToMq.MsgData.SendTime)
 	default:
 		return returnMsg(resp, req, constant.Fail, constant.MsgUnknownError, constant.MsgUnknownErrorInfo, msgToMq.MsgData.ServerMsgId, 0, msgToMq.MsgData.SendTime)

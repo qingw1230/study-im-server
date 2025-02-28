@@ -25,6 +25,7 @@ const (
 	Group_GetJoinedGroupList_FullMethodName = "/pbGroup.Group/GetJoinedGroupList"
 	Group_GetGroupInfo_FullMethodName       = "/pbGroup.Group/GetGroupInfo"
 	Group_SetGroupInfo_FullMethodName       = "/pbGroup.Group/SetGroupInfo"
+	Group_GetGroupAllMember_FullMethodName  = "/pbGroup.Group/GetGroupAllMember"
 )
 
 // GroupClient is the client API for Group service.
@@ -37,6 +38,7 @@ type GroupClient interface {
 	GetJoinedGroupList(ctx context.Context, in *GetJoinedGroupListReq, opts ...grpc.CallOption) (*GetJoinedGroupListResp, error)
 	GetGroupInfo(ctx context.Context, in *GetGroupInfoReq, opts ...grpc.CallOption) (*GetGroupInfoResp, error)
 	SetGroupInfo(ctx context.Context, in *SetGroupInfoReq, opts ...grpc.CallOption) (*SetGroupInfoResp, error)
+	GetGroupAllMember(ctx context.Context, in *GetGroupAllMemberReq, opts ...grpc.CallOption) (*GetGroupAllMemberResp, error)
 }
 
 type groupClient struct {
@@ -107,6 +109,16 @@ func (c *groupClient) SetGroupInfo(ctx context.Context, in *SetGroupInfoReq, opt
 	return out, nil
 }
 
+func (c *groupClient) GetGroupAllMember(ctx context.Context, in *GetGroupAllMemberReq, opts ...grpc.CallOption) (*GetGroupAllMemberResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetGroupAllMemberResp)
+	err := c.cc.Invoke(ctx, Group_GetGroupAllMember_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GroupServer is the server API for Group service.
 // All implementations must embed UnimplementedGroupServer
 // for forward compatibility.
@@ -117,6 +129,7 @@ type GroupServer interface {
 	GetJoinedGroupList(context.Context, *GetJoinedGroupListReq) (*GetJoinedGroupListResp, error)
 	GetGroupInfo(context.Context, *GetGroupInfoReq) (*GetGroupInfoResp, error)
 	SetGroupInfo(context.Context, *SetGroupInfoReq) (*SetGroupInfoResp, error)
+	GetGroupAllMember(context.Context, *GetGroupAllMemberReq) (*GetGroupAllMemberResp, error)
 	mustEmbedUnimplementedGroupServer()
 }
 
@@ -144,6 +157,9 @@ func (UnimplementedGroupServer) GetGroupInfo(context.Context, *GetGroupInfoReq) 
 }
 func (UnimplementedGroupServer) SetGroupInfo(context.Context, *SetGroupInfoReq) (*SetGroupInfoResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetGroupInfo not implemented")
+}
+func (UnimplementedGroupServer) GetGroupAllMember(context.Context, *GetGroupAllMemberReq) (*GetGroupAllMemberResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetGroupAllMember not implemented")
 }
 func (UnimplementedGroupServer) mustEmbedUnimplementedGroupServer() {}
 func (UnimplementedGroupServer) testEmbeddedByValue()               {}
@@ -274,6 +290,24 @@ func _Group_SetGroupInfo_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Group_GetGroupAllMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetGroupAllMemberReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).GetGroupAllMember(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Group_GetGroupAllMember_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).GetGroupAllMember(ctx, req.(*GetGroupAllMemberReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Group_ServiceDesc is the grpc.ServiceDesc for Group service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -304,6 +338,10 @@ var Group_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetGroupInfo",
 			Handler:    _Group_SetGroupInfo_Handler,
+		},
+		{
+			MethodName: "GetGroupAllMember",
+			Handler:    _Group_GetGroupAllMember_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

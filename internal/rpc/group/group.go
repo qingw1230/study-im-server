@@ -199,6 +199,25 @@ func (s *groupServer) GetJoinedGroupList(_ context.Context, req *pbGroup.GetJoin
 	return resp, nil
 }
 
+func (s *groupServer) GetGroupAllMember(_ context.Context, req *pbGroup.GetGroupAllMemberReq) (*pbGroup.GetGroupAllMemberResp, error) {
+	log.Info("call rpc GetGroupAllMember args:", req.String())
+	var resp pbGroup.GetGroupAllMemberResp
+	memberList, err := controller.GetGroupMemberListByGroupId(req.GroupId)
+	if err != nil {
+		log.Error("GetGroupMemberListByGroupId failed", err.Error())
+		resp.CommonResp = &constant.PBMySQLCommonFailResp
+		return &resp, nil
+	}
+
+	for _, v := range memberList {
+		var node sdkws.GroupMemberInfo
+		copier.Copy(&node, &v)
+		resp.MemberList = append(resp.MemberList, &node)
+	}
+	log.Info("rpc GetGroupAllMember return")
+	return &resp, nil
+}
+
 func (s *groupServer) GetGroupInfo(_ context.Context, req *pbGroup.GetGroupInfoReq) (*pbGroup.GetGroupInfoResp, error) {
 	log.Info("call rpc GetGroupInfo args:", req.String())
 	group, err := controller.GetGroupInfoByGroupId(req.GroupId)

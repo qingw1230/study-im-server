@@ -34,6 +34,20 @@ func GetGroupMemberListByUserId(userId string) ([]db.GroupMember, error) {
 	return groupMemberList, nil
 }
 
+// GetGroupMemberListByGroupId 获取群聊所有成员信息
+func GetGroupMemberListByGroupId(groupId string) ([]db.GroupMember, error) {
+	dbConn, err := db.DB.MySQLDB.DefaultGormDB()
+	if err != nil {
+		return nil, err
+	}
+	var groupMemberList []db.GroupMember
+	err = dbConn.Table(constant.DBTableGroupMember).Where("group_id = ?", groupId).Find(&groupMemberList).Error
+	if err != nil {
+		return nil, err
+	}
+	return groupMemberList, nil
+}
+
 // GetGroupMemberInfoByGroupIdAndUserId 根据 groupId 和 userId 获取群成员信息
 func GetGroupMemberInfoByGroupIdAndUserId(groupId, userId string) (*db.GroupMember, error) {
 	dbConn, err := db.DB.MySQLDB.DefaultGormDB()

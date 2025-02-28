@@ -45,17 +45,17 @@ func (d *DataBases) GetCheckCode(id string) (string, error) {
 	return ans, err
 }
 
-func (d *DataBases) IncrUserSeq(userId string) (uint64, error) {
+func (d *DataBases) IncrSeq(userId string) (uint64, error) {
 	key := userIncrSeq + userId
 	return redis.Uint64(d.Exec("INCR", key))
 }
 
-func (d *DataBases) GetUserMaxSeq(userId string) (uint64, error) {
+func (d *DataBases) GetMaxSeq(userId string) (uint64, error) {
 	key := userIncrSeq + userId
 	return redis.Uint64(d.Exec("GET", key))
 }
 
-func (d *DataBases) SetUserSeq(userId string, seq uint64) error {
+func (d *DataBases) SetSeq(userId string, seq uint64) error {
 	key := userIncrSeq + userId
 	_, err := d.Exec("SET", key, seq)
 	return err

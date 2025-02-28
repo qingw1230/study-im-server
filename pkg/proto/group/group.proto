@@ -68,6 +68,16 @@ message SetGroupInfoResp {
   server_api_params.CommonResp CommonResp = 1;
 }
 
+message GetGroupAllMemberReq {
+  string GroupId = 1;
+  string OpUserId = 2;
+}
+
+message GetGroupAllMemberResp {
+  server_api_params.CommonResp CommonResp = 1;
+  repeated server_api_params.GroupMemberInfo MemberList = 2;
+}
+
 service Group {
   rpc CreateGroup(CreateGroupReq) returns (CreateGroupResp);
   rpc DeleteGroup(DeleteGroupReq) returns (DeleteGroupResp);
@@ -75,4 +85,5 @@ service Group {
   rpc GetJoinedGroupList(GetJoinedGroupListReq) returns (GetJoinedGroupListResp);
   rpc GetGroupInfo(GetGroupInfoReq) returns (GetGroupInfoResp);
   rpc SetGroupInfo(SetGroupInfoReq) returns (SetGroupInfoResp);
+  rpc GetGroupAllMember(GetGroupAllMemberReq) returns (GetGroupAllMemberResp);
 }

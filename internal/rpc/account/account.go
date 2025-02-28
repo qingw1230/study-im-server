@@ -49,7 +49,7 @@ func (s *accountServer) Register(_ context.Context, req *pbAccount.RegisterReq) 
 	if err != nil {
 		return nil, err
 	}
-	err = db.DB.SetUserSeq(user.UserId, 0)
+	err = db.DB.SetSeq(user.UserId, 0)
 	if err != nil {
 		return nil, err
 	}
