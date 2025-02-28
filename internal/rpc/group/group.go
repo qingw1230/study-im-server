@@ -61,6 +61,20 @@ func (s *groupServer) CreateGroup(_ context.Context, req *pbGroup.CreateGroupReq
 		return &pbGroup.CreateGroupResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
 	}
 
+	conversationRecord := &db.Conversation{
+		OwnerUserId:      req.OwnerUserId,
+		ConversationId:   groupId,
+		ConversationType: constant.GroupChatType,
+		ConversationName: groupInfo.GroupName,
+		GroupId:          groupId,
+		MemberCount:      1,
+	}
+	err = controller.InsertIntoConversation(conversationRecord)
+	if err != nil {
+		log.Error("InsertIntoConversation failed", err.Error())
+		return &pbGroup.CreateGroupResp{CommonResp: &constant.PBMySQLCommonFailResp}, nil
+	}
+
 	var okUserIdList []string
 	for _, user := range req.InitMemberList {
 		us, err := controller.GetUserById(user.UserId)
