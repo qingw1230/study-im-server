@@ -91,8 +91,7 @@ func (s *accountServer) Login(_ context.Context, req *pbAccount.LoginReq) (*pbAc
 		return resp, nil
 	}
 
-	// TODO(qingw1230): 多设备登录检测
-	token, _, err := token_verify.CreateToken(user.UserId)
+	token, _, err := token_verify.CreateToken(user.UserId, req.PlatformId)
 	if err != nil {
 		resp := &pbAccount.LoginResp{
 			CommonResp: &sdkws.CommonResp{

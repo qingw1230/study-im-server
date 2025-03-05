@@ -2,6 +2,7 @@ package db
 
 import (
 	"github.com/gomodule/redigo/redis"
+	"github.com/qingw1230/study-im-server/pkg/common/constant"
 )
 
 const (
@@ -62,20 +63,19 @@ func (d *DataBases) SetSeq(userId string, seq uint64) error {
 }
 
 // AddTokenFlag 添加用户 token
-func (d *DataBases) AddTokenFlag(userId string, token string, flag int) error {
-	key := userIdTokenStatus + userId
+func (d *DataBases) AddTokenFlag(userId string, platformId int32, token string, flag int) error {
+	key := userIdTokenStatus + userId + ":" + constant.PlatformIdToName(platformId)
 	_, err := d.Exec("HSET", key, token, flag)
-	// TODO(qingw1230): 为 token 设置过期时间
 	return err
 }
 
-func (d *DataBases) GetTokenMapByUid(userId string) (map[string]int, error) {
-	key := userIdTokenStatus + userId
+func (d *DataBases) GetTokenMapByUidPid(userId string, platformId int32) (map[string]int, error) {
+	key := userIdTokenStatus + userId + ":" + constant.PlatformIdToName(platformId)
 	return redis.IntMap(d.Exec("HGETALL", key))
 }
 
-func (d *DataBases) DeleteTokenByUid(userId string, fields []string) error {
-	key := userIdTokenStatus + userId
+func (d *DataBases) DeleteTokenByUidPid(userId string, platformId int32, fields []string) error {
+	key := userIdTokenStatus + userId + ":" + constant.PlatformIdToName(platformId)
 	_, err := d.Exec("HDEL", key, redis.Args{}.Add().AddFlat(fields)...)
 	return err
 }

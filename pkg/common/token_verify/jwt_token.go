@@ -13,14 +13,16 @@ import (
 )
 
 type Claims struct {
-	UserId string
+	UserId   string
+	Platform string
 	jwt.RegisteredClaims
 }
 
-func BuildClaims(userId string, ttl int64) Claims {
+func BuildClaims(userId, platform string, ttl int64) Claims {
 	now := time.Now()
 	return Claims{
-		UserId: userId,
+		UserId:   userId,
+		Platform: platform,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(now.Add(time.Duration(ttl*24) * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(now),
@@ -30,34 +32,31 @@ func BuildClaims(userId string, ttl int64) Claims {
 }
 
 // CreateToken 为用户创建 token，返回 token 过期时间和错误
-func CreateToken(userId string) (string, int64, error) {
-	claims := BuildClaims(userId, config.Config.TokenPolicy.AccessExpire)
+func CreateToken(userId string, platformId int32) (string, int64, error) {
+	claims := BuildClaims(userId, constant.PlatformIdToName(platformId), config.Config.TokenPolicy.AccessExpire)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(config.Config.TokenPolicy.Secret))
 	if err != nil {
 		return "", 0, err
 	}
 
-	m, err := db.DB.GetTokenMapByUid(userId)
+	m, err := db.DB.GetTokenMapByUidPid(userId, platformId)
 	if err != nil && err != redis.ErrNil {
 		return "", 0, err
 	}
 
 	var deleteTokenKey []string
-	for k, v := range m {
-		_, err = GetClaimsFromToken(k)
-		if err != nil || v != constant.NormalToken {
-			deleteTokenKey = append(deleteTokenKey, k)
-		}
+	for k := range m {
+		deleteTokenKey = append(deleteTokenKey, k)
 	}
 	if len(deleteTokenKey) > 0 {
-		err = db.DB.DeleteTokenByUid(userId, deleteTokenKey)
+		err = db.DB.DeleteTokenByUidPid(userId, platformId, deleteTokenKey)
 		if err != nil {
 			return "", 0, err
 		}
 	}
 
-	err = db.DB.AddTokenFlag(userId, tokenString, constant.NormalToken)
+	err = db.DB.AddTokenFlag(userId, platformId, tokenString, constant.NormalToken)
 	if err != nil {
 		return "", 0, err
 	}
@@ -101,7 +100,7 @@ func ParseToken(tokenString string) (*Claims, error) {
 		return nil, err
 	}
 
-	m, err := db.DB.GetTokenMapByUid(claims.UserId)
+	m, err := db.DB.GetTokenMapByUidPid(claims.UserId, constant.PlatformNameToId(claims.Platform))
 	if err != nil {
 		log.Error("get token from redis err ", err.Error())
 		return nil, &constant.ErrTokenInvalid

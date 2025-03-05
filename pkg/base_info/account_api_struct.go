@@ -13,6 +13,7 @@ type RegisterReq struct {
 type LoginReq struct {
 	Email       string `json:"email" binding:"required,email"`
 	Password    string `json:"password" binding:"required"`
+	PlatformId  int32  `json:"platformId" binding:"required"`
 	CheckCode   string `json:"checkCode" binding:"required"`
 	CheckCodeId string `json:"checkCodeId" binding:"required"`
 }
