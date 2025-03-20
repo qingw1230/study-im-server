@@ -25,6 +25,9 @@ func (s *msgServer) SendMsg(_ context.Context, req *pbMsg.SendMsgReq) (*pbMsg.Se
 	msgToMq := pbMsg.MsgDataToMq{
 		Token: req.Token,
 	}
+	if req.MsgData.ContentType == 102 || req.MsgData.ContentType == 104 || req.MsgData.ContentType == 105 {
+		req.MsgData.Status = -1
+	}
 	resp := &pbMsg.SendMsgResp{CommonResp: &sdkws.CommonResp{}}
 
 	switch req.MsgData.SessionType {
@@ -103,8 +106,9 @@ func (s *msgServer) sendMsgToKafka(m *pbMsg.MsgDataToMq, key string) error {
 
 // GetMsgId 使用时间戳、sendId 和随机值生成
 func GetMsgId(sendId string) string {
-	t := time.Now().Format("2006-01-02 15:04:05")
-	return t + "-" + sendId + "-" + strconv.Itoa(rand.Int())
+	t := time.Now().UnixMilli()
+	strTimestamp := strconv.FormatInt(t, 10)
+	return strTimestamp + "-" + sendId + "-" + strconv.Itoa(rand.Int())
 }
 
 func returnMsg(resp *pbMsg.SendMsgResp, req *pbMsg.SendMsgReq, status string, code int32, info, serverMsgId string, seq uint64, sendTime int64) (*pbMsg.SendMsgResp, error) {

@@ -135,10 +135,13 @@ type ChatLog struct {
 	MsgFrom        int32  `gorm:"column:msg_from"`
 	ContentType    int32  `gorm:"column:content_type"`
 	Content        string `gorm:"column:content;type:varchar(3000)"`
-	Status         int32  `gorm:"column:status"`
+	FileSize       int64  `gorm:"column:file_size;type:bigint"`
+	FileName       string `gorm:"column:file_name;type:varchar(255)"`
+	FilePath       string `gorm:"column:file_path;type:varchar(255)"`
+	FileType       int32  `gorm:"column:file_type;type:tinyint"`
+	Status         int32  `gorm:"column:status;type:tinyint"`
 	SendTime       int64  `gorm:"column:send_time;type:bigint"`
 	CreateTime     int64  `gorm:"column:create_time;type:bigint"`
-	Ex             string `gorm:"column:ex;type:varchar(1024)"`
 }
 
 func (ChatLog) TableName() string {
